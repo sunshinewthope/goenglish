@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>가는 길 영어</title>
+<meta name="description" content="출퇴근길 10분, 여행과 콘서트에서 쓸 영어">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3A2D56">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- 고쳐서 다시 올릴 때는 아래 v= 숫자를 1씩 올리세요. -->
+<link rel="stylesheet" href="style.css?v=4">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <span class="brand-ko">가는 길 영어</span>
+      <span class="brand-sub">출퇴근길 10분</span>
+    </div>
+    <button type="button" id="btn-theme" class="icon-btn" aria-label="화면 밝기">◐</button>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ 오늘 ============ -->
+  <section id="view-today" class="view">
+
+    <div id="home">
+      <button type="button" class="levelcard" id="level-card">
+        <div class="lv-top">
+          <span class="lv-badge" id="lv-num">Lv.1</span>
+          <span class="lv-next" id="lv-next"></span>
+        </div>
+        <div class="lv-bar"><div class="lv-fill" id="lv-fill"></div></div>
+        <div class="lv-foot"><span id="lv-xp"></span><span id="lv-got"></span></div>
+      </button>
+
+      <div class="head">
+        <p class="eyebrow" id="slot-label">오늘</p>
+        <h1 id="head-title">가볍게 한 번</h1>
+        <p class="head-sub" id="head-sub"></p>
+      </div>
+
+      <div class="next-reward" id="next-reward" hidden>
+        <span class="nr-ico" id="nr-ico">🎁</span>
+        <div class="nr-body">
+          <p class="nr-name" id="nr-name"></p>
+          <p class="nr-left" id="nr-left"></p>
+        </div>
+        <div class="nr-bar"><div class="nr-fill" id="nr-fill"></div></div>
+      </div>
+
+      <ul class="plan" id="plan"></ul>
+
+      <button type="button" id="btn-go" class="big-btn">시작하기</button>
+      <p class="mini" id="go-note"></p>
+
+      <div class="drive">
+        <button type="button" id="btn-listen" class="drive-btn">
+          <span class="dr-ico" aria-hidden="true">🎧</span>
+          <span class="dr-t">듣기만 하기</span>
+          <span class="dr-s" id="listen-note">운전할 때 — 손 안 대도 됩니다</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 카드 -->
+    <div id="stage-card" class="stage" hidden>
+      <div class="stage-head">
+        <button type="button" class="back-btn" id="btn-quit">← 그만하기</button>
+        <div class="progress"><div class="progress-fill" id="card-progress"></div></div>
+        <p class="counter"><span id="card-counter"></span><span id="card-set"></span></p>
+      </div>
+
+      <article class="card">
+        <p class="card-hint" id="card-hint"></p>
+
+        <button type="button" id="btn-play" class="play">
+          <span aria-hidden="true">🔊</span> <span id="play-label">다시 듣기</span>
+        </button>
+
+        <p class="en" id="card-en" hidden></p>
+        <p class="ko" id="card-ko" hidden></p>
+        <p class="note" id="card-note" hidden></p>
+
+        <div class="reveal" id="reveal-wrap">
+          <button type="button" id="btn-reveal" class="big-btn">글자 보기</button>
+        </div>
+
+        <div class="rate" id="rate-wrap" hidden>
+          <button type="button" class="rate-no" id="btn-no">몰랐어요</button>
+          <button type="button" class="rate-ok" id="btn-ok">알았어요</button>
+        </div>
+
+        <button type="button" id="btn-slow" class="text-btn">🐢 천천히 듣기</button>
+      </article>
+    </div>
+
+    <!-- 듣기만 하기 (운전 중) -->
+    <div id="stage-listen" class="stage listen" hidden>
+      <div class="ls-head">
+        <span class="ls-time" id="ls-time">10:00</span>
+        <span class="ls-count" id="ls-count"></span>
+      </div>
+
+      <div class="ls-body">
+        <p class="ls-set" id="ls-set"></p>
+        <p class="ls-en" id="ls-en"></p>
+        <p class="ls-ko" id="ls-ko"></p>
+        <p class="ls-cue" id="ls-cue">곧 시작해요</p>
+      </div>
+
+      <button type="button" id="btn-listen-stop" class="ls-stop">
+        <span class="ls-stop-ico" aria-hidden="true">■</span>
+        <span>멈추기</span>
+      </button>
+      <p class="ls-warn" id="ls-warn">화면이 켜져 있어야 소리가 이어집니다. 거치대에 두세요.</p>
+    </div>
+
+    <!-- 마무리 -->
+    <div id="stage-done" class="stage" hidden>
+      <div class="done-card">
+        <p class="done-emoji" aria-hidden="true">✨</p>
+        <h2 class="done-title">끝났어요</h2>
+        <div id="done-summary" class="chips"></div>
+        <button type="button" id="btn-home" class="big-btn">처음으로</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 찾기 ============ -->
+  <section id="view-find" class="view" hidden>
+    <h1 class="view-title">찾기</h1>
+    <p class="view-sub">상황별로 보거나, 영어·한국어로 찾으세요</p>
+    <div class="search-wrap">
+      <label class="sr-only" for="q">찾기</label>
+      <input type="search" id="q" class="search" placeholder="영어 또는 한국어" autocomplete="off">
+      <button type="button" id="q-clear" class="clear" aria-label="지우기" hidden>×</button>
+    </div>
+    <div id="find-result" class="find-result"></div>
+  </section>
+
+  <!-- ============ 보상 ============ -->
+  <section id="view-reward" class="view" hidden>
+    <h1 class="view-title">보상</h1>
+    <p class="view-sub">내가 정한 목표에 닿으면 열립니다</p>
+
+    <div class="reward-head" id="reward-head"></div>
+    <div id="reward-list" class="reward-list"></div>
+
+    <button type="button" id="btn-add-reward" class="big-btn">보상 만들기</button>
+
+    <div class="share-box">
+      <p class="share-t">친구와 나누기</p>
+      <p class="share-s">보상 꾸러미를 파일로 주고받을 수 있어요.
+        친구는 자기 사진으로 자기 보상을 만들면 됩니다.</p>
+      <div class="share-row">
+        <button type="button" id="btn-export-reward" class="ghost-btn">내 보상 내보내기</button>
+        <label for="file-reward" class="ghost-btn as-label">보상 불러오기</label>
+        <input type="file" id="file-reward" accept=".json,.txt" hidden>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 나 ============ -->
+  <section id="view-me" class="view" hidden>
+    <h1 class="view-title">나</h1>
+    <p class="view-sub">지금까지 한 것과 설정</p>
+
+    <div class="stat-row" id="stat-row"></div>
+
+    <h2 class="sec-title">어려운 표현</h2>
+    <p class="sec-note">틀린 것이 모입니다. 복습에 자주 나와요.</p>
+    <div id="hard-list" class="chip-list"></div>
+
+    <h2 class="sec-title">무엇을 볼지</h2>
+    <p class="sec-note">지금 필요 없는 묶음은 꺼 두세요.</p>
+    <div id="set-toggles" class="set-toggles"></div>
+
+    <h2 class="sec-title">한 번에 몇 개</h2>
+    <div class="seg" id="cfg-per">
+      <button type="button" data-per="10">10개</button>
+      <button type="button" data-per="15">15개</button>
+      <button type="button" data-per="20">20개</button>
+    </div>
+    <p class="sec-note" id="per-note"></p>
+
+    <h2 class="sec-title">영어 목소리</h2>
+    <p class="sec-note">골라서 들어 보세요. 마음에 드는 것으로 두면 계속 그 목소리로 읽습니다.</p>
+    <div id="voice-list" class="voice-list"></div>
+
+    <h2 class="sec-title">듣기만 하기</h2>
+    <p class="sec-note">운전할 때 쓰는 모드예요. 여기서 맞춰 두면 그대로 나옵니다.</p>
+
+    <p class="f-label">얼마나 들을까요</p>
+    <div class="seg" id="cfg-lmin">
+      <button type="button" data-lmin="10">10분</button>
+      <button type="button" data-lmin="15">15분</button>
+      <button type="button" data-lmin="20">20분</button>
+    </div>
+
+    <p class="f-label">한국어 뜻</p>
+    <div class="seg" id="cfg-lko">
+      <button type="button" data-lko="1">같이 들려주기</button>
+      <button type="button" data-lko="0">영어만</button>
+    </div>
+
+    <p class="f-label">따라 말할 틈</p>
+    <div class="seg" id="cfg-lgap">
+      <button type="button" data-lgap="0">없음</button>
+      <button type="button" data-lgap="1">보통</button>
+      <button type="button" data-lgap="2">길게</button>
+    </div>
+    <p class="sec-note" id="listen-cfg-note"></p>
+
+    <h2 class="sec-title">기록 지키기</h2>
+    <div id="backup-state" class="backup-state"></div>
+    <button type="button" id="btn-backup" class="ghost-btn">기록 저장하기</button>
+    <label for="file-restore" class="ghost-btn as-label">저장한 파일에서 되살리기</label>
+    <input type="file" id="file-restore" accept=".json,.txt" hidden>
+
+    <div class="danger">
+      <button type="button" id="btn-reset" class="danger-btn">처음부터 다시</button>
+    </div>
+  </section>
+
+</main>
+
+<nav class="tabbar">
+  <button type="button" class="tab on" data-view="today"><span class="ti">◎</span><span>오늘</span></button>
+  <button type="button" class="tab" data-view="find"><span class="ti">⌕</span><span>찾기</span></button>
+  <button type="button" class="tab" data-view="reward"><span class="ti">🎁</span><span>보상</span></button>
+  <button type="button" class="tab" data-view="me"><span class="ti">✓</span><span>나</span></button>
+</nav>
+
+<!-- 보상 만들기 -->
+<div id="editor" class="sheet" hidden>
+  <div class="sheet-box">
+    <h2 class="sheet-title">보상 만들기</h2>
+
+    <label class="f-label" for="rw-cond">언제 열릴까요?</label>
+    <div class="seg" id="rw-cond">
+      <button type="button" data-cond="level">레벨</button>
+      <button type="button" data-cond="days">연속 날</button>
+      <button type="button" data-cond="learned">익힌 표현</button>
+    </div>
+    <div class="num-row">
+      <input type="number" id="rw-n" min="1" max="999" value="3" class="num">
+      <span id="rw-unit" class="unit">레벨이 되면</span>
+    </div>
+
+    <label class="f-label" for="rw-kind">무엇을 볼까요?</label>
+    <div class="seg" id="rw-kind">
+      <button type="button" data-kind="photo">사진</button>
+      <button type="button" data-kind="link">영상 링크</button>
+      <button type="button" data-kind="note">글</button>
+    </div>
+
+    <div id="rw-photo" class="f-block">
+      <label for="rw-file" class="pick-file">사진 고르기</label>
+      <input type="file" id="rw-file" accept="image/*" hidden>
+      <img id="rw-preview" class="preview" hidden alt="">
+      <p class="f-help">내 기기에만 저장됩니다. 작게 줄여서 담아요.</p>
+    </div>
+
+    <div id="rw-link" class="f-block" hidden>
+      <label class="sr-only" for="rw-url">영상 주소</label>
+      <input type="url" id="rw-url" class="f-input" placeholder="https://...">
+      <p class="f-help">공식 영상 주소를 넣으면 열 때 이어집니다.</p>
+    </div>
+
+    <label class="f-label" for="rw-cap">한마디</label>
+    <input type="text" id="rw-cap" class="f-input" placeholder="예) 여기까지 왔다!">
+
+    <div class="sheet-acts">
+      <button type="button" id="rw-cancel" class="ghost-btn">그만두기</button>
+      <button type="button" id="rw-save" class="big-btn">만들기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 보상 열림 -->
+<div id="unlock" class="sheet" hidden>
+  <div class="sheet-box center">
+    <p class="unlock-eyebrow">보상이 열렸어요</p>
+    <div id="unlock-body"></div>
+    <p class="unlock-cap" id="unlock-cap"></p>
+    <button type="button" id="unlock-ok" class="big-btn">좋아!</button>
+    <p class="unlock-more" id="unlock-more" hidden></p>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="phrases.js?v=1"></script>
+<script src="app.js?v=4"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "가는 길 영어",
+  "short_name": "가는 길 영어",
+  "description": "출퇴근길 10분, 여행과 콘서트에서 쓸 영어",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#17131F",
+  "theme_color": "#3A2D56",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
