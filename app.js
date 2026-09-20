@@ -244,7 +244,17 @@
     try { if (hum) { hum.stop(); hum.disconnect(); hum = null; } } catch (e) {}
     try { if (actx && actx.suspend) actx.suspend(); } catch (e) {}
   }
-  if ("speechSynthesis" in window) { pickVoice(); try { speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {} }
+  if ("speechSynthesis" in window) {
+    pickVoice();
+    try {
+      speechSynthesis.onvoiceschanged = function () {
+        pickVoice();
+        // 목록이 늦게 도착했으면 보고 있던 화면을 다시 그립니다.
+        var me = document.getElementById("view-me");
+        if (me && !me.hidden) renderVoices();
+      };
+    } catch (e) {}
+  }
   function prime() {
     if (primed || !("speechSynthesis" in window)) return;
     primed = true;
@@ -958,6 +968,7 @@
     $("per-note").textContent = "한 번에 " + S.cfg.per + "개, 약 " +
       Math.max(3, Math.round(S.cfg.per * 0.6)) + "분 걸려요.";
 
+    voiceTries = 0;        // 나 탭에 들어올 때마다 다시 넉넉히 기다려 봅니다
     renderVoices();
 
     markSeg("#cfg-lmin", "data-lmin", String(S.cfg.lmin));
@@ -1003,16 +1014,48 @@
             "설치 뒤 브라우저를 껐다 켜야 목록에 뜹니다."];
   }
 
+  /* 안드로이드는 getVoices() 가 처음에 빈 배열을 돌려줍니다.
+     목록은 조금 뒤에 채워지고 onvoiceschanged 로 알려 줍니다.
+     한 번 물어보고 "없다"고 단정하면 멀쩡한 기기에 없다고 하게 됩니다. */
+  var voiceTries = 0, voiceTimer = null;
+
+  function allVoices() {
+    if (!("speechSynthesis" in window)) return [];
+    return speechSynthesis.getVoices() || [];
+  }
+
   function renderVoices() {
     var box = $("voice-list"); box.innerHTML = "";
+    if (voiceTimer) { clearTimeout(voiceTimer); voiceTimer = null; }
     pickVoice();
+    var all = allVoices();
+
+    // 아직 목록이 안 왔으면 조금 기다렸다가 다시 봅니다. (최대 약 5초)
+    if (!all.length && voiceTries < 12) {
+      voiceTries++;
+      prime();   // 한 번 말을 시키면 목록이 채워지는 기기가 있습니다
+      var wait = el("div", "voice-wait");
+      wait.appendChild(el("p", "vw-t", "목소리를 찾는 중이에요…"));
+      wait.appendChild(el("p", "vw-s", "기기가 목록을 넘겨줄 때까지 잠깐 걸립니다."));
+      box.appendChild(wait);
+      voiceTimer = setTimeout(function () {
+        if (!$("view-me").hidden) renderVoices();
+      }, 400);
+      return;
+    }
 
     if (!enVoices.length) {
       var bad = el("div", "voice-none");
       bad.appendChild(el("p", "vn-t", "영어 목소리가 없어요."));
-      bad.appendChild(el("p", "vn-s",
-        "지금은 한국어 목소리가 영어를 읽고 있어서 발음이 한국식으로 들립니다. " +
-        "영어 듣기 연습에는 쓸 수 없어요."));
+      bad.appendChild(el("p", "vn-s", all.length
+        ? ("이 기기에 목소리는 " + all.length + "개 있는데 영어가 하나도 없습니다. " +
+           "지금은 한국어 목소리가 영어를 읽고 있어서 발음이 한국식으로 들립니다.")
+        : "이 브라우저가 목소리 목록을 주지 않습니다. 크롬으로 열어 보시면 될 때가 많아요."));
+
+      var again = el("button", "voice-retry", "다시 찾기"); again.type = "button";
+      again.onclick = function () { voiceTries = 0; renderVoices(); };
+      bad.appendChild(again);
+
       var how = el("ol", "vn-how");
       howToAddVoice().forEach(function (line) {
         var li = el("li");
