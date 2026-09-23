@@ -14,13 +14,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <!-- 고쳐서 다시 올릴 때는 아래 v= 숫자를 1씩 올리세요. -->
-<link rel="stylesheet" href="style.css?v=15">
+<link rel="stylesheet" href="style.css?v=17">
 </head>
 <body>
 
 <div id="bg-layer" class="bg-layer" hidden><div class="bg-scrim"></div></div>
 
-<div id="react-pop" class="react-pop" hidden><img id="react-img" alt=""></div>
+<div id="react-pop" class="react-pop" hidden></div>
 
 <header class="topbar">
   <div class="topbar-in">
@@ -61,8 +61,6 @@
         </div>
         <div class="nr-bar"><div class="nr-fill" id="nr-fill"></div></div>
       </div>
-
-      <ul class="plan" id="plan"></ul>
 
       <button type="button" id="btn-go" class="big-btn">시작하기</button>
       <p class="mini" id="go-note"></p>
@@ -196,7 +194,7 @@
     <!-- 마무리 -->
     <div id="stage-done" class="stage" hidden>
       <div class="done-card">
-        <img id="praise-img" class="praise-img" alt="" hidden>
+        <div id="praise-box" class="praise-box" hidden></div>
         <p class="done-emoji" id="done-emoji" aria-hidden="true">✨</p>
         <h2 class="done-title">끝났어요</h2>
         <div id="done-summary" class="chips"></div>
@@ -267,7 +265,7 @@
     <p class="sec-note">내 사진으로 꾸며 보세요. 사진은 이 기기에만 담기고,
       학습 기록과 따로 보관해서 기록이 밀려날 일이 없어요.</p>
     <div id="deco-list" class="deco-list"></div>
-    <input type="file" id="deco-file" accept="image/*" hidden>
+    <input type="file" id="deco-file" accept="image/*,video/*" hidden>
 
     <p class="f-label">바탕 사진 밝기</p>
     <div class="seg" id="cfg-bgdim">
@@ -406,6 +404,6 @@
 
 <script src="phrases.js?v=1"></script>
 <script src="talk.js?v=2"></script>
-<script src="app.js?v=15"></script>
+<script src="app.js?v=18"></script>
 </body>
 </html>

@@ -156,20 +156,23 @@ html.has-bg body { background: transparent; }
 
 .react-pop { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center;
   pointer-events: none; }
-.react-pop img { max-width: 62vw; max-height: 42vh; border-radius: 20px;
+.react-media { max-width: 62vw; max-height: 42vh; border-radius: 20px;
   box-shadow: var(--lift); animation: pop .42s ease-out; }
 @keyframes pop {
   0% { transform: scale(.7); opacity: 0; }
   60% { transform: scale(1.04); opacity: 1; }
   100% { transform: scale(1); opacity: 1; }
 }
-.praise-img { display: block; width: 100%; max-height: 42vh; object-fit: cover;
-  border-radius: 16px; margin-bottom: 14px; }
+.praise-box { margin-bottom: 14px; }
+.praise-media { display: block; width: 100%; max-height: 42vh; object-fit: cover;
+  border-radius: 16px; }
+.bg-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.deco-media { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; display: block; }
 
 .deco-list { display: flex; flex-direction: column; gap: 9px; }
 .deco-row { display: flex; align-items: center; gap: 12px;
   background: var(--card2); border: 1px solid var(--line); border-radius: 13px; padding: 11px 13px; }
-.deco-thumb { width: 54px; height: 54px; border-radius: 10px; object-fit: cover;
+.deco-thumb { width: 54px; height: 54px; border-radius: 10px; overflow: hidden;
   background: var(--plum-soft); flex: 0 0 auto; }
 .deco-none { width: 54px; height: 54px; border-radius: 10px; background: var(--plum-soft);
   display: grid; place-items: center; font-size: 1.3rem; flex: 0 0 auto; }

@@ -63,6 +63,21 @@
     });
   }
 
+  /* 담긴 것은 사진(데이터 글자) 이거나 움짤·동영상(파일 덩어리)입니다.
+     어느 쪽이든 화면에 걸 수 있는 주소로 바꿔 돌려줍니다. */
+  var picUrls = {};
+  function picUse(key, cb) {
+    picGet(key, function (v) {
+      if (!v) { cb(null); return; }
+      if (typeof v === "string") { cb({ url: v, video: false }); return; }
+      try {
+        if (picUrls[key]) URL.revokeObjectURL(picUrls[key]);
+        picUrls[key] = URL.createObjectURL(v);
+        cb({ url: picUrls[key], video: /^video\//.test(v.type || "") });
+      } catch (e) { cb(null); }
+    });
+  }
+
   function picDel(key, cb) {
     picOpen(function (db) {
       if (!db) { cb(false); return; }
@@ -82,25 +97,66 @@
   ];
 
   function applyBg() {
-    var L = $("bg-layer");
+    var L = $("bg-layer"), old = document.getElementById("bg-video");
     document.documentElement.style.setProperty("--bg-dim", (S.cfg.bgdim || 68) / 100);
-    picGet("bg", function (d) {
-      document.documentElement.classList.toggle("has-bg", !!d);
-      if (!d) { L.hidden = true; L.style.backgroundImage = ""; return; }
+    if (old) old.remove();
+    picUse("bg", function (p) {
+      document.documentElement.classList.toggle("has-bg", !!p);
+      L.style.backgroundImage = "";
+      if (!p) { L.hidden = true; return; }
       L.hidden = false;
-      L.style.backgroundImage = "url(" + d + ")";
+      if (p.video) {
+        var v = document.createElement("video");
+        v.id = "bg-video"; v.className = "bg-video";
+        v.src = p.url; v.autoplay = true; v.loop = true; v.muted = true;
+        v.playsInline = true; v.setAttribute("playsinline", "");
+        L.insertBefore(v, L.firstChild);
+        v.play()["catch"](function () {});
+      } else {
+        L.style.backgroundImage = "url(" + p.url + ")";
+      }
+    });
+  }
+
+  /* 사진이면 <img>, 동영상이면 <video> 로 걸어 줍니다 */
+  function mediaInto(box, p, cls) {
+    box.innerHTML = "";
+    if (!p) return null;
+    var e;
+    if (p.video) {
+      e = document.createElement("video");
+      e.autoplay = true; e.loop = true; e.muted = true;
+      e.playsInline = true; e.setAttribute("playsinline", "");
+    } else {
+      e = document.createElement("img"); e.alt = "";
+    }
+    e.className = cls || "";
+    e.src = p.url;
+    box.appendChild(e);
+    if (p.video) e.play()["catch"](function () {});
+    return e;
+  }
+
+  /* 끝 화면의 칭찬 사진. 앞 판이 남아 있지 않게 항상 다시 정합니다. */
+  function setPraise(on) {
+    var box = $("praise-box"), em = $("done-emoji");
+    if (!on) { box.innerHTML = ""; box.hidden = true; em.hidden = false; return; }
+    picUse("praise", function (p) {
+      if (!p) { box.innerHTML = ""; box.hidden = true; em.hidden = false; return; }
+      mediaInto(box, p, "praise-media");
+      box.hidden = false; em.hidden = true;
     });
   }
 
   var reactT = null;
   function showReact() {
-    picGet("react", function (d) {
-      if (!d) return;
+    picUse("react", function (p) {
+      if (!p) return;
       var box = $("react-pop");
-      $("react-img").src = d;
+      mediaInto(box, p, "react-media");
       box.hidden = false;
       if (reactT) clearTimeout(reactT);
-      reactT = setTimeout(function () { box.hidden = true; }, 1100);
+      reactT = setTimeout(function () { box.hidden = true; box.innerHTML = ""; }, 1600);
     });
   }
 
@@ -1020,6 +1076,9 @@
 
     if (quiet) { showStage("home"); renderHome(); checkRewards(); return; }
 
+    // 제대로 한 판 들었을 때만 칭찬 사진을 냅니다
+    setPraise(LIS.spoken >= 10);
+
     var box = $("done-summary"); box.innerHTML = "";
     var chips = (LIS.spoken >= 10)
       ? [["들은 표현", LIS.spoken + "개"], ["들은 시간", Math.max(1, used) + "분"]]
@@ -1101,26 +1160,21 @@
     var talkN = s.list.length ? buildTalk(s.list).length : 0;
     var fastN = s.list.length ? Math.min(2, (typeof FAST !== "undefined" ? FAST.length : 0)) : 0;
 
-    var ul = $("plan"); ul.innerHTML = "";
-    [["🆕", "새 표현", newN, "처음 보는 말"],
-     ["🔁", "복습", revN, "다시 볼 때가 된 말"],
-     ["💬", "대화 속에서", talkN, "주고받아 보고, 직접 말해 보기"],
-     ["🎤", "조금 빠른 말", fastN, "인터뷰에서 나오는 속도"]]
-      .forEach(function (p) {
-        if (!p[2]) return;
-        var li = el("li");
-        li.appendChild(el("span", "pi", p[0]));
-        var d = el("div");
-        d.appendChild(el("div", "pt", p[1]));
-        d.appendChild(el("div", "ps", p[3]));
-        li.appendChild(d);
-        li.appendChild(el("span", "pn", p[2] + "개"));
-        ul.appendChild(li);
-      });
-
-    $("btn-go").textContent = s.list.length ? ("시작하기 (" + s.list.length + "개)") : "오늘 볼 것을 다 봤어요";
+    $("btn-go").textContent = s.list.length ? "오늘의 미션 시작하기" : "오늘 볼 것을 다 봤어요";
     $("btn-go").disabled = !s.list.length;
-    $("go-note").textContent = s.list.length ? "약 " + Math.max(3, Math.round(s.list.length * 0.6)) + "분" : "‘찾기’에서 골라 볼 수 있어요";
+
+    // 무엇을 하는지는 한 줄로만. 화면을 덜 먹게.
+    if (s.list.length) {
+      var bits = [];
+      if (newN) bits.push("새 표현 " + newN);
+      if (revN) bits.push("복습 " + revN);
+      if (talkN) bits.push("대화 " + talkN);
+      if (fastN) bits.push("빠른 말 " + fastN);
+      $("go-note").textContent = bits.join(" · ") +
+        " · 약 " + Math.max(3, Math.round(s.list.length * 0.6)) + "분";
+    } else {
+      $("go-note").textContent = "‘찾기’에서 골라 볼 수 있어요";
+    }
 
     var hd = heardTodayCount();
     var dirNow = S.cfg.ldir === "auto" ? (hour < 14 ? "en" : "ko") : S.cfg.ldir;
@@ -1235,13 +1289,7 @@
         box.appendChild(c);
       });
 
-    // 다 했을 때 칭찬 사진
-    picGet("praise", function (d) {
-      var im = $("praise-img");
-      if (d) { im.src = d; im.hidden = false; $("done-emoji").hidden = true; }
-      else { im.hidden = true; $("done-emoji").hidden = false; }
-    });
-
+    setPraise(true);
     showStage("stage-done");
     checkRewards();
   }
@@ -1765,11 +1813,12 @@
       row.appendChild(acts);
       box.appendChild(row);
 
-      // 담긴 사진이 있으면 미리보기와 지우기를 더합니다
-      picGet(d.k, function (data) {
-        if (!data) return;
-        var img = el("img", "deco-thumb"); img.src = data; img.alt = "";
-        row.replaceChild(img, ph);
+      // 담긴 것이 있으면 미리보기와 지우기를 더합니다
+      picUse(d.k, function (p) {
+        if (!p) return;
+        var box = el("div", "deco-thumb");
+        mediaInto(box, p, "deco-media");
+        row.replaceChild(box, ph);
         pick.textContent = "바꾸기";
         var del = el("button", "del", "지우기"); del.type = "button";
         del.onclick = function () {
@@ -1784,17 +1833,33 @@
     });
   }
 
+  var MOVE_MAX = 12 * 1024 * 1024;   // 움짤·동영상은 12MB 까지
+
   function decoChosen(file) {
     if (!file || !decoPick) return;
     var key = decoPick;
+    var type = file.type || "";
+    var moving = /^video\//.test(type) || /gif$/i.test(type);
+
+    function done(ok) {
+      if (!ok) { toast("담지 못했어요."); return; }
+      renderDeco();
+      if (key === "bg") applyBg();
+      toast("넣었어요.");
+    }
+
+    if (moving) {
+      // 움직이는 것은 줄이지 않습니다. 줄이면 첫 장면만 남습니다.
+      if (file.size > MOVE_MAX) {
+        toast("너무 커요. 12MB 아래로 잘라서 넣어 주세요.");
+        return;
+      }
+      picPut(key, file, done);
+      return;
+    }
     shrinkImage(file, function (data) {
       if (!data) { toast("사진을 읽지 못했어요."); return; }
-      picPut(key, data, function (ok) {
-        if (!ok) { toast("사진을 담지 못했어요."); return; }
-        renderDeco();
-        if (key === "bg") applyBg();
-        toast("넣었어요.");
-      });
+      picPut(key, data, done);
     });
   }
 
