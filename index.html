@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <!-- 고쳐서 다시 올릴 때는 아래 v= 숫자를 1씩 올리세요. -->
-<link rel="stylesheet" href="style.css?v=17">
+<link rel="stylesheet" href="style.css?v=19">
 </head>
 <body>
 
@@ -216,6 +216,29 @@
     <div id="find-result" class="find-result"></div>
   </section>
 
+  <!-- ============ 읽기 ============ -->
+  <section id="view-read" class="view" hidden>
+
+    <div id="read-list-wrap">
+      <h1 class="view-title">읽기</h1>
+      <p class="view-sub">읽고 싶은 영어 글을 붙여 넣으세요.
+        문장마다 들을 수 있고, 낱말을 누르면 사전이 열려요.</p>
+      <div id="read-list" class="read-list"></div>
+      <button type="button" id="btn-read-new" class="big-btn">지문 넣기</button>
+    </div>
+
+    <div id="read-one" hidden>
+      <button type="button" id="btn-read-back" class="back-tag">← 지문 목록</button>
+      <h2 class="sec-title" id="read-title"></h2>
+      <div class="read-acts">
+        <button type="button" id="btn-read-play" class="ghost-btn">▶ 처음부터 듣기</button>
+        <button type="button" id="btn-read-tr" class="ghost-btn">🇰🇷 뜻 보기</button>
+      </div>
+      <div id="read-body" class="read-body"></div>
+      <button type="button" id="btn-read-del" class="danger-btn">이 지문 지우기</button>
+    </div>
+  </section>
+
   <!-- ============ 보상 ============ -->
   <section id="view-reward" class="view" hidden>
     <h1 class="view-title">보상</h1>
@@ -339,6 +362,7 @@
 <nav class="tabbar">
   <button type="button" class="tab on" data-view="today"><span class="ti">◎</span><span>오늘</span></button>
   <button type="button" class="tab" data-view="find"><span class="ti">⌕</span><span>찾기</span></button>
+  <button type="button" class="tab" data-view="read"><span class="ti">📖</span><span>읽기</span></button>
   <button type="button" class="tab" data-view="reward"><span class="ti">🎁</span><span>보상</span></button>
   <button type="button" class="tab" data-view="me"><span class="ti">✓</span><span>나</span></button>
 </nav>
@@ -389,6 +413,28 @@
   </div>
 </div>
 
+<!-- 지문 넣기 -->
+<div id="read-editor" class="sheet" hidden>
+  <div class="sheet-box">
+    <h2 class="sheet-title">지문 넣기</h2>
+
+    <label class="f-label" for="rd-title">제목</label>
+    <input type="text" id="rd-title" class="f-input" placeholder="예) 인터뷰 한 토막">
+
+    <label class="f-label" for="rd-text">영어 글</label>
+    <textarea id="rd-text" class="f-area" rows="9"
+      placeholder="여기에 붙여 넣으세요."></textarea>
+    <p class="f-help">기기 안에만 담깁니다. 문장 단위로 쪼개서 읽어 줘요.
+      뜻 보기는 기기에 번역 기능이 있으면 안에서 처리하고, 없으면 물어본 뒤
+      파파고로 보냅니다.</p>
+
+    <div class="sheet-acts">
+      <button type="button" id="rd-cancel" class="ghost-btn">그만두기</button>
+      <button type="button" id="rd-save" class="big-btn">담기</button>
+    </div>
+  </div>
+</div>
+
 <!-- 보상 열림 -->
 <div id="unlock" class="sheet" hidden>
   <div class="sheet-box center">
@@ -404,6 +450,6 @@
 
 <script src="phrases.js?v=1"></script>
 <script src="talk.js?v=2"></script>
-<script src="app.js?v=18"></script>
+<script src="app.js?v=20"></script>
 </body>
 </html>

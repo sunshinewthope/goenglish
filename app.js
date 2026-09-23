@@ -241,7 +241,7 @@
     var sets = {};
     SETS.forEach(function (s) { sets[s.id] = true; });
     return { seen: {}, ptr: 0, days: {}, sessions: 0, rewards: [],
-             heard: {}, heardDay: {}, listenXp: 0, listenMin: 0, links: [], fastPtr: 0,
+             heard: {}, heardDay: {}, listenXp: 0, listenMin: 0, links: [], reads: [], fastPtr: 0,
              cfg: { per: 15, newPer: 5, sets: sets, lmin: 10, lko: 1, lgap: 1, ldir: "auto" },
              theme: "auto", lastBackup: "" };
   }
@@ -264,6 +264,7 @@
     if (typeof S.listenMin !== "number") S.listenMin = 0;
     if (typeof S.cfg.voice !== "string") S.cfg.voice = "";
     if (!Array.isArray(S.links)) S.links = [];
+    if (!Array.isArray(S.reads)) S.reads = [];
     if (typeof S.fastPtr !== "number") S.fastPtr = 0;
     if ([82, 68, 50].indexOf(S.cfg.bgdim) < 0) S.cfg.bgdim = 68;
     if ([10, 15, 20].indexOf(S.cfg.lmin) < 0) S.cfg.lmin = 10;
@@ -827,6 +828,193 @@
   }
 
   /* ==========================================================
+     읽기 — 내가 넣은 지문
+     ========================================================== */
+  var RD = { id: "", sents: [], i: -1, playing: false, gen: 0 };
+
+  /* 문장으로 쪼갭니다. 약어(Mr. 등) 뒤에서 끊기지 않게 조심합니다. */
+  var ABBR = /(?:mr|mrs|ms|dr|prof|st|vs|etc|e\.g|i\.e|jr|sr|no)\.$/i;
+  function splitSents(text) {
+    var raw = String(text || "").replace(/\s+/g, " ").trim();
+    if (!raw) return [];
+    var out = [], buf = "", parts = raw.split(/(?<=[.!?])\s+/);
+    if (parts.length === 1 && raw.length > 0) parts = raw.split(/([.!?]+\s+)/);
+    for (var i = 0; i < parts.length; i++) {
+      buf += parts[i];
+      var t = buf.trim();
+      if (!t) { buf = ""; continue; }
+      if (ABBR.test(t)) { buf += " "; continue; }   // 약어면 이어 붙입니다
+      out.push(t); buf = "";
+    }
+    if (buf.trim()) out.push(buf.trim());
+    return out.filter(function (s) { return /[A-Za-z]/.test(s); });
+  }
+
+  function readById(id) {
+    for (var i = 0; i < S.reads.length; i++) if (S.reads[i].id === id) return S.reads[i];
+    return null;
+  }
+
+  function renderRead() {
+    $("read-list-wrap").hidden = !!RD.id;
+    $("read-one").hidden = !RD.id;
+    if (RD.id) { renderReadOne(); return; }
+
+    var box = $("read-list"); box.innerHTML = "";
+    if (!S.reads.length) {
+      box.appendChild(emptyBox("아직 넣은 지문이 없어요.",
+        "노래 가사, 인터뷰 받아쓴 것, 읽고 싶은 글 아무거나 괜찮아요."));
+      return;
+    }
+    S.reads.slice().reverse().forEach(function (r) {
+      var c = el("article", "read-card");
+      c.appendChild(el("h3", "rc-t", r.title || "제목 없음"));
+      c.appendChild(el("p", "rc-s", splitSents(r.text).length + "문장 · " + pretty(r.at)));
+      c.appendChild(el("p", "rc-p", String(r.text).slice(0, 80) + (r.text.length > 80 ? "…" : "")));
+      c.onclick = function () { RD.id = r.id; renderRead(); window.scrollTo(0, 0); };
+      box.appendChild(c);
+    });
+  }
+
+  function renderReadOne() {
+    var r = readById(RD.id);
+    if (!r) { RD.id = ""; renderRead(); return; }
+    RD.sents = splitSents(r.text);
+    $("read-title").textContent = r.title || "제목 없음";
+
+    var box = $("read-body"); box.innerHTML = "";
+    RD.sents.forEach(function (s, i) {
+      var row = el("div", "rs"); row.setAttribute("data-i", String(i));
+      var en = el("p", "rs-en"); en.innerHTML = wordHtml(s);
+      row.appendChild(en);
+      var ko = el("p", "rs-ko");
+      ko.textContent = (r.tr && r.tr[i]) ? r.tr[i] : "";
+      ko.hidden = !ko.textContent;
+      row.appendChild(ko);
+      var b = el("button", "rs-play", "🔊"); b.type = "button";
+      b.onclick = function (ev) { ev.stopPropagation(); readStop(); say(s); markSent(i); };
+      row.appendChild(b);
+      box.appendChild(row);
+    });
+    $("btn-read-play").textContent = RD.playing ? "■ 멈추기" : "▶ 처음부터 듣기";
+  }
+
+  function markSent(i) {
+    [].slice.call(document.querySelectorAll(".rs")).forEach(function (d) {
+      d.classList.toggle("on", +d.getAttribute("data-i") === i);
+    });
+  }
+
+  function readStop() {
+    RD.playing = false; RD.gen++;
+    try { speechSynthesis.cancel(); } catch (e) {}
+    $("btn-read-play").textContent = "▶ 처음부터 듣기";
+  }
+
+  function readPlay() {
+    if (RD.playing) { readStop(); markSent(-1); return; }
+    if (!RD.sents.length) return;
+    RD.playing = true; RD.gen++;
+    var g = RD.gen, i = 0;
+    $("btn-read-play").textContent = "■ 멈추기";
+    (function step() {
+      if (!RD.playing || g !== RD.gen) return;
+      if (i >= RD.sents.length) { readStop(); markSent(-1); return; }
+      markSent(i);
+      var row = document.querySelector('.rs[data-i="' + i + '"]');
+      if (row && row.scrollIntoView) row.scrollIntoView({ block: "center" });
+      lisSay(RD.sents[i], 0.92, "en-US", function () {
+        if (!RD.playing || g !== RD.gen) return;
+        i++;
+        setTimeout(step, 420);
+      });
+    })();
+  }
+
+  /* 해석. 크롬에 번역기가 있으면 기기 안에서 돌립니다 — 글이 밖으로 안 나갑니다.
+     없으면 파파고로 보낼 수 있는데, 그때는 지문이 네이버로 넘어가므로
+     자동으로 열지 않고 물어본 뒤에 엽니다. */
+  function withTimeout(p, ms) {
+    return new Promise(function (res) {
+      var done = false;
+      var t = setTimeout(function () { if (!done) { done = true; res(null); } }, ms);
+      p.then(function (v) { if (!done) { done = true; clearTimeout(t); res(v); } },
+             function () { if (!done) { done = true; clearTimeout(t); res(null); } });
+    });
+  }
+
+  function getTranslator() {
+    if (typeof Translator === "undefined") return Promise.resolve(null);
+    return withTimeout(
+      Translator.availability({ sourceLanguage: "en", targetLanguage: "ko" })
+        .then(function (av) {
+          if (!av || av === "unavailable") return null;
+          return Translator.create({ sourceLanguage: "en", targetLanguage: "ko" });
+        }),
+      8000
+    );
+  }
+
+  function papagoOpen(text) {
+    var u = "https://papago.naver.com/?sk=en&tk=ko&st=" + encodeURIComponent(text.slice(0, 900));
+    try { window.open(u, "_blank", "noopener"); }
+    catch (e) { toast("파파고를 열지 못했어요."); }
+  }
+
+  function readTranslate() {
+    var r = readById(RD.id);
+    if (!r || !RD.sents.length) return;
+    var btn = $("btn-read-tr");
+    btn.disabled = true; btn.textContent = "뜻을 가져오는 중…";
+
+    getTranslator().then(function (tr) {
+      if (!tr) {
+        // 번역기가 없을 때. 파파고로 보내면 글이 네이버로 넘어가니,
+        // 자동으로 열지 않고 한 번 더 누르게 합니다.
+        btn.disabled = false;
+        btn.textContent = "🇰🇷 파파고로 보내기";
+        btn.onclick = function () {
+          if (!window.confirm("이 기기에는 번역 기능이 없어요.\n\n파파고로 보내서 뜻을 볼까요?\n지문이 네이버로 넘어갑니다.")) return;
+          papagoOpen(r.text);
+        };
+        toast("이 기기엔 번역 기능이 없어요. 단추를 한 번 더 누르세요.");
+        return;
+      }
+      r.tr = r.tr || {};
+      var i = 0;
+      (function next() {
+        if (i >= RD.sents.length) {
+          save(); renderReadOne();
+          btn.disabled = false; btn.textContent = "🇰🇷 뜻 보기";
+          toast("뜻을 붙였어요.");
+          return;
+        }
+        if (r.tr[i]) { i++; next(); return; }
+        withTimeout(tr.translate(RD.sents[i]), 8000).then(function (out) {
+          r.tr[i] = out || "(못 옮겼어요)";
+          i++;
+          if (i % 3 === 0) renderReadOne();
+          next();
+        });
+      })();
+    });
+  }
+
+  function saveRead() {
+    var t = $("rd-title").value.trim(), x = $("rd-text").value.trim();
+    if (!x) { toast("글을 붙여 넣어 주세요."); return; }
+    if (x.length > 20000) { toast("너무 길어요. 나눠서 넣어 주세요."); return; }
+    S.reads.push({ id: "d" + Date.now(), title: t || "제목 없음", text: x, at: today(), tr: {} });
+    var ok = true;
+    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { ok = false; }
+    if (!ok) { S.reads.pop(); save(); toast("담을 자리가 모자라요."); return; }
+    $("read-editor").hidden = true;
+    $("rd-title").value = ""; $("rd-text").value = "";
+    renderRead();
+    toast("담았어요.");
+  }
+
+  /* ==========================================================
      듣기만 하기 — 운전 중에 쓰는 모드
      화면을 보지도 만지지도 못한다는 전제로 만들었습니다.
      그래서 채점하지 않고, 듣고 따라 말하는 것만 합니다.
@@ -1118,7 +1306,7 @@
   /* ==========================================================
      화면
      ========================================================== */
-  var VIEWS = ["today", "find", "reward", "me"];
+  var VIEWS = ["today", "find", "read", "reward", "me"];
   var STAGES = ["home", "stage-card", "stage-talk", "stage-fast", "stage-listen", "stage-done"];
 
   function showView(n) {
@@ -1129,6 +1317,7 @@
     });
     if (n === "today") renderHome();
     if (n === "find") renderFind();
+    if (n === "read") renderRead(); else readStop();
     if (n === "reward") renderRewards();
     if (n === "me") renderMe();
     window.scrollTo(0, 0);
@@ -1991,6 +2180,23 @@
     $("btn-fast-next").onclick = function () { FS.i++; drawFast(); };
 
     $("btn-add-link").onclick = addLink;
+
+    // 읽기
+    $("btn-read-new").onclick = function () { $("read-editor").hidden = false; };
+    $("rd-cancel").onclick = function () { $("read-editor").hidden = true; };
+    $("rd-save").onclick = saveRead;
+    $("btn-read-back").onclick = function () { readStop(); RD.id = ""; renderRead(); };
+    $("btn-read-play").onclick = readPlay;
+    $("btn-read-tr").onclick = readTranslate;
+    $("btn-read-del").onclick = function () {
+      var r = readById(RD.id);
+      if (!r) return;
+      if (!window.confirm("‘" + (r.title || "제목 없음") + "’ 을 지울까요?")) return;
+      readStop();
+      S.reads = S.reads.filter(function (x) { return x.id !== RD.id; });
+      save(); RD.id = ""; renderRead();
+      toast("지웠어요.");
+    };
 
     $("deco-file").onchange = function () { decoChosen(this.files && this.files[0]); this.value = ""; };
     [].slice.call(document.querySelectorAll("#cfg-bgdim button")).forEach(function (b) {
