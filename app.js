@@ -16,6 +16,41 @@
     return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
+  /* ---------- 사전 ----------
+     영어 낱말을 눌러 네이버 영어사전으로 넘깁니다.
+     글은 그대로 두고 낱말만 눌리게 감싸는 것이라, 읽는 데 방해가 없습니다. */
+  var DICT = "https://en.dict.naver.com/#/search?query=";
+
+  /* 줄임말은 사전에서 헛치기 쉬워서 본딧말로 바꿔 찾습니다. */
+  var SHORT = { "won't": "will", "can't": "can", "shan't": "shall",
+                "gonna": "going to", "wanna": "want to", "gotta": "got to",
+                "ain't": "be", "lemme": "let", "gimme": "give", "kinda": "kind of",
+                "dunno": "know", "y'all": "you" };
+
+  function dictWord(tok) {
+    var w = String(tok).replace(/^[^A-Za-z']+/, "").replace(/[^A-Za-z']+$/, "");
+    w = w.replace(/^'+|'+$/g, "");
+    if (!/[A-Za-z]/.test(w)) return "";
+    var low = w.toLowerCase();
+    if (SHORT[low]) return SHORT[low];
+    if (/n't$/i.test(w)) return w.slice(0, -3);          // doesn't → does
+    w = w.replace(/'(s|m|re|ve|ll|d)$/i, "");            // friend's → friend
+    return w || "";
+  }
+
+  function wordHtml(text) {
+    var parts = String(text == null ? "" : text).split(/(\s+)/), out = "", i;
+    for (i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      if (!p || !p.replace(/\s/g, "")) { out += esc(p); continue; }
+      var w = dictWord(p);
+      if (!w) { out += esc(p); continue; }
+      out += '<a class="w" href="' + DICT + encodeURIComponent(w) +
+             '" target="_blank" rel="noopener">' + esc(p) + '</a>';
+    }
+    return out;
+  }
+
   function today(d) {
     d = d || new Date();
     var m = d.getMonth() + 1, y = d.getDate();
@@ -392,7 +427,8 @@
     row.appendChild(el("span", "tk-who", mine ? "🙂" : "🧑"));
     var b = el("div", "tk-body");
     if (tag) b.appendChild(el("p", "tk-tag", tag));
-    b.appendChild(el("p", "tk-e", ln.e));
+    var pe = el("p", "tk-e"); pe.innerHTML = wordHtml(ln.e);
+    b.appendChild(pe);
     b.appendChild(el("p", "tk-k", ln.k));
     if (ln.n) b.appendChild(el("p", "tk-n", ln.n));
     row.appendChild(b);
@@ -415,7 +451,7 @@
     if (TK.step === TK.pi && !TK.done) {
       $("tk-turn").hidden = false;
       $("tk-ko").textContent = "“" + ln.k + "”";
-      $("tk-en").textContent = ln.e;
+      $("tk-en").innerHTML = wordHtml(ln.e);
       window.scrollTo(0, document.body.scrollHeight);
       return;
     }
@@ -609,7 +645,7 @@
     FS.shown = 0;
     $("fast-counter").textContent = (FS.i + 1) + " / " + FS.list.length;
     $("fast-progress").style.width = (FS.i / FS.list.length * 100) + "%";
-    $("fast-en").textContent = f.e;
+    $("fast-en").innerHTML = wordHtml(f.e);
     $("fast-ko").textContent = f.k;
     $("fast-note").textContent = f.n || "";
     $("fast-en").hidden = true;
@@ -1042,7 +1078,7 @@
 
     $("card-hint").textContent = row.h ? "소리만 듣고 맞혀 보세요" :
       (S.seen[row.e] ? "다시 보는 표현이에요" : "처음 보는 표현이에요");
-    $("card-en").textContent = row.e;
+    $("card-en").innerHTML = wordHtml(row.e);
     $("card-ko").textContent = row.k;
     $("card-note").textContent = row.n;
 
@@ -1384,7 +1420,7 @@
 
   function hitCard(r) {
     var c = el("article", "hit");
-    c.innerHTML = '<div class="hit-en">' + esc(r.e) + '</div>' +
+    c.innerHTML = '<div class="hit-en">' + wordHtml(r.e) + '</div>' +
       '<div class="hit-ko">' + esc(r.k) + '</div>' +
       (r.n ? '<div class="hit-note">' + esc(r.n) + '</div>' : '') +
       '<div class="hit-acts">' +

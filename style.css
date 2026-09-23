@@ -146,6 +146,13 @@ img { max-width: 100%; }
 .plan .ps { color: var(--mute); font-size: .8rem; }
 .plan .pn { margin-left: auto; color: var(--plum-ink); font-weight: 700; font-variant-numeric: tabular-nums; }
 
+/* ---- 사전으로 넘어가는 낱말 ---- */
+.w { color: inherit; text-decoration: none;
+  border-bottom: 1px dotted var(--mute);
+  -webkit-tap-highlight-color: transparent; }
+.w:active { background: var(--plum-soft); border-radius: 4px; border-bottom-color: var(--plum); }
+@media (hover: hover) { .w:hover { background: var(--plum-soft); border-radius: 4px; } }
+
 /* ---- 대화 속에서 ---- */
 .tk-where { color: var(--coral); font-size: .84rem; font-weight: 500; margin: 0 0 14px; }
 .tk-lines { display: flex; flex-direction: column; gap: 10px; }
