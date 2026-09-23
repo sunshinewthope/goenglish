@@ -225,8 +225,16 @@ img { max-width: 100%; }
 .ls-ko { font-size: 1.25rem; line-height: 1.5; margin: 16px 0 0; color: var(--ink2); min-height: 1.5em; }
 .ls-cue { color: var(--coral); font-size: 1rem; font-weight: 700; margin: 20px 0 0; min-height: 1.6em; }
 
+.ls-move { display: flex; gap: 8px; margin-bottom: 10px; }
+.ls-mv { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; min-height: 68px; background: var(--card2); color: var(--ink2);
+  border: 1px solid var(--line); border-radius: 14px;
+  font-family: var(--font); font-size: 1.25rem; cursor: pointer; }
+.ls-mv span { font-size: .72rem; }
+.ls-mv:active { background: var(--plum-soft); border-color: var(--plum); color: var(--plum-ink); }
+
 .ls-stop { display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 4px; width: 100%; min-height: 25vh; background: var(--card);
+  gap: 4px; width: 100%; min-height: 20vh; background: var(--card);
   color: var(--ink2); border: 2px solid var(--line); border-radius: 20px;
   font-family: var(--font); font-size: 1.1rem; font-weight: 700; cursor: pointer; }
 .ls-stop:active { background: var(--no-soft); border-color: var(--no); color: var(--no); }

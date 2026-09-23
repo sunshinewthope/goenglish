@@ -793,6 +793,19 @@
 
   function lisJump() { LIS.gen++; if (LIS.tm) clearTimeout(LIS.tm); LIS.tm = setTimeout(lisPhrase, 500); }
 
+  /* 듣는 중에 앞뒤로 옮기기. d 가 0 이면 지금 것을 다시. */
+  function lisSkip(d) {
+    if (!LIS.on) return;
+    if (LIS.guard) { clearTimeout(LIS.guard); LIS.guard = null; }
+    LIS.i += d;
+    if (LIS.i < 0) LIS.i = LIS.list.length - 1;
+    if (LIS.i >= LIS.list.length) LIS.i = 0;
+    LIS.spoken = Math.max(0, LIS.spoken + d);
+    LIS.tries = 0;
+    $("ls-cue").textContent = d < 0 ? "앞으로" : d > 0 ? "뒤로" : "다시";
+    lisJump();
+  }
+
   function lisTick() {
     if (!LIS.on) return;
     var left = Math.max(0, LIS.endAt - Date.now());
@@ -801,9 +814,21 @@
     if (left <= 0) listenStop();
   }
 
-  function listenStart() {
+  /* 멈춘 자리를 기억해 둡니다. 중간에 내렸다가 다시 타면 이어집니다. */
+  function savedSpot() {
+    var sp = S.listenAt;
+    if (!sp || !sp.list || !sp.list.length) return null;
+    if (sp.day !== today()) return null;            // 하루 지나면 새로 짭니다
+    if (sp.i <= 0 || sp.i >= sp.list.length) return null;
+    return sp;
+  }
+
+  function listenStart(fromStart) {
     if (!("speechSynthesis" in window)) { toast("이 기기는 소리 읽기를 못 해요."); return; }
-    var list = buildListen();
+
+    var spot = fromStart ? null : savedSpot();
+    var list = spot ? spot.list : buildListen();
+    var startAt = spot ? spot.i : 0;
     if (!list.length) { toast("들을 표현이 없어요. ‘나’에서 묶음을 켜 주세요."); return; }
 
     prime(); keepOn(); wakeOn();
@@ -820,8 +845,9 @@
       toast("한국어 목소리가 없어서 ‘영어 → 뜻’으로 합니다.");
     }
 
-    LIS.on = true; LIS.gen++; LIS.list = list; LIS.i = 0; LIS.spoken = 0; LIS.tries = 0;
+    LIS.on = true; LIS.gen++; LIS.list = list; LIS.i = startAt; LIS.spoken = startAt; LIS.tries = 0;
     LIS.endAt = Date.now() + S.cfg.lmin * 60000;
+    if (spot) toast(startAt + 1 + "번째부터 이어서 들어요.");
 
     showStage("stage-listen");
     $("ls-set").textContent = "";
@@ -851,6 +877,10 @@
       S.sessions++;
       S.listenMin = (S.listenMin || 0) + Math.max(1, used);
     }
+    // 어디까지 들었는지 남겨 둡니다
+    S.listenAt = (LIS.i > 0 && LIS.i < LIS.list.length)
+      ? { list: LIS.list, i: LIS.i, day: today() }
+      : null;
     save();
 
     if (quiet) { showStage("home"); renderHome(); checkRewards(); return; }
@@ -960,8 +990,12 @@
     var hd = heardTodayCount();
     var dirNow = S.cfg.ldir === "auto" ? (hour < 14 ? "en" : "ko") : S.cfg.ldir;
     var dirTxt = dirNow === "ko" ? "뜻 → 영어" : "영어 → 뜻";
-    $("listen-note").textContent = "운전할 때 · " + dirTxt +
-      (hd ? " — 오늘 들은 " + hd + "개는 뒤로" : " — " + S.cfg.lmin + "분, 손 안 대도 됩니다");
+    var spot = savedSpot();
+    $("listen-note").textContent = spot
+      ? ("이어서 " + (spot.i + 1) + "번째부터 · " + dirTxt)
+      : ("운전할 때 · " + dirTxt +
+         (hd ? " — 오늘 들은 " + hd + "개는 뒤로" : " — " + S.cfg.lmin + "분, 손 안 대도 됩니다"));
+    $("btn-listen-restart").hidden = !spot;
 
     renderNextReward();
   }
@@ -1645,8 +1679,12 @@
     $("level-card").onclick = function () { showView("reward"); };
 
     $("btn-go").onclick = start;
-    $("btn-listen").onclick = listenStart;
+    $("btn-listen").onclick = function () { listenStart(false); };
+    $("btn-listen-restart").onclick = function () { S.listenAt = null; save(); listenStart(true); };
     $("btn-listen-stop").onclick = function () { listenStop(); };
+    $("btn-ls-prev").onclick = function () { lisSkip(-1); };
+    $("btn-ls-again").onclick = function () { lisSkip(0); };
+    $("btn-ls-next").onclick = function () { lisSkip(1); };
     $("btn-quit").onclick = function () { quitMission(); };
     $("btn-home").onclick = function () { showStage("home"); renderHome(); };
     $("btn-play").onclick = function () { say(cur().e); };
