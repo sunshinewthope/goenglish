@@ -271,6 +271,7 @@
     if (S.cfg.lko !== 0 && S.cfg.lko !== 1) S.cfg.lko = 1;
     if ([0, 1, 2].indexOf(S.cfg.lgap) < 0) S.cfg.lgap = 1;
     if (["auto", "en", "ko"].indexOf(S.cfg.ldir) < 0) S.cfg.ldir = "auto";
+    if (S.cfg.ltalk !== 0 && S.cfg.ltalk !== 1) S.cfg.ltalk = 1;
   }
 
   function load() {
@@ -1133,7 +1134,11 @@
     var gapMs = Math.round(Math.max(1400, row.e.length * 70) * mul);
     var seq;
 
-    if (LIS.dir === "ko") {
+    // 대화가 있는 표현이면 주고받는 모습으로 들려줍니다
+    if (S.cfg.ltalk && hasTalk(row.e)) {
+      $("ls-set").textContent = "💬 " + row.sname;
+      seq = talkSeq(row, gapMs);
+    } else if (LIS.dir === "ko") {
       /* 뜻 → 영어. 한국어를 듣고 영어가 입에서 나오게 하는 연습입니다.
          답을 미리 보지 않도록 영어는 말할 때 화면에 냅니다. */
       $("ls-en").textContent = "";
@@ -1175,6 +1180,40 @@
       if (LIS.spoken % 5 === 0) save();
       lisPhrase();
     });
+  }
+
+  /* 대화 한 토막을 소리로만 듣는 차례로 바꿉니다.
+     상대가 말하고 → 내가 답할 틈 → 내 답 → 돌아오는 답.
+     돌아오는 답은 매번 다른 것이 뽑힙니다. */
+  function talkSeq(row, gapMs) {
+    var t = TALK[row.e];
+    var pi = practiceIdx(row.e, t.lines);
+    if (pi < 0) pi = 0;
+    var seq = [], i;
+
+    for (i = 0; i < pi; i++) {
+      seq.push({ cue: "상대가 이렇게 말해요", showEn: t.lines[i].e, en: t.lines[i].e, wait: 300 });
+      if (LIS.ko) seq.push({ ko: t.lines[i].k, show: t.lines[i].k, wait: 300 });
+      else seq.push({ show: t.lines[i].k, wait: 250 });
+    }
+
+    // 내 차례 — 뜻만 주고 영어로 말해 보게 합니다
+    $("ls-en").textContent = "";
+    if (LIS.ko) seq.push({ cue: "", ko: t.lines[pi].k, show: t.lines[pi].k, wait: 300 });
+    else seq.push({ show: t.lines[pi].k, wait: 250 });
+    if (S.cfg.lgap) seq.push({ cue: "뭐라고 답할까요?", wait: Math.round(gapMs * 1.1) });
+    seq.push({ cue: "이렇게 말하면 돼요", showEn: t.lines[pi].e, en: t.lines[pi].e, wait: 450 });
+
+    // 돌아오는 답 하나
+    var rep = null;
+    if (t.replies && t.replies.length) rep = t.replies[Math.floor(Math.random() * t.replies.length)];
+    else { for (i = pi + 1; i < t.lines.length; i++) if (t.lines[i].w === "them") { rep = t.lines[i]; break; } }
+    if (rep) {
+      seq.push({ cue: "이런 답이 돌아와요", showEn: rep.e, en: rep.e, wait: 300 });
+      if (LIS.ko) seq.push({ ko: rep.k, show: rep.k, wait: 700 });
+      else seq.push({ show: rep.k, wait: 600 });
+    }
+    return seq;
   }
 
   /* 이 차례가 끝까지 가면 대략 얼마나 걸리는지 */
@@ -1895,6 +1934,7 @@
     markSeg("#cfg-lko", "data-lko", String(S.cfg.lko));
     markSeg("#cfg-lgap", "data-lgap", String(S.cfg.lgap));
     markSeg("#cfg-ldir", "data-ldir", S.cfg.ldir);
+    markSeg("#cfg-ltalk", "data-ltalk", String(S.cfg.ltalk));
 
     $("ldir-note").textContent = S.cfg.ldir === "auto"
       ? "오후 2시 전에는 ‘영어 → 뜻’, 그 뒤에는 ‘뜻 → 영어’로 돕니다."
@@ -2276,7 +2316,8 @@
       };
     });
 
-    [["#cfg-lmin", "data-lmin", "lmin"], ["#cfg-lko", "data-lko", "lko"], ["#cfg-lgap", "data-lgap", "lgap"]]
+    [["#cfg-lmin", "data-lmin", "lmin"], ["#cfg-lko", "data-lko", "lko"],
+     ["#cfg-lgap", "data-lgap", "lgap"], ["#cfg-ltalk", "data-ltalk", "ltalk"]]
       .forEach(function (p) {
         [].slice.call(document.querySelectorAll(p[0] + " button")).forEach(function (b) {
           b.onclick = function () {
