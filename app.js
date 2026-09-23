@@ -272,6 +272,7 @@
     if ([0, 1, 2].indexOf(S.cfg.lgap) < 0) S.cfg.lgap = 1;
     if (["auto", "en", "ko"].indexOf(S.cfg.ldir) < 0) S.cfg.ldir = "auto";
     if (S.cfg.ltalk !== 0 && S.cfg.ltalk !== 1) S.cfg.ltalk = 1;
+    if (S.cfg.lfast !== 0 && S.cfg.lfast !== 1) S.cfg.lfast = 1;
   }
 
   function load() {
@@ -1061,13 +1062,30 @@
       if (!r.due || r.due <= t) { due.push(row.e); return; }
       rest.push(row.e);
     });
-    // 어느 묶음이든 비슷한 말이 연달아 나오지 않게 섞어 줄 세웁니다.
-    return spread(shuffle(hard)).concat(
+    /* 듣기는 노출이 목적이라 새 표현을 끊지 않습니다.
+       예전에 20개로 끊어 두었더니, 듣기만 하는 동안에는 채점 기록이
+       안 쌓여서 표현 전부가 '새 것'으로 분류되고, 그중 20개만 돌았습니다.
+       10분이면 같은 스무 개를 세 바퀴 듣게 됩니다.
+       어느 묶음이든 비슷한 말이 연달아 나오지 않게 섞어 줄 세웁니다. */
+    return withFast(spread(shuffle(hard)).concat(
       spread(shuffle(due)),
-      spread(neu).slice(0, 20),
+      spread(neu),
       spread(shuffle(rest)),
       spread(shuffle(later))
-    );
+    ));
+  }
+
+  /* 조금 빠른 말을 여덟 개마다 하나씩 끼워 넣습니다.
+     카드 미션 끝에만 나오면 거의 듣지 못하게 되어서요. */
+  var FAST_KEY = "@fast:";
+  function withFast(list) {
+    if (!S.cfg.lfast || typeof FAST === "undefined" || !FAST.length) return list;
+    var out = [], f = Math.floor(Math.random() * FAST.length), i;
+    for (i = 0; i < list.length; i++) {
+      out.push(list[i]);
+      if ((i + 1) % 8 === 0) { out.push(FAST_KEY + (f % FAST.length)); f++; }
+    }
+    return out;
   }
 
   /* 오늘 몇 개를 들었는지 — 홈 화면에 보여 줍니다 */
@@ -1121,7 +1139,9 @@
     if (!LIS.on) return;
     var g = LIS.gen;
     if (LIS.i >= LIS.list.length) LIS.i = 0;       // 다 돌면 처음부터
-    var row = BY_EN[LIS.list[LIS.i]];
+    var key = LIS.list[LIS.i];
+    if (key && key.indexOf(FAST_KEY) === 0) { lisFast(+key.slice(FAST_KEY.length), g); return; }
+    var row = BY_EN[key];
     if (!row) { LIS.i++; lisPhrase(); return; }
 
     $("ls-set").textContent = row.sicon + " " + row.sname;
@@ -1178,6 +1198,37 @@
       LIS.tries = 0;
       if (LIS.guard) { clearTimeout(LIS.guard); LIS.guard = null; }
       if (LIS.spoken % 5 === 0) save();
+      lisPhrase();
+    });
+  }
+
+  /* 조금 빠른 말 한 문장. 인터뷰에서 나오는 속도라 한 번 더 들려줍니다. */
+  function lisFast(fi, g) {
+    var f = (typeof FAST !== "undefined") ? FAST[fi] : null;
+    if (!f) { LIS.i++; lisPhrase(); return; }
+
+    $("ls-set").textContent = "🎤 조금 빠른 말";
+    $("ls-en").textContent = f.e;
+    $("ls-ko").textContent = "";
+    $("ls-cue").textContent = "";
+    $("ls-count").textContent = (LIS.spoken + 1) + "번째";
+
+    var seq = [{ en: f.e, wait: 500 }];
+    if (LIS.ko) seq.push({ ko: f.k, show: f.k, wait: 400 });
+    else seq.push({ show: f.k, wait: 300 });
+    seq.push({ cue: "한 번 더", en: f.e, echo: true, wait: 800 });
+
+    var myI = LIS.i;
+    if (LIS.guard) clearTimeout(LIS.guard);
+    LIS.guard = setTimeout(function () {
+      if (!LIS.on || LIS.i !== myI) return;
+      LIS.i++; LIS.tries = 0; LIS.spoken++;
+      lisJump();
+    }, seqMs(seq) + 7000);
+
+    runSeq(seq, g, function () {
+      LIS.spoken++; LIS.i++; LIS.tries = 0;
+      if (LIS.guard) { clearTimeout(LIS.guard); LIS.guard = null; }
       lisPhrase();
     });
   }
@@ -1935,6 +1986,7 @@
     markSeg("#cfg-lgap", "data-lgap", String(S.cfg.lgap));
     markSeg("#cfg-ldir", "data-ldir", S.cfg.ldir);
     markSeg("#cfg-ltalk", "data-ltalk", String(S.cfg.ltalk));
+    markSeg("#cfg-lfast", "data-lfast", String(S.cfg.lfast));
 
     $("ldir-note").textContent = S.cfg.ldir === "auto"
       ? "오후 2시 전에는 ‘영어 → 뜻’, 그 뒤에는 ‘뜻 → 영어’로 돕니다."
@@ -2317,7 +2369,8 @@
     });
 
     [["#cfg-lmin", "data-lmin", "lmin"], ["#cfg-lko", "data-lko", "lko"],
-     ["#cfg-lgap", "data-lgap", "lgap"], ["#cfg-ltalk", "data-ltalk", "ltalk"]]
+     ["#cfg-lgap", "data-lgap", "lgap"], ["#cfg-ltalk", "data-ltalk", "ltalk"],
+     ["#cfg-lfast", "data-lfast", "lfast"]]
       .forEach(function (p) {
         [].slice.call(document.querySelectorAll(p[0] + " button")).forEach(function (b) {
           b.onclick = function () {
