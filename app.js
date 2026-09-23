@@ -1191,16 +1191,20 @@
 
   function lisJump() { LIS.gen++; if (LIS.tm) clearTimeout(LIS.tm); LIS.tm = setTimeout(lisPhrase, 500); }
 
-  /* 듣는 중에 앞뒤로 옮기기. d 가 0 이면 지금 것을 다시. */
+  /* 듣는 중에 옮기기. d 가 0 이면 지금 것을 다시.
+     되돌릴 때는 한 문장씩으론 되돌아간 느낌이 안 나서 다섯씩 뜁니다. */
   function lisSkip(d) {
     if (!LIS.on) return;
     if (LIS.guard) { clearTimeout(LIS.guard); LIS.guard = null; }
     LIS.i += d;
-    if (LIS.i < 0) LIS.i = LIS.list.length - 1;
-    if (LIS.i >= LIS.list.length) LIS.i = 0;
+    if (LIS.i < 0) LIS.i = 0;                                  // 맨 앞에서 더 못 갑니다
+    if (LIS.i >= LIS.list.length) LIS.i = 0;                   // 끝나면 처음으로
     LIS.spoken = Math.max(0, LIS.spoken + d);
     LIS.tries = 0;
-    $("ls-cue").textContent = d < 0 ? "앞으로" : d > 0 ? "뒤로" : "다시";
+    // 곧 다음 문장이 화면을 덮어쓰니, 안내는 따로 띄웁니다
+    if (d < 0) toast("⏪ " + (-d) + "문장 되돌렸어요 · " + (LIS.i + 1) + "번째");
+    else if (d > 0) toast("⏭ 다음 · " + (LIS.i + 1) + "번째");
+    else toast("↻ 다시");
     lisJump();
   }
 
@@ -2181,7 +2185,7 @@
     $("btn-listen").onclick = function () { listenStart(false); };
     $("btn-listen-restart").onclick = function () { S.listenAt = null; save(); listenStart(true); };
     $("btn-listen-stop").onclick = function () { listenStop(); };
-    $("btn-ls-prev").onclick = function () { lisSkip(-1); };
+    $("btn-ls-prev").onclick = function () { lisSkip(-5); };
     $("btn-ls-again").onclick = function () { lisSkip(0); };
     $("btn-ls-next").onclick = function () { lisSkip(1); };
     $("btn-quit").onclick = function () { quitMission(); };
