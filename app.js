@@ -863,12 +863,20 @@
     return sp;
   }
 
-  function listenStart(fromStart) {
+  /* 묶음 하나만 통째로. 배운 순서 그대로 갑니다. */
+  function buildListenSet(sid) {
+    var out = [];
+    DECK.forEach(function (row) { if (row.sid === sid) out.push(row.e); });
+    return out;
+  }
+
+  function listenStart(fromStart, sid) {
     if (!("speechSynthesis" in window)) { toast("이 기기는 소리 읽기를 못 해요."); return; }
 
-    var spot = fromStart ? null : savedSpot();
-    var list = spot ? spot.list : buildListen();
+    var spot = (fromStart || sid) ? null : savedSpot();
+    var list = spot ? spot.list : (sid ? buildListenSet(sid) : buildListen());
     var startAt = spot ? spot.i : 0;
+    LIS.sid = spot ? (spot.sid || "") : (sid || "");
     if (!list.length) { toast("들을 표현이 없어요. ‘나’에서 묶음을 켜 주세요."); return; }
 
     prime(); keepOn(); wakeOn();
@@ -919,7 +927,7 @@
     }
     // 어디까지 들었는지 남겨 둡니다
     S.listenAt = (LIS.i > 0 && LIS.i < LIS.list.length)
-      ? { list: LIS.list, i: LIS.i, day: today() }
+      ? { list: LIS.list, i: LIS.i, day: today(), sid: LIS.sid || "" }
       : null;
     save();
 
@@ -1031,8 +1039,9 @@
     var dirNow = S.cfg.ldir === "auto" ? (hour < 14 ? "en" : "ko") : S.cfg.ldir;
     var dirTxt = dirNow === "ko" ? "뜻 → 영어" : "영어 → 뜻";
     var spot = savedSpot();
+    var spotSet = (spot && spot.sid && SET_BY_ID[spot.sid]) ? SET_BY_ID[spot.sid].name + " · " : "";
     $("listen-note").textContent = spot
-      ? ("이어서 " + (spot.i + 1) + "번째부터 · " + dirTxt)
+      ? (spotSet + "이어서 " + (spot.i + 1) + "번째부터 · " + dirTxt)
       : ("운전할 때 · " + dirTxt +
          (hd ? " — 오늘 들은 " + hd + "개는 뒤로" : " — " + S.cfg.lmin + "분, 손 안 대도 됩니다"));
     $("btn-listen-restart").hidden = !spot;
@@ -1412,6 +1421,15 @@
       box.appendChild(h);
       if (s2.note) box.appendChild(el("p", "sec-note", s2.note));
       hits = DECK.filter(function (r) { return r.sid === findSet; });
+
+      // 이 묶음만 통째로 듣기
+      var play = el("button", "set-listen"); play.type = "button";
+      play.innerHTML = '<span class="sl-ico">🎧</span>' +
+        '<span class="sl-t">이 묶음 통째로 듣기</span>' +
+        '<span class="sl-s">' + hits.length + '개 · 한 바퀴 약 ' +
+        Math.max(1, Math.round(hits.length * 10 / 60)) + '분 · 시간이 남으면 다시 돕니다</span>';
+      play.onclick = function () { showView("today"); listenStart(false, findSet); };
+      box.appendChild(play);
     }
 
     if (!hits.length) { box.appendChild(emptyBox("찾는 표현이 없어요.", "다른 말로 찾아보세요.")); return; }

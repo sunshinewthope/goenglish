@@ -322,6 +322,16 @@ img { max-width: 100%; }
 :root[data-theme="dark"] .hit-acts button.go, :root:not([data-theme="light"]) .hit-acts button.go { color: #17131F; }
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .hit-acts button.go { color: #fff; } }
 
+.set-listen { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px;
+  align-items: center; width: 100%; text-align: left;
+  background: var(--plum-soft); color: var(--plum-ink);
+  border: 2px solid var(--plum); border-radius: 16px; padding: 14px 16px;
+  font-family: var(--font); cursor: pointer; margin: 4px 0 14px; }
+.set-listen:active { transform: translateY(1px); }
+.set-listen .sl-ico { grid-row: 1 / 3; font-size: 1.5rem; }
+.set-listen .sl-t { font-size: 1.02rem; font-weight: 700; }
+.set-listen .sl-s { font-size: .78rem; color: var(--ink2); line-height: 1.5; }
+
 .back-tag { background: var(--card); border: 1px solid var(--line); border-radius: 999px;
   padding: 8px 15px; font-family: var(--font); font-size: .86rem; color: var(--ink2);
   cursor: pointer; align-self: flex-start; }
