@@ -351,6 +351,21 @@
     TK.step = 0; TK.done = false;
     TK.pi = practiceIdx(key, t.lines);
 
+    /* 돌아오는 답은 한 가지가 아닙니다.
+       replies 가 있으면 그중 하나를 골라 그 자리에 넣습니다.
+       할 때마다 달라지고, 끝나면 나머지도 돌려 들을 수 있습니다. */
+    TK.replyAt = -1; TK.reply = null; TK.replyIdx = 0;
+    if (t.replies && t.replies.length) {
+      for (var ri = TK.pi + 1; ri < t.lines.length; ri++) {
+        if (t.lines[ri].w === "them") { TK.replyAt = ri; break; }
+      }
+      if (TK.replyAt >= 0) {
+        TK.replyIdx = Math.floor(Math.random() * t.replies.length);
+        TK.reply = t.replies[TK.replyIdx];
+      }
+    }
+    $("btn-other-reply").hidden = true;
+
     $("talk-counter").textContent = (TK.i + 1) + " / " + TK.list.length;
     $("talk-progress").style.width = (TK.i / TK.list.length * 100) + "%";
     $("tk-where").textContent = "📍 " + (t.where || "");
@@ -368,12 +383,14 @@
     stepTalk();
   }
 
-  function addLine(ln, mine) {
-    var row = el("div", "tk-line" + (mine ? " mine" : ""));
+  function addLine(ln, mine, tag) {
+    var row = el("div", "tk-line" + (mine ? " mine" : "") + (tag ? " alt" : ""));
     row.appendChild(el("span", "tk-who", mine ? "🙂" : "🧑"));
     var b = el("div", "tk-body");
+    if (tag) b.appendChild(el("p", "tk-tag", tag));
     b.appendChild(el("p", "tk-e", ln.e));
     b.appendChild(el("p", "tk-k", ln.k));
+    if (ln.n) b.appendChild(el("p", "tk-n", ln.n));
     row.appendChild(b);
     $("tk-lines").appendChild(row);
     return row;
@@ -386,9 +403,10 @@
     if (TK.step >= t.lines.length) {
       $("btn-talk-next").hidden = false;
       $("btn-talk-next").textContent = (TK.i + 1 >= TK.list.length) ? "다음으로" : "다음 대화";
+      if (t.replies && t.replies.length > 1 && TK.replyAt >= 0) $("btn-other-reply").hidden = false;
       return;
     }
-    var ln = t.lines[TK.step];
+    var ln = (TK.step === TK.replyAt && TK.reply) ? TK.reply : t.lines[TK.step];
 
     if (TK.step === TK.pi && !TK.done) {
       $("tk-turn").hidden = false;
@@ -435,6 +453,7 @@
     TK.doneCount = (TK.doneCount || 0) + 1;
     var t = TALK[TK.list[TK.i]];
     addLine(t.lines[TK.pi], true);
+    $("tk-turn").hidden = true;    // 대화 속에 들어갔으니 상자는 접습니다
     TK.step++;
     setTimeout(stepTalk, 300);
   }
@@ -538,6 +557,19 @@
       box.textContent = "다르게 들렸어요: “" + txt + "”";
       setMicLabel("🎤 다시 말해보기");
     }
+  }
+
+  /* 같은 자리에서 나올 수 있는 다른 답을 하나씩 더 들려줍니다 */
+  function otherReply() {
+    if (TK.busy) return;
+    var t = TALK[TK.list[TK.i]];
+    if (!t || !t.replies || !t.replies.length) return;
+    TK.replyIdx = (TK.replyIdx + 1) % t.replies.length;
+    var r = t.replies[TK.replyIdx];
+    addLine(r, false, "이렇게도 대답해요");
+    window.scrollTo(0, document.body.scrollHeight);
+    TK.busy = true;
+    sayAs(r.e, false, function () { TK.busy = false; });
   }
 
   function talkNext() {
@@ -1628,6 +1660,7 @@
     $("btn-talk-next").onclick = talkNext;
     $("btn-mic").onclick = micTurn;
     $("btn-shadow").onclick = shadowTurn;
+    $("btn-other-reply").onclick = otherReply;
 
     // 조금 빠른 말
     $("btn-fast-quit").onclick = function () { quitMission(); };

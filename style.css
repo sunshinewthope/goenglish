@@ -158,6 +158,12 @@ img { max-width: 100%; }
 .tk-body { min-width: 0; }
 .tk-e { font-family: var(--en); font-size: 1.06rem; line-height: 1.45; margin: 0; color: var(--ink); }
 .tk-k { font-size: .86rem; color: var(--ink2); margin: 5px 0 0; line-height: 1.5; }
+.tk-n { font-size: .78rem; color: var(--coral); margin: 7px 0 0; line-height: 1.55;
+  background: var(--coral-soft); border-radius: 8px; padding: 7px 9px; }
+.tk-line.alt { border-style: dashed; background: var(--card2); }
+.tk-tag { font-size: .72rem; font-weight: 700; color: var(--mute); margin: 0 0 5px;
+  letter-spacing: .02em; }
+#btn-other-reply { margin-top: 14px; }
 
 .tk-turn { margin-top: 14px; background: var(--coral-soft);
   border: 2px solid var(--coral-bg); border-radius: 16px; padding: 16px; }

@@ -27,6 +27,18 @@ var TALK = {
     { w: "them", e: "So who's your bias?", k: "그래서 최애가 누구예요?" },
     { w: "me", e: "J-hope. He's been my bias since day one.", k: "제이홉이요. 처음부터 쭉 최애였어요." },
     { w: "them", e: "Oh, good taste. His stage presence is unreal.", k: "오, 보는 눈 있으시네요. 무대 장악력이 장난 아니죠." }
+  ],
+  replies: [
+    { e: "Oh, good taste. His stage presence is unreal.", k: "오, 보는 눈 있으시네요. 무대 장악력이 장난 아니죠.",
+      n: "unreal 은 '말도 안 된다'는 칭찬입니다." },
+    { e: "Hobi! Obviously. Who else?", k: "호비죠! 당연하죠. 누가 또 있겠어요?",
+      n: "Hobi 는 애칭입니다. Who else? 는 되묻는 게 아니라 맞장구예요." },
+    { e: "Honestly, I can't pick. I'm an OT7 kind of person.", k: "솔직히 못 고르겠어요. 저는 다 좋아하는 쪽이에요.",
+      n: "OT7 은 일곱 명 다 좋아한다는 팬덤 말. I'm a ~ kind of person = 저는 ~하는 사람이에요." },
+    { e: "Mine's changed like three times this year, not gonna lie.", k: "저는 올해만 세 번쯤 바뀌었어요, 솔직히.",
+      n: "not gonna lie 는 '솔직히'. 문장 끝에 붙어 뭉개집니다. like 도 뜻 없이 들어갑니다." },
+    { e: "Same! Did you catch his solo stage last tour?", k: "저도요! 지난 투어 솔로 무대 보셨어요?",
+      n: "catch 가 '보다'로 쓰입니다. Did you 가 '디쥬'처럼 붙습니다." }
   ]
 },
 
@@ -45,6 +57,20 @@ var TALK = {
     { w: "me", e: "Excuse me, is this the line for merch?", k: "실례지만 굿즈 줄이 여기예요?" },
     { w: "them", e: "Yeah, this is it. The entrance line is over there.", k: "네, 여기 맞아요. 입장 줄은 저쪽이에요." },
     { w: "me", e: "Thank you!", k: "고맙습니다!" }
+  ],
+  replies: [
+    { e: "Yeah, this is it. The entrance line is over there.", k: "네, 여기 맞아요. 입장 줄은 저쪽이에요.",
+      n: "this is it = 여기 맞아요." },
+    { e: "This is the queue for merch, yeah. Back of the line's round the corner though.",
+      k: "네, 굿즈 줄 맞아요. 근데 줄 끝은 저 모퉁이 돌아서예요.",
+      n: "영국은 line 대신 queue(큐). round the corner = 모퉁이 돌아서. 끝의 though 는 '근데'." },
+    { e: "No, love, this is the entry line. Merch is down the side.",
+      k: "아니에요, 이건 입장 줄이에요. 굿즈는 옆쪽으로 가셔야 해요.",
+      n: "love 는 영국에서 모르는 사람에게 쓰는 친근한 호칭. 애정 표현이 아닙니다." },
+    { e: "I think so? I only just got here myself.", k: "아마도요? 저도 방금 왔어요.",
+      n: "끝을 올려 말하는 I think so? 는 '확실하진 않은데'. only just = 방금 막." },
+    { e: "Yeah, but they're nearly sold out of the tour tees.", k: "네, 근데 투어 티셔츠는 거의 다 팔렸어요.",
+      n: "묻지 않은 정보가 딸려 옵니다. tees = T-shirts." }
   ]
 },
 
@@ -54,6 +80,19 @@ var TALK = {
     { w: "me", e: "How long have you been waiting?", k: "얼마나 기다리셨어요?" },
     { w: "them", e: "About three hours. I got here at six.", k: "세 시간쯤요. 여섯 시에 왔어요." },
     { w: "me", e: "Wow. That's dedication.", k: "와. 대단하시네요." }
+  ],
+  replies: [
+    { e: "About three hours. I got here at six.", k: "세 시간쯤요. 여섯 시에 왔어요.",
+      n: "got here 가 '가리어'처럼 붙습니다." },
+    { e: "Since half five this morning, believe it or not.", k: "오늘 아침 다섯 시 반부터요, 믿기지 않겠지만.",
+      n: "★ half five 는 5시 반입니다. 4시 반이 아니에요. 영국식이고 한국 사람이 제일 많이 틀립니다." },
+    { e: "Not that long, maybe forty minutes? The queue moved dead quick.",
+      k: "그렇게 오래는 아니에요, 한 사십 분? 줄이 엄청 빨리 줄었어요.",
+      n: "dead quick 의 dead 는 '엄청'이라는 강조입니다. 죽음과 상관없어요." },
+    { e: "Ages. Feels like I've been here forever.", k: "한참이요. 여기 평생 있었던 것 같아요.",
+      n: "Ages 는 '아주 오래'. 나이가 아닙니다." },
+    { e: "Too long! My legs are killing me.", k: "너무 오래요! 다리가 죽겠어요.",
+      n: "~ is killing me = 아파 죽겠다. 아주 자주 씁니다." }
   ]
 },
 
@@ -81,6 +120,22 @@ var TALK = {
     { w: "me", e: "Sorry, do you know where section B is?", k: "죄송한데, B구역이 어디인지 아세요?" },
     { w: "them", e: "Go up these stairs and turn left. You can't miss it.", k: "이 계단 올라가서 왼쪽이요. 바로 보일 거예요." },
     { w: "me", e: "Got it, thanks a lot.", k: "알겠어요, 정말 고마워요." }
+  ],
+  replies: [
+    { e: "Go up these stairs and turn left. You can't miss it.", k: "이 계단 올라가서 왼쪽이요. 바로 보일 거예요.",
+      n: "You can't miss it = 못 찾을 리 없어요. 놓치지 말라는 뜻이 아닙니다." },
+    { e: "B? That's the other side, mate. All the way round.",
+      k: "B요? 그건 반대편이에요. 쭉 돌아가셔야 해요.",
+      n: "mate 는 영국에서 모르는 사람에게도 씁니다. all the way round = 빙 돌아서." },
+    { e: "Sorry, no idea. I'm in the standing pit myself.",
+      k: "죄송해요, 모르겠어요. 저는 스탠딩이라서요.",
+      n: "no idea = 전혀 모르겠다. myself 는 '저는요'라는 덧붙임." },
+    { e: "Follow the signs for the two hundreds, then it's on your right.",
+      k: "200번대 표지판 따라가시면, 오른쪽에 있어요.",
+      n: "the two hundreds = 200번대 구역. 숫자를 이렇게 뭉뚱그려 말합니다." },
+    { e: "Just ask one of the stewards, they'll sort you out.",
+      k: "안내 요원한테 물어보세요, 알아서 해결해 줄 거예요.",
+      n: "steward = 공연장 안내 요원. sort you out = 처리해 주다." }
   ]
 },
 
