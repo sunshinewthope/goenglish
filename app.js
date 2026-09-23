@@ -1024,6 +1024,28 @@
 
   function heardToday(e) { return S.heardDay && S.heardDay[e] === today(); }
 
+  /* 묶음을 돌아가며 한 개씩 뽑아 다시 줄 세웁니다.
+     그냥 배운 순서대로 두면 '잘 안 들리는 말' 16개가 통째로 붙어 나와서
+     비슷한 말만 계속 듣게 됩니다. */
+  function spread(keys) {
+    var bySet = {}, order = [], i;
+    for (i = 0; i < keys.length; i++) {
+      var row = BY_EN[keys[i]];
+      if (!row) continue;
+      if (!bySet[row.sid]) { bySet[row.sid] = []; order.push(row.sid); }
+      bySet[row.sid].push(keys[i]);
+    }
+    var out = [], moved = true;
+    while (moved) {
+      moved = false;
+      for (i = 0; i < order.length; i++) {
+        var arr = bySet[order[i]];
+        if (arr.length) { out.push(arr.shift()); moved = true; }
+      }
+    }
+    return out;
+  }
+
   /* 들을 차례: 틀린 것 → 복습할 때가 된 것 → 새 것 → 나머지.
      오늘 이미 들은 것은 맨 뒤로 미룹니다.
      그래야 가는 길과 오는 길에 다른 표현이 나옵니다. */
@@ -1038,8 +1060,13 @@
       if (!r.due || r.due <= t) { due.push(row.e); return; }
       rest.push(row.e);
     });
-    // 새 표현은 배운 순서대로, 한 번에 너무 많이 쏟아지지 않게 끊습니다.
-    return shuffle(hard).concat(shuffle(due), neu.slice(0, 20), shuffle(rest), shuffle(later));
+    // 어느 묶음이든 비슷한 말이 연달아 나오지 않게 섞어 줄 세웁니다.
+    return spread(shuffle(hard)).concat(
+      spread(shuffle(due)),
+      spread(neu).slice(0, 20),
+      spread(shuffle(rest)),
+      spread(shuffle(later))
+    );
   }
 
   /* 오늘 몇 개를 들었는지 — 홈 화면에 보여 줍니다 */
