@@ -19,6 +19,92 @@
   /* ---------- 사전 ----------
      영어 낱말을 눌러 네이버 영어사전으로 넘깁니다.
      글은 그대로 두고 낱말만 눌리게 감싸는 것이라, 읽는 데 방해가 없습니다. */
+  /* ---------- 꾸미기 사진 ----------
+     사진은 학습 기록과 같은 칸에 두지 않습니다.
+     localStorage 는 5MB 뿐이라 사진이 커지면 기록이 저장 안 되는 일이 생깁니다.
+     그래서 사진만 IndexedDB 에 따로 담습니다. */
+  var PIC_DB = "enggo_pics", PIC_STORE = "pics";
+  var picCache = {};
+
+  function picOpen(cb) {
+    try {
+      if (!window.indexedDB) { cb(null); return; }
+      var rq = indexedDB.open(PIC_DB, 1);
+      rq.onupgradeneeded = function () {
+        var db = rq.result;
+        if (!db.objectStoreNames.contains(PIC_STORE)) db.createObjectStore(PIC_STORE);
+      };
+      rq.onsuccess = function () { cb(rq.result); };
+      rq.onerror = function () { cb(null); };
+    } catch (e) { cb(null); }
+  }
+
+  function picPut(key, data, cb) {
+    picOpen(function (db) {
+      if (!db) { cb(false); return; }
+      try {
+        var tx = db.transaction(PIC_STORE, "readwrite");
+        tx.objectStore(PIC_STORE).put(data, key);
+        tx.oncomplete = function () { picCache[key] = data; cb(true); };
+        tx.onerror = function () { cb(false); };
+      } catch (e) { cb(false); }
+    });
+  }
+
+  function picGet(key, cb) {
+    if (picCache[key] !== undefined) { cb(picCache[key]); return; }
+    picOpen(function (db) {
+      if (!db) { cb(""); return; }
+      try {
+        var rq = db.transaction(PIC_STORE, "readonly").objectStore(PIC_STORE).get(key);
+        rq.onsuccess = function () { picCache[key] = rq.result || ""; cb(picCache[key]); };
+        rq.onerror = function () { cb(""); };
+      } catch (e) { cb(""); }
+    });
+  }
+
+  function picDel(key, cb) {
+    picOpen(function (db) {
+      if (!db) { cb(false); return; }
+      try {
+        var tx = db.transaction(PIC_STORE, "readwrite");
+        tx.objectStore(PIC_STORE)["delete"](key);
+        tx.oncomplete = function () { picCache[key] = ""; cb(true); };
+        tx.onerror = function () { cb(false); };
+      } catch (e) { cb(false); }
+    });
+  }
+
+  var DECOS = [
+    { k: "bg", ico: "🖼️", t: "바탕 사진", s: "앱 뒤에 깔립니다." },
+    { k: "react", ico: "🎉", t: "잘했을 때 뜨는 사진", s: "‘알았어요’를 누를 때 잠깐 떠요." },
+    { k: "praise", ico: "🏆", t: "다 했을 때 칭찬 사진", s: "오늘 미션을 마치면 나와요." }
+  ];
+
+  function applyBg() {
+    var L = $("bg-layer");
+    document.documentElement.style.setProperty("--bg-dim", (S.cfg.bgdim || 68) / 100);
+    picGet("bg", function (d) {
+      document.documentElement.classList.toggle("has-bg", !!d);
+      if (!d) { L.hidden = true; L.style.backgroundImage = ""; return; }
+      L.hidden = false;
+      L.style.backgroundImage = "url(" + d + ")";
+    });
+  }
+
+  var reactT = null;
+  function showReact() {
+    picGet("react", function (d) {
+      if (!d) return;
+      var box = $("react-pop");
+      $("react-img").src = d;
+      box.hidden = false;
+      if (reactT) clearTimeout(reactT);
+      reactT = setTimeout(function () { box.hidden = true; }, 1100);
+    });
+  }
+
+  /* ---------- 사전 ---------- */
   var DICT = "https://en.dict.naver.com/#/search?query=";
 
   /* 줄임말은 사전에서 헛치기 쉬워서 본딧말로 바꿔 찾습니다. */
@@ -123,6 +209,7 @@
     if (typeof S.cfg.voice !== "string") S.cfg.voice = "";
     if (!Array.isArray(S.links)) S.links = [];
     if (typeof S.fastPtr !== "number") S.fastPtr = 0;
+    if ([82, 68, 50].indexOf(S.cfg.bgdim) < 0) S.cfg.bgdim = 68;
     if ([10, 15, 20].indexOf(S.cfg.lmin) < 0) S.cfg.lmin = 10;
     if (S.cfg.lko !== 0 && S.cfg.lko !== 1) S.cfg.lko = 1;
     if ([0, 1, 2].indexOf(S.cfg.lgap) < 0) S.cfg.lgap = 1;
@@ -1115,7 +1202,7 @@
     var row = cur();
     if (!S.seen[row.e]) results.newN++;
     record(row.e, ok);
-    if (ok) results.ok++; else results.no++;
+    if (ok) { results.ok++; showReact(); } else results.no++;
     save();
     idx++;
     drawCard();
@@ -1147,6 +1234,13 @@
         c.appendChild(el("b", null, p[1]));
         box.appendChild(c);
       });
+
+    // 다 했을 때 칭찬 사진
+    picGet("praise", function (d) {
+      var im = $("praise-img");
+      if (d) { im.src = d; im.hidden = false; $("done-emoji").hidden = true; }
+      else { im.hidden = true; $("done-emoji").hidden = false; }
+    });
 
     showStage("stage-done");
     checkRewards();
@@ -1521,6 +1615,9 @@
     $("per-note").textContent = "한 번에 " + S.cfg.per + "개, 약 " +
       Math.max(3, Math.round(S.cfg.per * 0.6)) + "분 걸려요.";
 
+    renderDeco();
+    markSeg("#cfg-bgdim", "data-bgdim", String(S.cfg.bgdim || 68));
+
     renderLinks();
 
     voiceTries = 0;        // 나 탭에 들어올 때마다 다시 넉넉히 기다려 봅니다
@@ -1647,6 +1744,60 @@
   }
 
   /* 세워두고 볼 영상 — 주소만 담아 둡니다. 영상 자체는 담지 않습니다. */
+  var decoPick = "";
+
+  function renderDeco() {
+    var box = $("deco-list"); box.innerHTML = "";
+    DECOS.forEach(function (d) {
+      var row = el("div", "deco-row");
+      var ph = el("div", "deco-none", d.ico);
+      row.appendChild(ph);
+
+      var body = el("div", "deco-body");
+      body.appendChild(el("p", "deco-t", d.t));
+      body.appendChild(el("p", "deco-s", d.s));
+      row.appendChild(body);
+
+      var acts = el("div", "deco-acts");
+      var pick = el("button", null, "고르기"); pick.type = "button";
+      pick.onclick = function () { decoPick = d.k; $("deco-file").click(); };
+      acts.appendChild(pick);
+      row.appendChild(acts);
+      box.appendChild(row);
+
+      // 담긴 사진이 있으면 미리보기와 지우기를 더합니다
+      picGet(d.k, function (data) {
+        if (!data) return;
+        var img = el("img", "deco-thumb"); img.src = data; img.alt = "";
+        row.replaceChild(img, ph);
+        pick.textContent = "바꾸기";
+        var del = el("button", "del", "지우기"); del.type = "button";
+        del.onclick = function () {
+          picDel(d.k, function () {
+            renderDeco();
+            if (d.k === "bg") applyBg();
+            toast("지웠어요.");
+          });
+        };
+        acts.appendChild(del);
+      });
+    });
+  }
+
+  function decoChosen(file) {
+    if (!file || !decoPick) return;
+    var key = decoPick;
+    shrinkImage(file, function (data) {
+      if (!data) { toast("사진을 읽지 못했어요."); return; }
+      picPut(key, data, function (ok) {
+        if (!ok) { toast("사진을 담지 못했어요."); return; }
+        renderDeco();
+        if (key === "bg") applyBg();
+        toast("넣었어요.");
+      });
+    });
+  }
+
   function renderLinks() {
     var box = $("link-list"); box.innerHTML = "";
     if (!S.links.length) {
@@ -1776,6 +1927,14 @@
 
     $("btn-add-link").onclick = addLink;
 
+    $("deco-file").onchange = function () { decoChosen(this.files && this.files[0]); this.value = ""; };
+    [].slice.call(document.querySelectorAll("#cfg-bgdim button")).forEach(function (b) {
+      b.onclick = function () {
+        S.cfg.bgdim = +b.getAttribute("data-bgdim");
+        save(); applyBg(); renderMe();
+      };
+    });
+
     var qt = null;
     $("q").oninput = function () {
       if (qt) clearTimeout(qt);
@@ -1860,6 +2019,7 @@
   /* ---------- 시작 ---------- */
   load();
   applyTheme();
+  applyBg();
   bind();
   showView("today");
   checkRewards();

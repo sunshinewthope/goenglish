@@ -14,9 +14,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <!-- 고쳐서 다시 올릴 때는 아래 v= 숫자를 1씩 올리세요. -->
-<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="style.css?v=15">
 </head>
 <body>
+
+<div id="bg-layer" class="bg-layer" hidden><div class="bg-scrim"></div></div>
+
+<div id="react-pop" class="react-pop" hidden><img id="react-img" alt=""></div>
 
 <header class="topbar">
   <div class="topbar-in">
@@ -192,7 +196,8 @@
     <!-- 마무리 -->
     <div id="stage-done" class="stage" hidden>
       <div class="done-card">
-        <p class="done-emoji" aria-hidden="true">✨</p>
+        <img id="praise-img" class="praise-img" alt="" hidden>
+        <p class="done-emoji" id="done-emoji" aria-hidden="true">✨</p>
         <h2 class="done-title">끝났어요</h2>
         <div id="done-summary" class="chips"></div>
         <button type="button" id="btn-home" class="big-btn">처음으로</button>
@@ -257,6 +262,20 @@
       <button type="button" data-per="20">20개</button>
     </div>
     <p class="sec-note" id="per-note"></p>
+
+    <h2 class="sec-title">앱 꾸미기</h2>
+    <p class="sec-note">내 사진으로 꾸며 보세요. 사진은 이 기기에만 담기고,
+      학습 기록과 따로 보관해서 기록이 밀려날 일이 없어요.</p>
+    <div id="deco-list" class="deco-list"></div>
+    <input type="file" id="deco-file" accept="image/*" hidden>
+
+    <p class="f-label">바탕 사진 밝기</p>
+    <div class="seg" id="cfg-bgdim">
+      <button type="button" data-bgdim="82">연하게</button>
+      <button type="button" data-bgdim="68">보통</button>
+      <button type="button" data-bgdim="50">진하게</button>
+    </div>
+    <p class="sec-note">글자가 잘 안 보이면 ‘연하게’로 두세요.</p>
 
     <h2 class="sec-title">세워두고 볼 영상</h2>
     <p class="sec-note">공식 영상 주소를 넣어 두면 ‘조금 빠른 말’ 끝에 단추로 뜹니다.
@@ -387,6 +406,6 @@
 
 <script src="phrases.js?v=1"></script>
 <script src="talk.js?v=2"></script>
-<script src="app.js?v=14"></script>
+<script src="app.js?v=15"></script>
 </body>
 </html>

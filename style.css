@@ -146,6 +146,41 @@ img { max-width: 100%; }
 .plan .ps { color: var(--mute); font-size: .8rem; }
 .plan .pn { margin-left: auto; color: var(--plum-ink); font-weight: 700; font-variant-numeric: tabular-nums; }
 
+/* ---- 앱 꾸미기 ---- */
+/* 바탕 사진이 깔릴 때만 body 배경을 비워 사진이 보이게 합니다 */
+html.has-bg body { background: transparent; }
+.bg-layer { position: fixed; inset: 0; z-index: -1; background-size: cover;
+  background-position: center; background-repeat: no-repeat; }
+.bg-scrim { position: absolute; inset: 0; background: var(--ground);
+  opacity: var(--bg-dim, .68); }
+
+.react-pop { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center;
+  pointer-events: none; }
+.react-pop img { max-width: 62vw; max-height: 42vh; border-radius: 20px;
+  box-shadow: var(--lift); animation: pop .42s ease-out; }
+@keyframes pop {
+  0% { transform: scale(.7); opacity: 0; }
+  60% { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.praise-img { display: block; width: 100%; max-height: 42vh; object-fit: cover;
+  border-radius: 16px; margin-bottom: 14px; }
+
+.deco-list { display: flex; flex-direction: column; gap: 9px; }
+.deco-row { display: flex; align-items: center; gap: 12px;
+  background: var(--card2); border: 1px solid var(--line); border-radius: 13px; padding: 11px 13px; }
+.deco-thumb { width: 54px; height: 54px; border-radius: 10px; object-fit: cover;
+  background: var(--plum-soft); flex: 0 0 auto; }
+.deco-none { width: 54px; height: 54px; border-radius: 10px; background: var(--plum-soft);
+  display: grid; place-items: center; font-size: 1.3rem; flex: 0 0 auto; }
+.deco-body { flex: 1 1 auto; min-width: 0; }
+.deco-t { font-size: .95rem; font-weight: 500; margin: 0; }
+.deco-s { font-size: .76rem; color: var(--mute); margin: 3px 0 0; line-height: 1.5; }
+.deco-acts { display: flex; gap: 6px; flex: 0 0 auto; }
+.deco-acts button { background: var(--card); color: var(--ink2); border: 1px solid var(--line);
+  border-radius: 9px; padding: 7px 10px; font-family: var(--font); font-size: .8rem; cursor: pointer; }
+.deco-acts button.del { color: var(--no); border-color: var(--no); }
+
 /* ---- 사전으로 넘어가는 낱말 ---- */
 .w { color: inherit; text-decoration: none;
   border-bottom: 1px dotted var(--mute);
