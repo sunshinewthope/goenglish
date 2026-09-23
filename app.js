@@ -344,7 +344,11 @@
   }
 
   function drawTalk() {
-    if (TK.i >= TK.list.length) { fastStart(); return; }
+    // 찾기에서 대화 하나만 열어 본 경우에는 끝나면 그냥 돌아갑니다
+    if (TK.i >= TK.list.length) {
+      if (TK.solo) { TK.solo = false; showStage("home"); renderHome(); return; }
+      fastStart(); return;
+    }
     var key = TK.list[TK.i], t = TALK[key];
     if (!t) { TK.i++; drawTalk(); return; }
 
@@ -1018,7 +1022,7 @@
     SESSION = s; idx = 0; results = { ok: 0, no: 0, newN: 0 };
     S.ptr = Math.max(S.ptr, s.nextPtr);
     // 오늘 볼 표현 중에서 대화를 고릅니다. 카드가 끝나면 이어집니다.
-    TK.list = buildTalk(s.list); TK.okCount = 0; TK.doneCount = 0; TK.micUsed = false;
+    TK.list = buildTalk(s.list); TK.okCount = 0; TK.doneCount = 0; TK.micUsed = false; TK.solo = false;
     save();
     showStage("stage-card");
     drawCard();
@@ -1386,6 +1390,10 @@
       '<div class="hit-acts">' +
         '<button type="button" data-a="say">🔊 듣기</button>' +
         '<button type="button" data-a="slow">🐢 천천히</button>' +
+        (hasTalk(r.e)
+          ? '<button type="button" data-a="talk" class="talk">💬 대화' +
+            (TALK[r.e].replies ? ' · 답 ' + TALK[r.e].replies.length + '가지' : '') + '</button>'
+          : '') +
         '<button type="button" data-a="one" class="go">' +
           (S.seen[r.e] ? "↻ 다시" : "▶ 지금 익히기") + '</button>' +
       '</div>';
@@ -1395,6 +1403,11 @@
       var a = b.getAttribute("data-a");
       if (a === "say") say(r.e);
       else if (a === "slow") say(r.e, true);
+      else if (a === "talk") {
+        TK.list = [r.e]; TK.i = 0; TK.solo = true;
+        TK.okCount = 0; TK.doneCount = 0; TK.micUsed = false;
+        showView("today"); showStage("stage-talk"); drawTalk();
+      }
       else {
         SESSION = { list: [r.e], nextPtr: S.ptr };
         idx = 0; results = { ok: 0, no: 0, newN: 0 };
