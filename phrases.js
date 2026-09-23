@@ -170,7 +170,19 @@ var SETS = [
     { e: "That was incredible.", k: "진짜 최고였어요", n: "공연 끝나고." },
     { e: "I can't believe I'm here.", k: "여기 있다는 게 안 믿겨요" },
     { e: "My voice is gone.", k: "목이 다 쉬었어요", n: "공연 끝나고 웃으면서." },
-    { e: "Are you going tomorrow too?", k: "내일도 가세요?", n: "며칠 공연이면." }
+    { e: "Are you going tomorrow too?", k: "내일도 가세요?", n: "며칠 공연이면." },
+    { e: "Can I squeeze past?", k: "좀 지나가도 될까요?", n: "빽빽한 데서 비집고 나갈 때. squeeze past = 비집고 지나가다." },
+    { e: "Do you mind if I sit here?", k: "여기 앉아도 될까요?", n: "mind 로 물으면 ‘아니요’가 허락입니다. Not at all 이 ‘앉으세요’예요." },
+    { e: "How did you get tickets?", k: "표 어떻게 구하셨어요?", n: "팬들끼리 반드시 나오는 이야기. 티켓팅 고생담이 돌아옵니다." },
+    { e: "Do you know the setlist?", k: "셋리스트 아세요?", n: "setlist = 부를 곡 순서. 미리 도는 경우가 많아요." },
+    { e: "Is the opening act on yet?", k: "오프닝 시작했어요?", n: "opening act = 앞 순서 가수. on = 무대에 올라 있다." },
+    { e: "Are they doing an encore?", k: "앙코르 해요?", n: "encore 는 ‘앙코르’가 아니라 ‘앙콜’에 가깝게 들립니다." },
+    { e: "Can you see okay from here?", k: "여기서 잘 보이세요?", n: "see okay = 잘 보이다. 자리 이야기할 때." },
+    { e: "Is there a bag check?", k: "짐 맡기는 데 있어요?", n: "bag check = 짐 보관소. 큰 가방은 못 들고 들어가는 곳이 많아요." },
+    { e: "I'm so nervous!", k: "너무 떨려요!", n: "공연 전 팬들이 서로에게 하는 말. 설렘에 가깝습니다." },
+    { e: "What's your Instagram?", k: "인스타 뭐예요?", n: "연락처 주고받는 요즘 방식. 헤어지기 직전에 씁니다." },
+    { e: "I'll tag you in the photo.", k: "사진에 태그할게요.", n: "tag = 사진에 계정을 걸어 두다." },
+    { e: "Let's find each other after.", k: "끝나고 만나요.", n: "find each other = 서로 찾다. after 뒤가 생략됐습니다." }
   ]
 },
 
