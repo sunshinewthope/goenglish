@@ -64,8 +64,8 @@
     var sets = {};
     SETS.forEach(function (s) { sets[s.id] = true; });
     return { seen: {}, ptr: 0, days: {}, sessions: 0, rewards: [],
-             heard: {}, listenXp: 0, listenMin: 0,
-             cfg: { per: 15, newPer: 5, sets: sets, lmin: 10, lko: 1, lgap: 1 },
+             heard: {}, heardDay: {}, listenXp: 0, listenMin: 0, links: [], fastPtr: 0,
+             cfg: { per: 15, newPer: 5, sets: sets, lmin: 10, lko: 1, lgap: 1, ldir: "auto" },
              theme: "auto", lastBackup: "" };
   }
 
@@ -82,12 +82,16 @@
     if (!S.cfg.sets) S.cfg.sets = {};
     SETS.forEach(function (s) { if (S.cfg.sets[s.id] == null) S.cfg.sets[s.id] = true; });
     if (!S.heard) S.heard = {};
+    if (!S.heardDay) S.heardDay = {};
     if (typeof S.listenXp !== "number") S.listenXp = 0;
     if (typeof S.listenMin !== "number") S.listenMin = 0;
     if (typeof S.cfg.voice !== "string") S.cfg.voice = "";
+    if (!Array.isArray(S.links)) S.links = [];
+    if (typeof S.fastPtr !== "number") S.fastPtr = 0;
     if ([10, 15, 20].indexOf(S.cfg.lmin) < 0) S.cfg.lmin = 10;
     if (S.cfg.lko !== 0 && S.cfg.lko !== 1) S.cfg.lko = 1;
     if ([0, 1, 2].indexOf(S.cfg.lgap) < 0) S.cfg.lgap = 1;
+    if (["auto", "en", "ko"].indexOf(S.cfg.ldir) < 0) S.cfg.ldir = "auto";
   }
 
   function load() {
@@ -276,9 +280,335 @@
       var u = new SpeechSynthesisUtterance(String(t));
       u.lang = "en-US"; u.rate = slow ? 0.62 : 0.92;
       if (!voice) pickVoice();
-      if (voice) u.voice = voice;
+      if (voice) { try { u.voice = voice; } catch (e2) {} }
       speechSynthesis.speak(u);
     } catch (e) {}
+  }
+
+  /* ==========================================================
+     대화 속에서 — 표현을 주고받는 자리에 넣어 봅니다
+     ========================================================== */
+  var TK = { list: [], i: 0, step: 0, done: false, rec: null, busy: false };
+
+  function hasTalk(e) { return !!(typeof TALK !== "undefined" && TALK[e]); }
+
+  /* 연습할 줄: 그 표현이 들어 있는 내 줄, 없으면 첫 번째 내 줄 */
+  function practiceIdx(key, lines) {
+    var want = norm(key), i;
+    for (i = 0; i < lines.length; i++) {
+      if (lines[i].w === "me" && norm(lines[i].e).indexOf(want) >= 0) return i;
+    }
+    for (i = 0; i < lines.length; i++) if (lines[i].w === "me") return i;
+    return -1;
+  }
+
+  function norm(s) {
+    return String(s == null ? "" : s).toLowerCase()
+      .replace(/[^a-z0-9' ]/g, " ").replace(/\s+/g, " ").trim();
+  }
+  function wordsOf(s) { var a = norm(s).split(" "); return a[0] === "" ? [] : a; }
+
+  /* 말한 것이 얼마나 맞았는지 — 낱말 단위로 넉넉하게 셉니다 */
+  function scoreSaid(target, said) {
+    var t = wordsOf(target), pool = wordsOf(said), hit = 0, i, j;
+    if (!t.length) return 0;
+    for (i = 0; i < t.length; i++) {
+      j = pool.indexOf(t[i]);
+      if (j >= 0) { hit++; pool.splice(j, 1); }
+    }
+    return hit / t.length;
+  }
+
+  function buildTalk(sessionList) {
+    var mine = [], other = [], i;
+    for (i = 0; i < sessionList.length; i++) {
+      if (hasTalk(sessionList[i])) mine.push(sessionList[i]);
+    }
+    if (mine.length < 4 && typeof TALK !== "undefined") {
+      for (var k in TALK) {
+        if (!TALK.hasOwnProperty(k)) continue;
+        if (mine.indexOf(k) >= 0) continue;
+        var row = BY_EN[k];
+        if (row && enabled(row)) other.push(k);
+      }
+      other = shuffle(other);
+    }
+    return shuffle(mine).slice(0, 4).concat(other).slice(0, 4);
+  }
+
+  function talkStart() {
+    if (!TK.list.length) { fastStart(); return; }
+    TK.i = 0;
+    showStage("stage-talk");
+    drawTalk();
+  }
+
+  function drawTalk() {
+    if (TK.i >= TK.list.length) { fastStart(); return; }
+    var key = TK.list[TK.i], t = TALK[key];
+    if (!t) { TK.i++; drawTalk(); return; }
+
+    TK.step = 0; TK.done = false;
+    TK.pi = practiceIdx(key, t.lines);
+
+    $("talk-counter").textContent = (TK.i + 1) + " / " + TK.list.length;
+    $("talk-progress").style.width = (TK.i / TK.list.length * 100) + "%";
+    $("tk-where").textContent = "📍 " + (t.where || "");
+    $("tk-lines").innerHTML = "";
+    $("tk-turn").hidden = true;
+    $("tk-en").hidden = true;
+    $("tk-en").textContent = "";        // 앞 대화의 답이 남아 있지 않게
+    $("tk-heard").hidden = true;
+    $("tk-heard").textContent = "";
+    $("tk-acts").hidden = false;
+    $("btn-talk-next").hidden = true;
+    $("btn-talk-next").onclick = talkNext;
+    setMicLabel("🎤 말해보기");
+
+    stepTalk();
+  }
+
+  function addLine(ln, mine) {
+    var row = el("div", "tk-line" + (mine ? " mine" : ""));
+    row.appendChild(el("span", "tk-who", mine ? "🙂" : "🧑"));
+    var b = el("div", "tk-body");
+    b.appendChild(el("p", "tk-e", ln.e));
+    b.appendChild(el("p", "tk-k", ln.k));
+    row.appendChild(b);
+    $("tk-lines").appendChild(row);
+    return row;
+  }
+
+  /* 한 줄씩 들려주다가, 내 차례에서 멈춥니다 */
+  function stepTalk() {
+    var t = TALK[TK.list[TK.i]];
+    if (!t) return;
+    if (TK.step >= t.lines.length) {
+      $("btn-talk-next").hidden = false;
+      $("btn-talk-next").textContent = (TK.i + 1 >= TK.list.length) ? "다음으로" : "다음 대화";
+      return;
+    }
+    var ln = t.lines[TK.step];
+
+    if (TK.step === TK.pi && !TK.done) {
+      $("tk-turn").hidden = false;
+      $("tk-ko").textContent = "“" + ln.k + "”";
+      $("tk-en").textContent = ln.e;
+      window.scrollTo(0, document.body.scrollHeight);
+      return;
+    }
+
+    addLine(ln, ln.w === "me");
+    TK.step++;
+    TK.busy = true;
+    sayAs(ln.e, ln.w === "me", function () {
+      TK.busy = false;
+      setTimeout(stepTalk, 260);
+    });
+  }
+
+  /* 상대와 내 목소리를 높낮이로 구분해 줍니다 */
+  function sayAs(text, mine, done) {
+    if (!("speechSynthesis" in window)) { done(); return; }
+    var fired = false, wd = null;
+    function fin() { if (fired) return; fired = true; if (wd) clearTimeout(wd); done(); }
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(String(text));
+      u.lang = "en-US"; u.rate = 0.92; u.pitch = mine ? 0.95 : 1.12;
+      if (!voice) pickVoice();
+      if (voice) { try { u.voice = voice; } catch (e2) {} }
+      u.onend = fin; u.onerror = fin;
+      wd = setTimeout(fin, 2500 + String(text).length * 110);
+      speechSynthesis.speak(u);
+    } catch (e) { fin(); }
+  }
+
+  function setMicLabel(s) { $("btn-mic").textContent = s; }
+
+  /* 내 차례를 마치고 다음 줄로 */
+  function finishTurn() {
+    TK.done = true;
+    $("tk-en").hidden = false;
+    $("tk-acts").hidden = true;
+    $("btn-talk-next").hidden = true;   // 남은 줄을 다 들려준 뒤에 다시 냅니다
+    TK.doneCount = (TK.doneCount || 0) + 1;
+    var t = TALK[TK.list[TK.i]];
+    addLine(t.lines[TK.pi], true);
+    TK.step++;
+    setTimeout(stepTalk, 300);
+  }
+
+  function shadowTurn() {
+    if (TK.busy) return;
+    var t = TALK[TK.list[TK.i]];
+    $("tk-en").hidden = false;
+    TK.busy = true;
+    // 누르자마자 무엇이 일어나는지 보여 줍니다
+    $("tk-heard").hidden = false;
+    $("tk-heard").className = "tk-heard half";
+    $("tk-heard").textContent = "잘 들어 보세요…";
+    sayAs(t.lines[TK.pi].e, true, function () {
+      TK.busy = false;
+      $("tk-heard").hidden = false;
+      $("tk-heard").className = "tk-heard ok";
+      $("tk-heard").textContent = "따라 말해 보세요. 되면 다음으로.";
+      $("tk-acts").hidden = true;
+      $("btn-talk-next").hidden = false;
+      $("btn-talk-next").textContent = "따라 했어요";
+      $("btn-talk-next").onclick = function () {
+        $("btn-talk-next").onclick = talkNext;
+        finishTurn();
+      };
+    });
+  }
+
+  /* 마이크로 듣고 맞췄는지 봅니다 */
+  function micTurn() {
+    if (TK.busy) return;
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { toast("이 브라우저는 마이크로 듣지 못해요. ‘듣고 따라 하기’를 쓰세요."); return; }
+    var t = TALK[TK.list[TK.i]], target = t.lines[TK.pi].e;
+
+    try { speechSynthesis.cancel(); } catch (e) {}
+    setMicLabel("🔴 듣고 있어요…");
+    $("tk-heard").hidden = true;
+    TK.micUsed = true;
+
+    var r = new SR(), got = false;
+    TK.rec = r;
+    r.lang = "en-US"; r.interimResults = false; r.maxAlternatives = 4;
+
+    r.onresult = function (ev) {
+      got = true;
+      // 첫 후보를 기본으로 둡니다. 아니면 다 틀렸을 때 빈칸이 나옵니다.
+      var best = -1, txt = (ev.results[0][0] && ev.results[0][0].transcript) || "", i;
+      for (i = 0; i < ev.results[0].length; i++) {
+        var alt = ev.results[0][i].transcript;
+        var sc = scoreSaid(target, alt);
+        if (sc > best) { best = sc; txt = alt; }
+      }
+      showSaid(txt, Math.max(0, best));
+    };
+    r.onerror = function (ev) {
+      got = true;
+      setMicLabel("🎤 다시 말해보기");
+      var m = ev.error === "not-allowed" ? "마이크를 쓸 수 없어요. 브라우저에서 허락해 주세요."
+            : ev.error === "no-speech" ? "소리가 잡히지 않았어요."
+            : ev.error === "network" ? "인터넷이 있어야 알아들어요."
+            : "잘 듣지 못했어요.";
+      $("tk-heard").hidden = false;
+      $("tk-heard").className = "tk-heard no";
+      $("tk-heard").textContent = m;
+    };
+    r.onend = function () {
+      TK.rec = null;
+      if (!got) {
+        setMicLabel("🎤 다시 말해보기");
+        $("tk-heard").hidden = false;
+        $("tk-heard").className = "tk-heard no";
+        $("tk-heard").textContent = "소리가 잡히지 않았어요.";
+      }
+    };
+    try { r.start(); } catch (e) { setMicLabel("🎤 말해보기"); toast("마이크를 열지 못했어요."); }
+  }
+
+  function showSaid(txt, sc) {
+    var box = $("tk-heard");
+    box.hidden = false;
+    if (sc >= 0.7) {
+      box.className = "tk-heard ok";
+      box.textContent = "좋아요! 들린 대로: “" + txt + "”";
+      $("tk-en").hidden = false;
+      $("tk-acts").hidden = true;
+      $("btn-talk-next").hidden = false;
+      $("btn-talk-next").textContent = "다음";
+      $("btn-talk-next").onclick = function () {
+        $("btn-talk-next").onclick = talkNext;
+        finishTurn();
+      };
+      TK.okCount = (TK.okCount || 0) + 1;
+    } else if (sc >= 0.45) {
+      box.className = "tk-heard half";
+      box.textContent = "거의 다 왔어요. 들린 대로: “" + txt + "”";
+      setMicLabel("🎤 다시 말해보기");
+      $("tk-en").hidden = false;
+    } else {
+      box.className = "tk-heard no";
+      box.textContent = "다르게 들렸어요: “" + txt + "”";
+      setMicLabel("🎤 다시 말해보기");
+    }
+  }
+
+  function talkNext() {
+    if (TK.rec) { try { TK.rec.abort(); } catch (e) {} TK.rec = null; }
+    TK.i++;
+    drawTalk();
+  }
+
+  /* ==========================================================
+     조금 빠른 말 — 인터뷰에서 나오는 속도
+     ========================================================== */
+  var FS = { list: [], i: 0, shown: 0 };
+
+  function buildFast() {
+    if (typeof FAST === "undefined" || !FAST.length) return [];
+    var n = Math.min(2, FAST.length), out = [], p = S.fastPtr || 0, i;
+    for (i = 0; i < n; i++) { out.push(FAST[p % FAST.length]); p++; }
+    S.fastPtr = p % FAST.length;
+    return out;
+  }
+
+  function fastStart() {
+    FS.list = buildFast();
+    if (!FS.list.length) { finish(); return; }
+    FS.i = 0;
+    showStage("stage-fast");
+    drawFast();
+  }
+
+  function drawFast() {
+    if (FS.i >= FS.list.length) { finish(); return; }
+    var f = FS.list[FS.i];
+    FS.shown = 0;
+    $("fast-counter").textContent = (FS.i + 1) + " / " + FS.list.length;
+    $("fast-progress").style.width = (FS.i / FS.list.length * 100) + "%";
+    $("fast-en").textContent = f.e;
+    $("fast-ko").textContent = f.k;
+    $("fast-note").textContent = f.n || "";
+    $("fast-en").hidden = true;
+    $("fast-ko").hidden = true;
+    $("fast-note").hidden = true;
+    $("fast-reveal").hidden = false;
+    $("btn-fast-show").textContent = "글자 보기";
+    $("btn-fast-next").hidden = true;
+    renderWatchLink();
+    say(f.e);
+  }
+
+  function fastReveal() {
+    var f = FS.list[FS.i];
+    FS.shown++;
+    if (FS.shown === 1) {
+      $("fast-en").hidden = false;
+      $("btn-fast-show").textContent = "뜻 보기";
+      say(f.e);
+    } else {
+      $("fast-ko").hidden = false;
+      $("fast-note").hidden = !f.n;
+      $("fast-reveal").hidden = true;
+      $("btn-fast-next").hidden = false;
+      $("btn-fast-next").textContent = (FS.i + 1 >= FS.list.length) ? "끝내기" : "다음";
+    }
+  }
+
+  function renderWatchLink() {
+    var a = $("fast-link"), ls = S.links || [];
+    if (!ls.length) { a.hidden = true; return; }
+    var pick = ls[FS.i % ls.length];
+    a.hidden = false;
+    a.href = pick.url;
+    a.textContent = "▶ " + (pick.name || "세워두고 볼 영상");
   }
 
   /* ==========================================================
@@ -289,11 +619,16 @@
   var LIS = { on: false, gen: 0, list: [], i: 0, spoken: 0,
               endAt: 0, tick: null, tm: null, wake: null, ko: false };
 
-  /* 들을 차례: 틀린 것 → 복습할 때가 된 것 → 새 것 → 나머지 */
+  function heardToday(e) { return S.heardDay && S.heardDay[e] === today(); }
+
+  /* 들을 차례: 틀린 것 → 복습할 때가 된 것 → 새 것 → 나머지.
+     오늘 이미 들은 것은 맨 뒤로 미룹니다.
+     그래야 가는 길과 오는 길에 다른 표현이 나옵니다. */
   function buildListen() {
-    var t = today(), hard = [], due = [], neu = [], rest = [];
+    var t = today(), hard = [], due = [], neu = [], rest = [], later = [];
     DECK.forEach(function (row) {
       if (!enabled(row)) return;
+      if (heardToday(row.e)) { later.push(row.e); return; }
       var r = S.seen[row.e];
       if (!r) { neu.push(row.e); return; }
       if ((r.wrong || 0) > 0 && r.box <= 2) { hard.push(row.e); return; }
@@ -301,7 +636,16 @@
       rest.push(row.e);
     });
     // 새 표현은 배운 순서대로, 한 번에 너무 많이 쏟아지지 않게 끊습니다.
-    return shuffle(hard).concat(shuffle(due), neu.slice(0, 20), shuffle(rest));
+    return shuffle(hard).concat(shuffle(due), neu.slice(0, 20), shuffle(rest), shuffle(later));
+  }
+
+  /* 오늘 몇 개를 들었는지 — 홈 화면에 보여 줍니다 */
+  function heardTodayCount() {
+    var n = 0, t = today();
+    for (var k in S.heardDay) {
+      if (S.heardDay.hasOwnProperty(k) && S.heardDay[k] === t && BY_EN[k]) n++;
+    }
+    return n;
   }
 
   function lisSay(text, rate, lang, done) {
@@ -312,7 +656,8 @@
       var u = new SpeechSynthesisUtterance(String(text));
       u.lang = lang; u.rate = rate;
       var v = (lang === "ko-KR") ? koVoice : voice;
-      if (v) u.voice = v;
+      // 목소리 지정이 실패해도 말은 나와야 합니다. 기본 목소리로 읽습니다.
+      if (v) { try { u.voice = v; } catch (e2) {} }
       u.onend = fin; u.onerror = fin;
       // onend 가 영영 안 오는 기기가 있습니다. 넉넉히 기다렸다가 그냥 넘어갑니다.
       wd = setTimeout(fin, 2500 + String(text).length * 110);
@@ -329,6 +674,7 @@
       var st = seq[k++];
       if (st.cue != null) $("ls-cue").textContent = st.cue;
       if (st.show != null) $("ls-ko").textContent = st.show;
+      if (st.showEn != null) $("ls-en").textContent = st.showEn;
       function after() {
         if (!LIS.on || g !== LIS.gen) return;
         if (st.wait) LIS.tm = setTimeout(next, st.wait); else next();
@@ -353,26 +699,64 @@
     $("ls-cue").textContent = "";
     $("ls-count").textContent = (LIS.spoken + 1) + "번째";
 
-    var seq = [{ en: row.e, wait: 450 }];
-    if (LIS.ko) seq.push({ ko: row.k, show: row.k, wait: 350 });
-    else seq.push({ show: row.k, wait: 250 });
+    var g2 = S.cfg.lgap, mul = (g2 === 2 ? 1.8 : 1.1);
+    var gapMs = Math.round(Math.max(1400, row.e.length * 70) * mul);
+    var seq;
 
-    var g2 = S.cfg.lgap;
-    if (g2) {
-      var mul = (g2 === 2 ? 1.8 : 1.1);
-      seq.push({ cue: "따라 말해 보세요",
-                 wait: Math.round(Math.max(1400, row.e.length * 70) * mul) });
+    if (LIS.dir === "ko") {
+      /* 뜻 → 영어. 한국어를 듣고 영어가 입에서 나오게 하는 연습입니다.
+         답을 미리 보지 않도록 영어는 말할 때 화면에 냅니다. */
+      $("ls-en").textContent = "";
+      $("ls-ko").textContent = row.k;
+      seq = [{ ko: row.k, wait: 400 }];
+      seq.push({ cue: "영어로 말해 보세요",
+                 wait: g2 ? Math.round(gapMs * 1.25) : 900 });
+      seq.push({ cue: "", showEn: row.e, en: row.e, wait: 500 });
+      seq.push({ en: row.e, echo: true, wait: 800 });
+    } else {
+      /* 영어 → 뜻. 알아듣는 연습입니다. */
+      seq = [{ en: row.e, wait: 450 }];
+      if (LIS.ko) seq.push({ ko: row.k, show: row.k, wait: 350 });
+      else seq.push({ show: row.k, wait: 250 });
+      if (g2) seq.push({ cue: "따라 말해 보세요", wait: gapMs });
+      seq.push({ cue: "", en: row.e, echo: true, wait: 900 });
     }
-    seq.push({ cue: "", en: row.e, echo: true, wait: 900 });
+
+    /* 한 표현에 너무 오래 머물면 그냥 넘깁니다.
+       화면이 잠깐 가려져 재생이 끊기면 다음으로 넘기는 코드까지 못 가는데,
+       그대로 두면 같은 문장을 되풀이하게 됩니다. */
+    var myI = LIS.i;
+    if (LIS.guard) clearTimeout(LIS.guard);
+    LIS.guard = setTimeout(function () {
+      if (!LIS.on || LIS.i !== myI) return;
+      S.heardDay[row.e] = today();      // 끝까지 흘러갔으니 들은 것으로 칩니다
+      LIS.i++; LIS.tries = 0; LIS.spoken++;
+      lisJump();
+    }, seqMs(seq) + 7000);
 
     runSeq(seq, g, function () {
       S.heard[row.e] = (S.heard[row.e] || 0) + 1;
+      S.heardDay[row.e] = today();      // 다음 차례엔 뒤로 밀립니다
       S.listenXp = (S.listenXp || 0) + 1;
       LIS.spoken++;
       LIS.i++;
+      LIS.tries = 0;
+      if (LIS.guard) { clearTimeout(LIS.guard); LIS.guard = null; }
       if (LIS.spoken % 5 === 0) save();
       lisPhrase();
     });
+  }
+
+  /* 이 차례가 끝까지 가면 대략 얼마나 걸리는지 */
+  function seqMs(seq) {
+    var t = 0;
+    for (var i = 0; i < seq.length; i++) {
+      var st = seq[i];
+      if (st.en) t += 900 + String(st.en).length * 80;
+      if (st.ko) t += 700 + String(st.ko).length * 90;
+      t += st.wait || 0;
+    }
+    return t;
   }
 
   function lisJump() { LIS.gen++; if (LIS.tm) clearTimeout(LIS.tm); LIS.tm = setTimeout(lisPhrase, 500); }
@@ -395,7 +779,16 @@
     LIS.ko = !!S.cfg.lko && !!koVoice;
     if (S.cfg.lko && !koVoice) toast("한국어 목소리가 없어서 영어만 나옵니다.");
 
-    LIS.on = true; LIS.gen++; LIS.list = list; LIS.i = 0; LIS.spoken = 0;
+    /* 어느 쪽으로 연습할지. 자동이면 오전은 알아듣기, 오후는 말하기입니다. */
+    LIS.dir = S.cfg.ldir === "auto"
+      ? (new Date().getHours() < 14 ? "en" : "ko")
+      : S.cfg.ldir;
+    if (LIS.dir === "ko" && !koVoice) {
+      LIS.dir = "en";
+      toast("한국어 목소리가 없어서 ‘영어 → 뜻’으로 합니다.");
+    }
+
+    LIS.on = true; LIS.gen++; LIS.list = list; LIS.i = 0; LIS.spoken = 0; LIS.tries = 0;
     LIS.endAt = Date.now() + S.cfg.lmin * 60000;
 
     showStage("stage-listen");
@@ -414,6 +807,7 @@
     LIS.on = false; LIS.gen++;
     if (LIS.tick) { clearInterval(LIS.tick); LIS.tick = null; }
     if (LIS.tm) { clearTimeout(LIS.tm); LIS.tm = null; }
+    if (LIS.guard) { clearTimeout(LIS.guard); LIS.guard = null; }
     try { speechSynthesis.cancel(); } catch (e) {}
     keepOff(); wakeOff();
 
@@ -469,7 +863,7 @@
      화면
      ========================================================== */
   var VIEWS = ["today", "find", "reward", "me"];
-  var STAGES = ["home", "stage-card", "stage-listen", "stage-done"];
+  var STAGES = ["home", "stage-card", "stage-talk", "stage-fast", "stage-listen", "stage-done"];
 
   function showView(n) {
     if (LIS.on) listenStop(true);   // 다른 곳으로 가면 듣기는 멈춥니다
@@ -507,23 +901,35 @@
     var newN = 0, revN = 0;
     s.list.forEach(function (e) { if (S.seen[e]) revN++; else newN++; });
 
+    var talkN = s.list.length ? buildTalk(s.list).length : 0;
+    var fastN = s.list.length ? Math.min(2, (typeof FAST !== "undefined" ? FAST.length : 0)) : 0;
+
     var ul = $("plan"); ul.innerHTML = "";
-    [["🆕", "새 표현", newN], ["🔁", "복습", revN]].forEach(function (p) {
-      var li = el("li");
-      li.appendChild(el("span", "pi", p[0]));
-      var d = el("div");
-      d.appendChild(el("div", "pt", p[1]));
-      d.appendChild(el("div", "ps", p[1] === "새 표현" ? "처음 보는 말" : "다시 볼 때가 된 말"));
-      li.appendChild(d);
-      li.appendChild(el("span", "pn", p[2] + "개"));
-      ul.appendChild(li);
-    });
+    [["🆕", "새 표현", newN, "처음 보는 말"],
+     ["🔁", "복습", revN, "다시 볼 때가 된 말"],
+     ["💬", "대화 속에서", talkN, "주고받아 보고, 직접 말해 보기"],
+     ["🎤", "조금 빠른 말", fastN, "인터뷰에서 나오는 속도"]]
+      .forEach(function (p) {
+        if (!p[2]) return;
+        var li = el("li");
+        li.appendChild(el("span", "pi", p[0]));
+        var d = el("div");
+        d.appendChild(el("div", "pt", p[1]));
+        d.appendChild(el("div", "ps", p[3]));
+        li.appendChild(d);
+        li.appendChild(el("span", "pn", p[2] + "개"));
+        ul.appendChild(li);
+      });
 
     $("btn-go").textContent = s.list.length ? ("시작하기 (" + s.list.length + "개)") : "오늘 볼 것을 다 봤어요";
     $("btn-go").disabled = !s.list.length;
     $("go-note").textContent = s.list.length ? "약 " + Math.max(3, Math.round(s.list.length * 0.6)) + "분" : "‘찾기’에서 골라 볼 수 있어요";
 
-    $("listen-note").textContent = "운전할 때 — " + S.cfg.lmin + "분 동안 소리만, 손 안 대도 됩니다";
+    var hd = heardTodayCount();
+    var dirNow = S.cfg.ldir === "auto" ? (hour < 14 ? "en" : "ko") : S.cfg.ldir;
+    var dirTxt = dirNow === "ko" ? "뜻 → 영어" : "영어 → 뜻";
+    $("listen-note").textContent = "운전할 때 · " + dirTxt +
+      (hd ? " — 오늘 들은 " + hd + "개는 뒤로" : " — " + S.cfg.lmin + "분, 손 안 대도 됩니다");
 
     renderNextReward();
   }
@@ -545,6 +951,8 @@
     if (!s.list.length) return;
     SESSION = s; idx = 0; results = { ok: 0, no: 0, newN: 0 };
     S.ptr = Math.max(S.ptr, s.nextPtr);
+    // 오늘 볼 표현 중에서 대화를 고릅니다. 카드가 끝나면 이어집니다.
+    TK.list = buildTalk(s.list); TK.okCount = 0; TK.doneCount = 0; TK.micUsed = false;
     save();
     showStage("stage-card");
     drawCard();
@@ -553,7 +961,7 @@
   function cur() { return BY_EN[SESSION.list[idx]]; }
 
   function drawCard() {
-    if (idx >= SESSION.list.length) { finish(); return; }
+    if (idx >= SESSION.list.length) { talkStart(); return; }   // 카드 다음은 대화
     var row = cur();
     if (!row) { idx++; drawCard(); return; }
 
@@ -598,6 +1006,15 @@
     drawCard();
   }
 
+  /* 어느 단계에서든 그만둘 때 — 말하던 것, 듣던 것을 모두 멈춥니다 */
+  function quitMission() {
+    if (TK.rec) { try { TK.rec.abort(); } catch (e) {} TK.rec = null; }
+    try { speechSynthesis.cancel(); } catch (e) {}
+    TK.busy = false;
+    showStage("home");
+    renderHome();
+  }
+
   function finish() {
     var t = today();
     S.days[t] = (S.days[t] || 0) + 1;
@@ -605,7 +1022,10 @@
     save();
 
     var box = $("done-summary"); box.innerHTML = "";
-    [["새 표현", results.newN + "개"], ["알았어요", results.ok + "개"], ["몰랐어요", results.no + "개"]]
+    var rows = [["새 표현", results.newN + "개"], ["알았어요", results.ok + "개"], ["몰랐어요", results.no + "개"]];
+    if (TK.doneCount) rows.push(["대화", TK.doneCount + "개"]);
+    if (TK.micUsed) rows.push(["말해서 맞춘 것", (TK.okCount || 0) + "개"]);
+    rows
       .forEach(function (p) {
         var c = el("span", "chip");
         c.appendChild(document.createTextNode(p[0] + " "));
@@ -968,16 +1388,25 @@
     $("per-note").textContent = "한 번에 " + S.cfg.per + "개, 약 " +
       Math.max(3, Math.round(S.cfg.per * 0.6)) + "분 걸려요.";
 
+    renderLinks();
+
     voiceTries = 0;        // 나 탭에 들어올 때마다 다시 넉넉히 기다려 봅니다
     renderVoices();
 
     markSeg("#cfg-lmin", "data-lmin", String(S.cfg.lmin));
     markSeg("#cfg-lko", "data-lko", String(S.cfg.lko));
     markSeg("#cfg-lgap", "data-lgap", String(S.cfg.lgap));
+    markSeg("#cfg-ldir", "data-ldir", S.cfg.ldir);
+
+    $("ldir-note").textContent = S.cfg.ldir === "auto"
+      ? "오후 2시 전에는 ‘영어 → 뜻’, 그 뒤에는 ‘뜻 → 영어’로 돕니다."
+      : S.cfg.ldir === "en"
+        ? "영어를 먼저 듣고 뜻을 확인합니다. 알아듣는 연습이에요."
+        : "뜻을 먼저 듣고 영어를 말해 본 뒤 답을 듣습니다. 입이 트이는 쪽이에요.";
+
     $("listen-cfg-note").textContent =
       (S.listenMin ? "지금까지 " + S.listenMin + "분 들었어요. " : "") +
-      (S.cfg.lgap ? "영어 → 뜻 → 따라 말할 틈 → 영어 한 번 더, 이 순서로 돕니다."
-                  : "영어 → 뜻 → 영어 한 번 더, 이 순서로 돕니다.");
+      "오늘 이미 들은 표현은 다음 차례에 뒤로 미룹니다.";
 
     renderBackup();
   }
@@ -1084,6 +1513,35 @@
     box.appendChild(note);
   }
 
+  /* 세워두고 볼 영상 — 주소만 담아 둡니다. 영상 자체는 담지 않습니다. */
+  function renderLinks() {
+    var box = $("link-list"); box.innerHTML = "";
+    if (!S.links.length) {
+      box.appendChild(el("p", "sec-note", "아직 없어요. 공식 영상 주소를 넣어 두세요."));
+      return;
+    }
+    S.links.forEach(function (lk, i) {
+      var row = el("div", "link-row");
+      var a = el("a", "link-a", lk.name || lk.url);
+      a.href = lk.url; a.target = "_blank"; a.rel = "noopener";
+      row.appendChild(a);
+      var x = el("button", "link-x", "지우기"); x.type = "button";
+      x.onclick = function () { S.links.splice(i, 1); save(); renderLinks(); };
+      row.appendChild(x);
+      box.appendChild(row);
+    });
+  }
+
+  function addLink() {
+    var url = $("lk-url").value.trim(), name = $("lk-name").value.trim();
+    if (!/^https?:\/\//i.test(url)) { toast("주소는 http 로 시작해야 해요."); return; }
+    S.links.push({ url: url, name: name || "영상" });
+    save();
+    $("lk-url").value = ""; $("lk-name").value = "";
+    renderLinks();
+    toast("넣었어요.");
+  }
+
   function renderBackup() {
     var box = $("backup-state");
     if (!S.lastBackup) { box.className = "backup-state warn"; box.textContent = "아직 저장한 적이 없어요."; return; }
@@ -1157,13 +1615,28 @@
     $("btn-go").onclick = start;
     $("btn-listen").onclick = listenStart;
     $("btn-listen-stop").onclick = function () { listenStop(); };
-    $("btn-quit").onclick = function () { showStage("home"); renderHome(); };
+    $("btn-quit").onclick = function () { quitMission(); };
     $("btn-home").onclick = function () { showStage("home"); renderHome(); };
     $("btn-play").onclick = function () { say(cur().e); };
     $("btn-slow").onclick = function () { say(cur().e, true); };
     $("btn-reveal").onclick = reveal;
     $("btn-ok").onclick = function () { rate(true); };
     $("btn-no").onclick = function () { rate(false); };
+
+    // 대화 속에서
+    $("btn-talk-quit").onclick = function () { quitMission(); };
+    $("btn-talk-next").onclick = talkNext;
+    $("btn-mic").onclick = micTurn;
+    $("btn-shadow").onclick = shadowTurn;
+
+    // 조금 빠른 말
+    $("btn-fast-quit").onclick = function () { quitMission(); };
+    $("btn-fast-play").onclick = function () { say(FS.list[FS.i].e); };
+    $("btn-fast-slow").onclick = function () { say(FS.list[FS.i].e, true); };
+    $("btn-fast-show").onclick = fastReveal;
+    $("btn-fast-next").onclick = function () { FS.i++; drawFast(); };
+
+    $("btn-add-link").onclick = addLink;
 
     var qt = null;
     $("q").oninput = function () {
@@ -1214,6 +1687,13 @@
         });
       });
 
+    [].slice.call(document.querySelectorAll("#cfg-ldir button")).forEach(function (b) {
+      b.onclick = function () {
+        S.cfg.ldir = b.getAttribute("data-ldir");
+        save(); renderMe();
+      };
+    });
+
     // 화면이 잠기거나 다른 앱으로 갔다 오면 말이 끊깁니다. 그 표현부터 다시 들려줍니다.
     document.addEventListener("visibilitychange", function () {
       if (!LIS.on) return;
@@ -1223,6 +1703,9 @@
       } else {
         keepOn();
         if (!LIS.wake) wakeOn();
+        // 같은 표현을 두 번 넘게 되풀이하지 않습니다. 운전 중엔 되풀이보다 넘어가는 게 낫습니다.
+        LIS.tries = (LIS.tries || 0) + 1;
+        if (LIS.tries > 1) { LIS.i++; LIS.tries = 0; LIS.spoken++; }
         lisJump();
       }
     });

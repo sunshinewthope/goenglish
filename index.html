@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <!-- 고쳐서 다시 올릴 때는 아래 v= 숫자를 1씩 올리세요. -->
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
 
@@ -102,6 +102,62 @@
 
         <button type="button" id="btn-slow" class="text-btn">🐢 천천히 듣기</button>
       </article>
+    </div>
+
+    <!-- 대화 속에서 -->
+    <div id="stage-talk" class="stage" hidden>
+      <div class="stage-head">
+        <button type="button" class="back-btn" id="btn-talk-quit">← 그만하기</button>
+        <div class="progress"><div class="progress-fill" id="talk-progress"></div></div>
+        <p class="counter"><span id="talk-counter"></span><span>대화 속에서</span></p>
+      </div>
+
+      <p class="tk-where" id="tk-where"></p>
+      <div class="tk-lines" id="tk-lines"></div>
+
+      <div class="tk-turn" id="tk-turn" hidden>
+        <p class="tk-turn-label">내 차례예요</p>
+        <p class="tk-ko" id="tk-ko"></p>
+        <p class="tk-en" id="tk-en" hidden></p>
+        <p class="tk-heard" id="tk-heard" hidden></p>
+
+        <div class="tk-acts" id="tk-acts">
+          <button type="button" id="btn-mic" class="mic-btn">🎤 말해보기</button>
+          <button type="button" id="btn-shadow" class="ghost-btn">👂 듣고 따라 하기</button>
+        </div>
+      </div>
+
+      <button type="button" id="btn-talk-next" class="big-btn" hidden>다음</button>
+    </div>
+
+    <!-- 조금 빠른 말 -->
+    <div id="stage-fast" class="stage" hidden>
+      <div class="stage-head">
+        <button type="button" class="back-btn" id="btn-fast-quit">← 그만하기</button>
+        <div class="progress"><div class="progress-fill" id="fast-progress"></div></div>
+        <p class="counter"><span id="fast-counter"></span><span>조금 빠른 말</span></p>
+      </div>
+
+      <article class="card">
+        <p class="card-hint">인터뷰에서 나오는 속도예요</p>
+
+        <button type="button" id="btn-fast-play" class="play">
+          <span aria-hidden="true">🔊</span> 다시 듣기
+        </button>
+
+        <p class="en" id="fast-en" hidden></p>
+        <p class="ko" id="fast-ko" hidden></p>
+        <p class="note" id="fast-note" hidden></p>
+
+        <div class="reveal" id="fast-reveal">
+          <button type="button" id="btn-fast-show" class="big-btn">글자 보기</button>
+        </div>
+
+        <button type="button" id="btn-fast-next" class="big-btn" hidden>다음</button>
+        <button type="button" id="btn-fast-slow" class="text-btn">🐢 천천히 듣기</button>
+      </article>
+
+      <a id="fast-link" class="watch-link" href="#" target="_blank" rel="noopener" hidden>▶ 세워두고 볼 영상</a>
     </div>
 
     <!-- 듣기만 하기 (운전 중) -->
@@ -193,6 +249,18 @@
     </div>
     <p class="sec-note" id="per-note"></p>
 
+    <h2 class="sec-title">세워두고 볼 영상</h2>
+    <p class="sec-note">공식 영상 주소를 넣어 두면 ‘조금 빠른 말’ 끝에 단추로 뜹니다.
+      운전 중에는 열리지 않아요.</p>
+    <div class="link-add">
+      <label class="sr-only" for="lk-url">영상 주소</label>
+      <input type="url" id="lk-url" class="f-input" placeholder="https://...">
+      <label class="sr-only" for="lk-name">이름</label>
+      <input type="text" id="lk-name" class="f-input" placeholder="이름 (예: 제이홉 인터뷰)">
+      <button type="button" id="btn-add-link" class="ghost-btn">넣기</button>
+    </div>
+    <div id="link-list" class="link-list"></div>
+
     <h2 class="sec-title">영어 목소리</h2>
     <p class="sec-note">골라서 들어 보세요. 마음에 드는 것으로 두면 계속 그 목소리로 읽습니다.</p>
     <div id="voice-list" class="voice-list"></div>
@@ -206,6 +274,14 @@
       <button type="button" data-lmin="15">15분</button>
       <button type="button" data-lmin="20">20분</button>
     </div>
+
+    <p class="f-label">어느 쪽으로 연습할까요</p>
+    <div class="seg col" id="cfg-ldir">
+      <button type="button" data-ldir="auto">가는 길·오는 길 자동</button>
+      <button type="button" data-ldir="en">영어 → 뜻 (알아듣기)</button>
+      <button type="button" data-ldir="ko">뜻 → 영어 (입에서 나오게)</button>
+    </div>
+    <p class="sec-note" id="ldir-note"></p>
 
     <p class="f-label">한국어 뜻</p>
     <div class="seg" id="cfg-lko">
@@ -301,6 +377,7 @@
 <div id="toast" class="toast" hidden></div>
 
 <script src="phrases.js?v=1"></script>
-<script src="app.js?v=5"></script>
+<script src="talk.js?v=1"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>

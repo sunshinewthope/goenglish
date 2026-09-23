@@ -146,6 +146,54 @@ img { max-width: 100%; }
 .plan .ps { color: var(--mute); font-size: .8rem; }
 .plan .pn { margin-left: auto; color: var(--plum-ink); font-weight: 700; font-variant-numeric: tabular-nums; }
 
+/* ---- 대화 속에서 ---- */
+.tk-where { color: var(--coral); font-size: .84rem; font-weight: 500; margin: 0 0 14px; }
+.tk-lines { display: flex; flex-direction: column; gap: 10px; }
+.tk-line { display: flex; gap: 10px; align-items: flex-start;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  padding: 13px 15px; }
+.tk-line.mine { background: var(--plum-soft); border-color: var(--plum);
+  margin-left: 22px; }
+.tk-who { font-size: 1.2rem; line-height: 1.3; flex: 0 0 auto; }
+.tk-body { min-width: 0; }
+.tk-e { font-family: var(--en); font-size: 1.06rem; line-height: 1.45; margin: 0; color: var(--ink); }
+.tk-k { font-size: .86rem; color: var(--ink2); margin: 5px 0 0; line-height: 1.5; }
+
+.tk-turn { margin-top: 14px; background: var(--coral-soft);
+  border: 2px solid var(--coral-bg); border-radius: 16px; padding: 16px; }
+.tk-turn-label { color: var(--coral); font-size: .8rem; font-weight: 700; margin: 0 0 8px; }
+.tk-ko { font-size: 1.1rem; font-weight: 500; margin: 0; line-height: 1.5; color: var(--ink); }
+.tk-en { font-family: var(--en); font-size: 1.14rem; margin: 12px 0 0;
+  color: var(--plum-ink); font-weight: 700; line-height: 1.45; }
+.tk-heard { font-size: .87rem; margin: 12px 0 0; padding: 10px 12px;
+  border-radius: 10px; line-height: 1.5; }
+.tk-heard.ok { background: var(--ok-soft); color: var(--ok); }
+.tk-heard.half { background: var(--plum-soft); color: var(--plum-ink); }
+.tk-heard.no { background: var(--no-soft); color: var(--no); }
+.tk-acts { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.mic-btn { display: block; width: 100%; background: var(--coral-bg); color: #2A1610;
+  border: 0; border-radius: 14px; padding: 15px; font-family: var(--font);
+  font-size: 1.04rem; font-weight: 700; cursor: pointer; }
+.mic-btn:active { transform: translateY(1px); }
+.tk-acts .ghost-btn { margin-top: 0; }
+#btn-talk-next { margin-top: 16px; }
+
+/* ---- 조금 빠른 말 ---- */
+.watch-link { display: block; text-align: center; margin-top: 14px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  padding: 13px; color: var(--plum-ink); text-decoration: none; font-size: .95rem; }
+
+/* ---- 세워두고 볼 영상 (나 탭) ---- */
+.link-add { display: flex; flex-direction: column; gap: 8px; }
+.link-add .ghost-btn { margin-top: 0; }
+.link-list { margin-top: 10px; display: flex; flex-direction: column; gap: 7px; }
+.link-row { display: flex; align-items: center; gap: 10px;
+  background: var(--card2); border: 1px solid var(--line); border-radius: 11px; padding: 11px 13px; }
+.link-a { color: var(--plum-ink); font-size: .92rem; text-decoration: none;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto; }
+.link-x { background: none; border: 0; color: var(--mute); font-family: var(--font);
+  font-size: .8rem; cursor: pointer; flex: 0 0 auto; }
+
 /* ---- 듣기만 하기 들어가는 문 ---- */
 .drive { margin-top: 22px; padding-top: 20px; border-top: 1px dashed var(--line); }
 .drive-btn { display: block; width: 100%; background: var(--plum-soft); color: var(--plum-ink);
@@ -311,6 +359,8 @@ img { max-width: 100%; }
 .set-toggle.on .mark { color: var(--ok); }
 
 .seg { display: flex; gap: 7px; }
+.seg.col { flex-direction: column; }
+.seg.col button { text-align: left; padding: 12px 14px; }
 .seg button { flex: 1 1 0; background: var(--card2); color: var(--ink2);
   border: 1px solid var(--line); border-radius: 10px; padding: 10px 6px;
   font-family: var(--font); font-size: .9rem; cursor: pointer; }
