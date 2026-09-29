@@ -29,7 +29,11 @@ var SETS = [
     { e: "I'm all right, thanks.", k: "괜찮아요 (사양할게요)", n: "권유를 부드럽게 거절하는 말. No 보다 자연스러워요.", h: true },
     { e: "It's on me.", k: "제가 낼게요", n: "밥값을 내겠다는 뜻.", h: true },
     { e: "I'm gonna grab a coffee.", k: "커피 좀 사 올게요", n: "gonna = going to, grab = 간단히 사다·가져오다.", h: true },
-    { e: "Do you want me to wait?", k: "기다릴까요?", n: "Do you want me to ~ 는 ‘제가 ~해 드릴까요’입니다.", h: true }
+    { e: "Do you want me to wait?", k: "기다릴까요?", n: "Do you want me to ~ 는 ‘제가 ~해 드릴까요’입니다.", h: true },
+    { e: "You're all set.", k: "다 되셨어요", n: "★ 계산이나 절차가 끝났다는 말. 짧아서 제일 많이 놓칩니다.", h: true },
+    { e: "How are you getting on?", k: "잘 돼 가세요?", n: "★ getting on = 진행되다. 직원이 지나가며 묻는 말입니다.", h: true },
+    { e: "Whenever you're ready.", k: "준비되시면 말씀하세요", n: "서두르지 말라는 뜻. 재촉이 아닙니다.", h: true },
+    { e: "That's you done.", k: "다 되셨습니다", n: "★ 영국식. 문법이 이상해 보이지만 아주 흔한 말이에요.", h: true }
   ]
 },
 
@@ -52,7 +56,11 @@ var SETS = [
     { e: "Which exit should I take?", k: "몇 번 출구로 나가요?", n: "지하철에서." },
     { e: "I think I'm lost.", k: "길을 잃은 것 같아요", n: "도움을 청하는 첫마디로 좋습니다." },
     { e: "Could you help me lift my bag?", k: "가방 올리는 것 좀 도와주실 수 있어요?", n: "기차 선반에 짐 올릴 때. lift = 들어 올리다." },
-    { e: "You're a star, thank you!", k: "정말 멋진 분이세요, 고맙습니다!", n: "★ You're a star = 고마울 때 하는 칭찬. 연예인이라는 뜻이 아닙니다." }
+    { e: "You're a star, thank you!", k: "정말 멋진 분이세요, 고맙습니다!", n: "★ You're a star = 고마울 때 하는 칭찬. 연예인이라는 뜻이 아닙니다." },
+    { e: "Am I going the right way?", k: "이쪽 방향 맞아요?", n: "이미 걷고 있을 때 확인하는 말." },
+    { e: "How far is it from here?", k: "여기서 얼마나 멀어요?", n: "거리를 묻는 기본 문장. 시간으로 답이 오는 경우가 많습니다." },
+    { e: "Is there a shortcut?", k: "질러가는 길 있어요?", n: "shortcut = 지름길." },
+    { e: "Could you write it down?", k: "적어 주실 수 있어요?", n: "★ 지명이 안 들릴 때 가장 확실한 방법입니다." }
   ]
 },
 
@@ -76,7 +84,10 @@ var SETS = [
     { e: "Is there any extra charge for that?", k: "그거 추가 요금 있나요?", n: "업그레이드해 준다고 할 때 꼭 물어볼 말. 공짜일 수도, 돈을 받을 수도 있어요." },
     { e: "Is cut fruit allowed in the room?", k: "손질한 과일은 방에 가져가도 되나요?", n: "동남아 숙소는 두리안을 금합니다. 껍질 벗겨 담아온 건 보통 괜찮아요." },
     { e: "I'd like to order room service.", k: "룸서비스 시키고 싶어요.", n: "방 전화로 0번을 누르거나 Room Service 버튼을 누르면 됩니다." },
-    { e: "Could I change rooms?", k: "방을 바꿀 수 있을까요?", n: "change rooms 는 늘 복수형입니다. room 하나만 쓰면 어색해요." }
+    { e: "Could I change rooms?", k: "방을 바꿀 수 있을까요?", n: "change rooms 는 늘 복수형입니다. room 하나만 쓰면 어색해요." },
+    { e: "Could I have a wake-up call?", k: "모닝콜 좀 해 주실 수 있어요?", n: "★ wake-up call 이 모닝콜입니다. morning call 은 안 통해요." },
+    { e: "Is there a laundry service?", k: "세탁 서비스 있어요?", n: "laundry = 빨래. 긴 여행이면 꼭 필요합니다." },
+    { e: "Do you have an iron?", k: "다리미 있어요?", n: "공연 갈 옷을 다릴 때. 방에 없으면 빌려줍니다." }
   ]
 },
 
@@ -101,7 +112,9 @@ var SETS = [
     { e: "Do you have iced coffee?", k: "아이스커피 있어요?", n: "★ 유럽은 아이스커피가 없는 곳이 많습니다. iced 를 빼면 뜨거운 게 나와요." },
     { e: "Could I get some cold water?", k: "시원한 물 좀 주실 수 있어요?", n: "★ 유럽은 미지근한 물이 기본. with ice 를 붙이면 확실합니다." },
     { e: "I dropped my fork.", k: "포크를 떨어뜨렸어요", n: "이 말만 하면 새로 가져다줍니다. 주워서 쓰지 마세요." },
-    { e: "There's no toilet paper.", k: "휴지가 없어요", n: "★ toilet paper 가 화장실 휴지. tissue 는 코 푸는 휴지예요." }
+    { e: "There's no toilet paper.", k: "휴지가 없어요", n: "★ toilet paper 가 화장실 휴지. tissue 는 코 푸는 휴지예요." },
+    { e: "Could we sit outside?", k: "밖에 앉아도 될까요?", n: "테라스 자리를 청할 때." },
+    { e: "Is there a wait?", k: "기다려야 해요?", n: "★ a wait = 대기 시간. 들어서자마자 묻는 말입니다." }
   ]
 },
 
@@ -176,7 +189,13 @@ var SETS = [
     { e: "I'm glad we came.", k: "오길 잘했어요" },
     { e: "That made my day.", k: "덕분에 기분 좋아졌어요", n: "작은 친절을 받았을 때 하면 아주 좋습니다." },
     { e: "Not bad at all.", k: "꽤 괜찮은데요", n: "‘나쁘지 않다’가 아니라 칭찬입니다." },
-    { e: "I needed that.", k: "이게 필요했어요", n: "쉬거나 먹고 나서 한숨 돌릴 때." }
+    { e: "I needed that.", k: "이게 필요했어요", n: "쉬거나 먹고 나서 한숨 돌릴 때." },
+    { e: "That was fun.", k: "재밌었어요", n: "헤어지며 하는 가장 쉬운 마무리." },
+    { e: "I'm so full.", k: "배불러요", n: "★ full = 배부른. 식사 뒤에 자주 씁니다." },
+    { e: "It's colder than I thought.", k: "생각보다 춥네요", n: "날씨 이야기로 말을 트기 좋습니다." },
+    { e: "I'm shattered.", k: "완전 지쳤어요", n: "★ shattered = 기진맥진(영국). 미국은 exhausted." },
+    { e: "What a day.", k: "참 긴 하루였네요", n: "★ 좋은 날에도 힘든 날에도 씁니다. 말투로 갈려요." },
+    { e: "I could get used to this.", k: "이런 거 익숙해지겠어요", n: "★ get used to = 익숙해지다. 좋은 상황에서 하는 말." }
   ]
 },
 
@@ -234,7 +253,15 @@ var SETS = [
     { e: "Have a good one.", k: "좋은 하루 보내세요", n: "Have a good day 의 가벼운 말." },
     { e: "Enjoy your trip.", k: "여행 잘하세요" },
     { e: "Sorry, I'd rather not. I'm terrible at photos.", k: "죄송해요, 사양할게요. 사진을 정말 못 찍어서요", n: "★ I'd rather not = 안 하고 싶어요. 가장 부드러운 거절입니다." },
-    { e: "I'll try, but I'm really bad at this.", k: "해볼게요, 근데 제가 정말 못 찍어요", n: "미리 말해 두고 찍어 주는 경우. 부담을 덜어 줍니다." }
+    { e: "I'll try, but I'm really bad at this.", k: "해볼게요, 근데 제가 정말 못 찍어요", n: "미리 말해 두고 찍어 주는 경우. 부담을 덜어 줍니다." },
+    { e: "How's your day been?", k: "오늘 어떠셨어요?", n: "말을 트는 가장 흔한 물음." },
+    { e: "What brings you here?", k: "여긴 어쩐 일로 오셨어요?", n: "★ What brings you ~ = 무슨 일로 오셨나요. 통째로 외우세요." },
+    { e: "Is it always this busy?", k: "늘 이렇게 붐벼요?", n: "현지 사람에게 말 걸기 좋은 물음." },
+    { e: "I love your bag.", k: "가방 예쁘네요", n: "★ 칭찬 한마디로 대화가 열립니다. love 는 과장이 아니에요." },
+    { e: "Sorry, I didn't get your name.", k: "죄송해요, 이름을 못 들었어요", n: "★ get = 알아듣다. 다시 묻는 가장 자연스러운 말." },
+    { e: "I'm Jiyeon, by the way.", k: "참, 저는 지연이에요", n: "★ by the way = 참, 그런데. 이름을 끼워 넣을 때 씁니다." },
+    { e: "Mind if I join you?", k: "같이 있어도 될까요?", n: "★ Do you 가 빠진 말. 합석하거나 끼어들 때." },
+    { e: "Let's keep in touch.", k: "연락하고 지내요", n: "keep in touch = 연락을 이어가다." }
   ]
 },
 
@@ -253,7 +280,15 @@ var SETS = [
     { e: "How much cash are you carrying?", k: "현금 얼마나 갖고 계세요?", n: "★ 만 달러가 넘으면 반드시 신고해야 합니다. 그 아래면 대략만 말하면 돼요.", h: true },
     { e: "I'm here for a concert.", k: "콘서트 보러 왔어요", n: "관광 목적을 구체적으로 말할 때. 심사관이 되묻는 일이 줄어듭니다." },
     { e: "I'm traveling alone.", k: "혼자 왔어요", n: "traveling alone = 혼자 여행하는." },
-    { e: "Here's my hotel booking.", k: "숙소 예약증이에요", n: "말보다 보여 주는 게 빠릅니다. 폰에 미리 띄워 두세요." }
+    { e: "Here's my hotel booking.", k: "숙소 예약증이에요", n: "말보다 보여 주는 게 빠릅니다. 폰에 미리 띄워 두세요." },
+    { e: "Anything to declare?", k: "신고할 물건 있어요?", n: "★ 세관에서. declare = 신고하다.", h: true },
+    { e: "Nothing to declare.", k: "신고할 것 없어요", n: "이 한마디면 통과입니다." },
+    { e: "Please step over here.", k: "이쪽으로 오세요", n: "★ 따로 검사하려고 부르는 말. 당황하지 말고 따라가면 됩니다.", h: true },
+    { e: "Could you open your bag?", k: "가방 좀 열어 주시겠어요?", n: "가방 검사. 열어 주면 됩니다.", h: true },
+    { e: "Take your hat off, please.", k: "모자 벗어 주세요", n: "사진을 찍을 때. 안경도 벗으라고 할 수 있어요.", h: true },
+    { e: "I'm just transiting.", k: "환승만 해요", n: "★ transit = 갈아타기. 입국이 아니라는 뜻입니다." },
+    { e: "Where's baggage claim?", k: "수하물 찾는 곳이 어디예요?", n: "★ baggage claim = 짐 찾는 곳. 표지판에도 이렇게 써 있습니다." },
+    { e: "My luggage didn't arrive.", k: "짐이 안 나왔어요", n: "★ 짐 분실 신고. 수하물표(baggage tag)를 챙겨 두세요." }
   ]
 },
 
@@ -300,7 +335,14 @@ var SETS = [
     { e: "The man is a genius.", k: "그 사람 천재예요", n: "★ The man = 그 사람(감탄조). He 보다 힘이 실립니다." },
     { e: "The whole show tells a story.", k: "공연 전체가 하나의 이야기예요", n: "기승전결이 있다는 말을 영어로는 이렇게 합니다." },
     { e: "Every song has its own concept.", k: "곡마다 컨셉이 뚜렷해요", n: "★ its own = 저마다의. concept 은 그대로 씁니다." },
-    { e: "He always thanks his dancers and band.", k: "늘 댄서와 밴드에게 고마워해요", n: "★ 스태프를 챙기는 사람이라는 칭찬. give credit to 도 같은 뜻이에요." }
+    { e: "He always thanks his dancers and band.", k: "늘 댄서와 밴드에게 고마워해요", n: "★ 스태프를 챙기는 사람이라는 칭찬. give credit to 도 같은 뜻이에요." },
+    { e: "I've been a fan for years.", k: "몇 년째 팬이에요", n: "for years = 몇 년째. 현재완료로 말합니다." },
+    { e: "His voice live is incredible.", k: "라이브 목소리가 정말 좋아요", n: "★ live 는 '라이브'로 읽습니다. 녹음이 아니라는 뜻." },
+    { e: "He deserves everything.", k: "다 누릴 자격이 있어요", n: "★ deserve = ~할 자격이 있다. 팬들이 자주 쓰는 말." },
+    { e: "I cried, not gonna lie.", k: "솔직히 울었어요", n: "not gonna lie = 솔직히 말하면. 문장 끝에 붙습니다." },
+    { e: "That outfit though.", k: "그 옷은 진짜…", n: "★ 끝의 though 가 '그건 진짜'라는 감탄이 됩니다. 요즘 말이에요." },
+    { e: "He looked so happy tonight.", k: "오늘 정말 행복해 보였어요", n: "공연 뒤에 나누기 좋은 한마디." },
+    { e: "I'm going to have this on repeat.", k: "이거 무한반복할 거예요", n: "★ on repeat = 반복 재생. 노래 이야기에 씁니다." }
   ]
 },
 
