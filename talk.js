@@ -1316,6 +1316,139 @@ var TALK = {
 
 /* ---------- 잘 안 들리는 말 ---------- */
 
+"I've forgotten the safe code.": {
+  where: "금고가 안 열려 프런트에 전화",
+  lines: [
+    { w: "me", e: "Sorry, I've forgotten the safe code. Can you help?", k: "죄송한데, 금고 비밀번호를 잊어버렸어요. 도와주실 수 있나요?" },
+    { w: "them", e: "No problem, that happens a lot. I'll send someone up.", k: "괜찮아요, 자주 있는 일이에요. 사람 올려 보낼게요." },
+    { w: "me", e: "Thank you. Room 402.", k: "고맙습니다. 402호예요." }
+  ],
+  replies: [
+    { e: "No problem, that happens a lot. I'll send someone up.", k: "괜찮아요, 자주 있는 일이에요. 사람 올려 보낼게요.",
+      n: "★ that happens a lot = 흔한 일이에요. 민망해하지 않아도 됩니다." },
+    { e: "Of course. We have a master key for the safes.", k: "그럼요. 금고 마스터 키가 있어요.",
+      n: "master key = 모든 금고를 여는 열쇠. 직원이 직접 열어 줍니다." },
+    { e: "Sure. I'll need to see your ID first, though.", k: "네. 다만 신분증부터 확인해야 해요.",
+      n: "★ 신분증을 반드시 확인합니다. 여권을 준비해 두세요." },
+    { e: "Someone'll be up in ten minutes. Will you be in?", k: "십 분 안에 올라갈 거예요. 방에 계실 거죠?",
+      n: "★ Will you be in? = 방에 계실 건가요? in 만으로 '안에 있다'가 됩니다." }
+  ]
+},
+
+"Could I borrow a bottle opener?": {
+  where: "와인을 사 와서 프런트에",
+  lines: [
+    { w: "me", e: "Could I borrow a bottle opener?", k: "병따개 좀 빌릴 수 있을까요?" },
+    { w: "them", e: "Is it wine? You'll want a corkscrew.", k: "와인이세요? 그럼 코르크 스크루가 필요하실 거예요." },
+    { w: "me", e: "Yes, wine. That's the one.", k: "네, 와인이요. 그거 맞아요." }
+  ],
+  replies: [
+    { e: "Is it wine? You'll want a corkscrew.", k: "와인이세요? 그럼 코르크 스크루가 필요하실 거예요.",
+      n: "★ corkscrew = 와인 따개. bottle opener 는 병맥주용입니다." },
+    { e: "Sure, there should be one in the minibar drawer.", k: "네, 미니바 서랍에 하나 있을 거예요.",
+      n: "drawer = 서랍. 방에 이미 있는 경우가 많아요." },
+    { e: "Of course. I'll bring it up — what room are you in?", k: "그럼요. 올려 드릴게요. 몇 호실이세요?",
+      n: "what room are you in = 몇 호실이세요." },
+    { e: "We do, but I'll have to open it down here. Hotel policy.", k: "있는데, 여기서 제가 열어 드려야 해요. 호텔 규정이라서요.",
+      n: "Hotel policy = 호텔 규정. 안 된다고 할 때 붙는 말." }
+  ]
+},
+
+"Could I borrow a phone charger?": {
+  where: "충전기를 두고 왔을 때",
+  lines: [
+    { w: "me", e: "Could I borrow a phone charger? I left mine at home.", k: "휴대폰 충전기 좀 빌릴 수 있을까요? 집에 두고 왔어요." },
+    { w: "them", e: "What type? We've got a box of ones guests left behind.", k: "어떤 거요? 손님들이 두고 간 충전기가 한 상자 있어요." },
+    { w: "me", e: "USB-C, if you have one.", k: "C타입이요, 있으시면요." }
+  ],
+  replies: [
+    { e: "What type? We've got a box of ones guests left behind.", k: "어떤 거요? 손님들이 두고 간 충전기가 한 상자 있어요.",
+      n: "★ left behind = 두고 간. 프런트에 분실 충전기가 모여 있습니다." },
+    { e: "We can lend you one, but we'll need a deposit.", k: "빌려 드릴 순 있는데, 보증금을 받아요.",
+      n: "★ deposit = 보증금. 돌려줄 때 받아 갑니다." },
+    { e: "Sorry, we don't lend those. There's a shop next door.", k: "죄송해요, 그건 안 빌려드려요. 옆에 가게 있어요.",
+      n: "next door = 바로 옆. 거절하며 대안을 줍니다." },
+    { e: "Sure. Just drop it back at checkout.", k: "네. 체크아웃할 때 돌려주시면 돼요.",
+      n: "drop it back = 돌려주다. 가볍게 말할 때 씁니다." }
+  ]
+},
+
+"Is there any extra charge for that?": {
+  where: "업그레이드해 준다는 말을 듣고",
+  lines: [
+    { w: "them", e: "Good news — we've upgraded you to a sea view room.", k: "좋은 소식이에요. 바다 전망 방으로 올려 드렸어요." },
+    { w: "me", e: "Oh, thank you! Is there any extra charge for that?", k: "아, 고맙습니다! 추가 요금이 있나요?" },
+    { w: "them", e: "None at all, it's complimentary.", k: "전혀 없어요, 무료입니다." }
+  ],
+  replies: [
+    { e: "None at all, it's complimentary.", k: "전혀 없어요, 무료입니다.",
+      n: "★ complimentary = 무료. free 보다 호텔에서 더 자주 씁니다. 칭찬이 아니에요." },
+    { e: "No charge. We were overbooked, so it's on us.", k: "요금 없어요. 예약이 초과돼서 저희가 부담해요.",
+      n: "★ on us = 저희가 냅니다. overbooked = 예약이 넘친." },
+    { e: "It's thirty a night, but I can do twenty for you.", k: "하루 30인데, 20에 해 드릴게요.",
+      n: "★ 돈을 받는 경우입니다. a night = 하루당. 거절해도 됩니다." },
+    { e: "Just the resort fee, same as before.", k: "리조트 요금만요, 원래랑 같아요.",
+      n: "resort fee = 숙박료와 별도로 붙는 시설 이용료." }
+  ]
+},
+
+"Is cut fruit allowed in the room?": {
+  where: "과일을 사 들고 들어오며",
+  lines: [
+    { w: "me", e: "I saw the sign about durian. Is cut fruit allowed in the room?", k: "두리안 안내문 봤는데요. 손질한 과일은 방에 가져가도 되나요?" },
+    { w: "them", e: "Cut is fine. It's the whole ones that smell.", k: "손질한 건 괜찮아요. 통째로 있는 게 냄새가 나서요." },
+    { w: "me", e: "Good to know. Thank you.", k: "알아두면 좋겠네요. 고맙습니다." }
+  ],
+  replies: [
+    { e: "Cut is fine. It's the whole ones that smell.", k: "손질한 건 괜찮아요. 통째로 있는 게 냄새가 나서요.",
+      n: "★ whole ones = 통째인 것. cut = 잘라 놓은." },
+    { e: "As long as it's sealed, no problem.", k: "밀봉만 돼 있으면 괜찮아요.",
+      n: "★ As long as ~ = ~하기만 하면. sealed = 밀봉된." },
+    { e: "Any durian's a no, sorry. Even cut.", k: "두리안은 안 돼요, 죄송해요. 잘라도요.",
+      n: "★ a no = 안 된다. 명사처럼 씁니다." },
+    { e: "In the room, yes. Not in the lobby or the lift.", k: "방에서는 돼요. 로비나 승강기에서는 안 되고요.",
+      n: "장소마다 규정이 다른 경우입니다." }
+  ]
+},
+
+"I'd like to order room service.": {
+  where: "방에서 전화로",
+  lines: [
+    { w: "me", e: "Hi, I'd like to order room service.", k: "안녕하세요, 룸서비스 시키고 싶은데요." },
+    { w: "them", e: "Certainly. What room are you calling from?", k: "네. 몇 호실에서 거셨어요?" },
+    { w: "me", e: "Room 402. Could I get the club sandwich?", k: "402호요. 클럽 샌드위치 하나 주세요." }
+  ],
+  replies: [
+    { e: "Certainly. What room are you calling from?", k: "네. 몇 호실에서 거셨어요?",
+      n: "★ calling from = 어디서 전화하는지. 방 번호를 먼저 묻습니다." },
+    { e: "Of course. The kitchen closes at eleven, just so you know.", k: "네. 참고로 주방은 11시에 닫아요.",
+      n: "just so you know = 참고로 알려드리면." },
+    { e: "Sure. There's a ten percent service charge on top.", k: "네. 서비스 요금 10퍼센트가 추가됩니다.",
+      n: "★ on top = 위에 더해서. 룸서비스는 대개 추가 요금이 붙습니다." },
+    { e: "Yes — it'll be about forty minutes tonight.", k: "네, 오늘은 사십 분쯤 걸려요.",
+      n: "it'll be = 걸릴 거예요. 소요 시간을 알려 줍니다." }
+  ]
+},
+
+"Could I change rooms?": {
+  where: "방에 문제가 있어 프런트에",
+  lines: [
+    { w: "me", e: "There's a smell in my room. Could I change rooms?", k: "방에서 냄새가 나요. 방을 바꿀 수 있을까요?" },
+    { w: "them", e: "I'm sorry about that. Let me see what we have.", k: "죄송합니다. 남은 방이 있는지 볼게요." },
+    { w: "me", e: "Thank you, I'd really appreciate it.", k: "고맙습니다, 정말 감사해요." }
+  ],
+  replies: [
+    { e: "I'm sorry about that. Let me see what we have.", k: "죄송합니다. 남은 방이 있는지 볼게요.",
+      n: "Let me see what we have = 뭐가 남았는지 보겠다." },
+    { e: "Of course. Would a higher floor suit you?", k: "그럼요. 높은 층은 어떠세요?",
+      n: "★ suit you = 괜찮으시겠어요. 취향을 묻는 정중한 말." },
+    { e: "We're fully booked tonight, but I can send maintenance.", k: "오늘은 만실이라서요, 대신 정비 직원을 보낼게요.",
+      n: "★ maintenance = 시설 정비 직원. 방 대신 수리로 해결합니다." },
+    { e: "Certainly. I'll have someone help with your bags.", k: "네. 짐 옮기는 것도 도와드릴게요.",
+      n: "have someone help = 누굴 시켜 돕게 하다." }
+  ]
+},
+
 "Could you say that again?": {
   where: "못 알아들었을 때",
   lines: [

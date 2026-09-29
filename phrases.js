@@ -67,7 +67,14 @@ var SETS = [
     { e: "The room is a bit cold.", k: "방이 좀 추워요", n: "a bit 을 넣으면 부드러워집니다." },
     { e: "Is a late check-out possible?", k: "늦게 나가도 될까요?" },
     { e: "Could you call a taxi for me?", k: "택시 좀 불러 주실 수 있어요?" },
-    { e: "Which floor is it on?", k: "몇 층이에요?" }
+    { e: "Which floor is it on?", k: "몇 층이에요?" },
+    { e: "I've forgotten the safe code.", k: "금고 비밀번호를 잊어버렸어요.", n: "safe = 객실 금고. 직원이 마스터 키로 열어 줍니다." },
+    { e: "Could I borrow a bottle opener?", k: "병따개 좀 빌릴 수 있을까요?", n: "와인은 corkscrew(코르크 스크루). 샴페인은 손으로 돌려 여는 거라 따개가 필요 없어요." },
+    { e: "Could I borrow a phone charger?", k: "휴대폰 충전기 좀 빌릴 수 있을까요?", n: "프런트에 두고 간 충전기가 모여 있는 경우가 많아요." },
+    { e: "Is there any extra charge for that?", k: "그거 추가 요금 있나요?", n: "업그레이드해 준다고 할 때 꼭 물어볼 말. 공짜일 수도, 돈을 받을 수도 있어요." },
+    { e: "Is cut fruit allowed in the room?", k: "손질한 과일은 방에 가져가도 되나요?", n: "동남아 숙소는 두리안을 금합니다. 껍질 벗겨 담아온 건 보통 괜찮아요." },
+    { e: "I'd like to order room service.", k: "룸서비스 시키고 싶어요.", n: "방 전화로 0번을 누르거나 Room Service 버튼을 누르면 됩니다." },
+    { e: "Could I change rooms?", k: "방을 바꿀 수 있을까요?", n: "change rooms 는 늘 복수형입니다. room 하나만 쓰면 어색해요." }
   ]
 },
 
