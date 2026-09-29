@@ -1195,7 +1195,8 @@
     $("ls-count").textContent = (LIS.spoken + 1) + "번째";
 
     // 리듬은 다른 것들과 같게 — 듣고, 뜻 보고, 틈, 한 번 더
-    var seq = [{ en: f.e, wait: 400 }], gap = gapFor(f.e);
+    // 긴 문장이라 만들어 말하긴 어렵습니다. 듣고 따라 말하는 쪽으로만 씁니다.
+    var seq = [{ showEn: f.e, en: f.e, wait: 400 }], gap = gapFor(f.e);
     if (LIS.ko) seq.push({ ko: f.k, show: f.k, wait: 350 });
     else seq.push({ show: f.k, wait: 300 });
     if (gap) seq.push({ cue: "따라 말해 보세요", wait: gap });
@@ -1217,40 +1218,61 @@
   }
 
   /* ── 듣기 리듬 ──────────────────────────────────────────────
-     낱개든 대화든 틈은 늘 같은 자리에 한 번만 옵니다.
-     어떤 건 따라 말할 틈이 있고 어떤 건 그냥 지나가면 헷갈리니까요.
+     한 번 듣는 동안 줄의 순서는 언제나 똑같습니다.
+     예전에는 내 말만 한국어로 시작하고 나머지는 영어로 시작해서
+     왔다갔다 했습니다.
 
-       뜻 → 영어 :  (상대 말) → 내가 할 말의 뜻 → [틈] → 영어
-       영어 → 뜻 :  (상대 말) → 영어 → 뜻 → [틈] → 영어 한 번 더
+       가는 길(영어 → 뜻) :  모든 줄이  영어 → 한국어
+       오는 길(뜻 → 영어) :  모든 줄이  한국어 → 영어
+
+     다른 것은 하나뿐입니다 — 내가 할 말에만 틈이 들어갑니다.
+
+       가는 길 내 말 :  영어 → 한국어 → [틈] → 영어 한 번 더
+       오는 길 내 말 :  한국어 → [틈] → 영어
 
      틈은 내가 말해야 하는 문장 길이에 맞춰 잡습니다.
      ─────────────────────────────────────────────────────────── */
   function gapFor(text) {
     if (!S.cfg.lgap) return 0;
-    var mul = (S.cfg.lgap === 2 ? 2.0 : 1.3);
-    return Math.round(Math.max(2000, String(text || "").length * 90) * mul);
+    var mul = (S.cfg.lgap === 2 ? 2.2 : 1.4);
+    return Math.round(Math.max(3000, String(text || "").length * 130) * mul);
   }
 
-  function sayLine(seq, e, k, wait) {
-    seq.push({ showEn: e, en: e, wait: 300 });
-    if (LIS.ko) seq.push({ ko: k, show: k, wait: wait });
-    else seq.push({ show: k, wait: wait });
+  /* 듣기만 하는 줄 — 상대가 하는 말, 돌아오는 답 */
+  function hearLine(seq, e, k, wait) {
+    if (LIS.dir === "ko") {
+      if (LIS.ko) seq.push({ ko: k, show: k, wait: 300 });
+      else seq.push({ show: k, wait: 250 });
+      seq.push({ showEn: e, en: e, wait: wait });
+    } else {
+      seq.push({ showEn: e, en: e, wait: 300 });
+      if (LIS.ko) seq.push({ ko: k, show: k, wait: wait });
+      else seq.push({ show: k, wait: wait });
+    }
+  }
+
+  /* 내가 할 말 — 같은 순서에 틈만 더합니다 */
+  function speakLine(seq, e, k, wait) {
+    var gap = gapFor(e);
+    if (LIS.dir === "ko") {
+      if (LIS.ko) seq.push({ ko: k, show: k, wait: 300 });
+      else seq.push({ show: k, wait: 250 });
+      if (gap) seq.push({ cue: "영어로 말해 보세요", wait: gap });
+      seq.push({ cue: "", showEn: e, en: e, wait: wait });
+    } else {
+      seq.push({ showEn: e, en: e, wait: 300 });
+      if (LIS.ko) seq.push({ ko: k, show: k, wait: 300 });
+      else seq.push({ show: k, wait: 250 });
+      if (gap) seq.push({ cue: "따라 말해 보세요", wait: gap });
+      seq.push({ cue: "", en: e, echo: true, wait: wait });
+    }
   }
 
   /* 대화가 없는 표현 — 혼자 나오는 한 문장 */
   function soloSeq(row) {
-    var seq = [], gap = gapFor(row.e);
-    if (LIS.dir === "ko") {
-      $("ls-en").textContent = "";
-      $("ls-ko").textContent = row.k;
-      seq.push({ ko: row.k, show: row.k, wait: 350 });
-      if (gap) seq.push({ cue: "영어로 말해 보세요", wait: gap });
-      seq.push({ cue: "", showEn: row.e, en: row.e, wait: 900 });
-    } else {
-      sayLine(seq, row.e, row.k, 350);
-      if (gap) seq.push({ cue: "따라 말해 보세요", wait: gap });
-      seq.push({ cue: "", en: row.e, echo: true, wait: 900 });
-    }
+    var seq = [];
+    $("ls-en").textContent = "";
+    speakLine(seq, row.e, row.k, 900);
     return seq;
   }
 
@@ -1264,23 +1286,15 @@
 
     $("ls-en").textContent = "";
 
-    // 내 차례 전에 상대가 하는 말
+    // 내 차례 전에 상대가 하는 말 — 듣기만 합니다
     for (i = 0; i < pi; i++) {
       seq.push({ cue: "상대가 이렇게 말해요" });
-      sayLine(seq, t.lines[i].e, t.lines[i].k, 400);
+      hearLine(seq, t.lines[i].e, t.lines[i].k, 400);
     }
 
-    var gap = gapFor(mine.e);
-    if (LIS.dir === "ko") {
-      seq.push({ cue: "", ko: mine.k, show: mine.k, wait: 350 });
-      if (gap) seq.push({ cue: "영어로 말해 보세요", wait: gap });
-      seq.push({ cue: "내가 할 말", showEn: mine.e, en: mine.e, wait: 500 });
-    } else {
-      seq.push({ cue: "내가 할 말" });
-      sayLine(seq, mine.e, mine.k, 350);
-      if (gap) seq.push({ cue: "따라 말해 보세요", wait: gap });
-      seq.push({ cue: "", en: mine.e, echo: true, wait: 500 });
-    }
+    // 내가 할 말 — 순서는 위와 같고, 틈만 들어갑니다
+    seq.push({ cue: "내가 할 말" });
+    speakLine(seq, mine.e, mine.k, 500);
 
     // 돌아오는 답 하나 — 매번 다른 것이 뽑힙니다
     var rep = null;
@@ -1288,7 +1302,7 @@
     else { for (i = pi + 1; i < t.lines.length; i++) if (t.lines[i].w === "them") { rep = t.lines[i]; break; } }
     if (rep) {
       seq.push({ cue: "이런 답이 돌아와요" });
-      sayLine(seq, rep.e, rep.k, 800);
+      hearLine(seq, rep.e, rep.k, 800);
     }
     return seq;
   }
