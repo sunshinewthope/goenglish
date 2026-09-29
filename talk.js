@@ -1316,6 +1316,198 @@ var TALK = {
 
 /* ---------- 잘 안 들리는 말 ---------- */
 
+/* ---------- 최애 자랑하기 ---------- */
+
+"Have you seen Hope on the Street?": {
+  where: "줄 서서 콘텐츠 이야기가 나왔을 때",
+  lines: [
+    { w: "them", e: "I'm quite new. What should I watch first?", k: "저 아직 초보예요. 뭐부터 봐야 해요?" },
+    { w: "me", e: "Have you seen Hope on the Street? He goes and learns from street dance masters.", k: "홉 온 더 스트릿 보셨어요? 스트릿 댄스 고수들을 찾아가 배우는 거예요." },
+    { w: "them", e: "Wait, he's already that good and he's still learning?", k: "잠깐만요, 이미 그렇게 잘하는데 또 배운다고요?" }
+  ],
+  replies: [
+    { e: "Wait, he's already that good and he's still learning?", k: "잠깐만요, 이미 그렇게 잘하는데 또 배운다고요?",
+      n: "★ already that good = 이미 그만큼 잘하는. 감탄하며 되묻는 말." },
+    { e: "Adding it to my list right now.", k: "지금 바로 볼 목록에 넣을게요.",
+      n: "I'm 이 빠진 Adding it ~. my list = 볼 것 목록." },
+    { e: "Oh, that's the one with the different dance styles?", k: "아, 여러 춤 장르 나오는 그거요?",
+      n: "★ the one with ~ = ~가 나오는 그거. 제목이 헷갈릴 때 이렇게 짚습니다." },
+    { e: "Twice. It's what got me into him, honestly.", k: "두 번 봤어요. 솔직히 그거 보고 빠졌어요.",
+      n: "★ got me into him = 그를 좋아하게 만들었다. 입덕 계기를 말하는 표현." }
+  ]
+},
+
+"The man is a genius.": {
+  where: "그 콘텐츠 이야기를 이어가며",
+  lines: [
+    { w: "them", e: "So he just learns the dance and that's it?", k: "그럼 춤만 배우고 끝이에요?" },
+    { w: "me", e: "No — he writes a song for each theme, learns the dance, and turns it into a whole series. The man is a genius.", k: "아뇨. 주제마다 곡을 쓰고, 거기 맞는 춤을 배워서, 그걸 하나의 시리즈로 만들어요. 그 사람 천재예요." },
+    { w: "them", e: "Okay, that's actually ridiculous. In a good way.", k: "와, 그건 진짜 말도 안 되네요. 좋은 뜻으로요." }
+  ],
+  replies: [
+    { e: "Okay, that's actually ridiculous. In a good way.", k: "와, 그건 진짜 말도 안 되네요. 좋은 뜻으로요.",
+      n: "★ ridiculous 는 원래 '터무니없다'인데, in a good way 를 붙이면 최고의 칭찬이 됩니다." },
+    { e: "Most people can do one of those things. Not all four.", k: "보통은 그중 하나만 해도 대단해요. 네 가지를 다는 아니고요.",
+      n: "one of those things = 그것들 중 하나. 대단함을 셈으로 보여 줍니다." },
+    { e: "And he makes it look like a hobby.", k: "게다가 취미처럼 해내요.",
+      n: "makes it look like ~ = ~처럼 보이게 한다. 쉬워 보인다는 칭찬." },
+    { e: "Genius is the right word, honestly.", k: "천재라는 말이 딱 맞아요, 정말로.",
+      n: "★ is the right word = 그 말이 딱 맞다. 상대 말을 받아 주는 방식." }
+  ]
+},
+
+"He's even better in person.": {
+  where: "무대에 등장한 직후, 옆자리 팬과",
+  lines: [
+    { w: "them", e: "Oh my god, there he is!", k: "세상에, 나왔다!" },
+    { w: "me", e: "He's even better in person. The photos don't do him justice.", k: "실물이 훨씬 낫네요. 사진이 실물을 못 담아요." },
+    { w: "them", e: "Right? And he looks so happy to be here.", k: "그쵸? 여기 있는 게 정말 행복해 보여요." }
+  ],
+  replies: [
+    { e: "Right? And he looks so happy to be here.", k: "그쵸? 여기 있는 게 정말 행복해 보여요.",
+      n: "★ photos don't do him justice = 사진이 실물만 못하다. 통째로 외워 두면 좋습니다." },
+    { e: "I know! The screens don't even capture it.", k: "그러니까요! 화면으로도 다 안 담겨요.",
+      n: "capture = 담아내다. I know 는 '내 말이'라는 맞장구." },
+    { e: "Wait till he's closer. You'll lose it.", k: "가까이 오면 보세요. 정신 못 차릴걸요.",
+      n: "Wait till ~ = ~하면 더 놀라실 거예요." },
+    { e: "And he's been on a plane all day! How?", k: "게다가 하루 종일 비행기 탔는데! 어떻게 저래요?",
+      n: "How? 한 단어로 감탄을 대신합니다." }
+  ]
+},
+
+"His dancing is on another level.": {
+  where: "댄스 무대가 끝나고",
+  lines: [
+    { w: "them", e: "Did you see that footwork?", k: "그 발놀림 보셨어요?" },
+    { w: "me", e: "His dancing is on another level. Nobody moves like that.", k: "춤이 차원이 달라요. 저렇게 움직이는 사람 없어요." },
+    { w: "them", e: "And he makes it look easy, that's the scary part.", k: "게다가 쉬워 보이게 하잖아요, 그게 무서운 거죠." }
+  ],
+  replies: [
+    { e: "And he makes it look easy, that's the scary part.", k: "게다가 쉬워 보이게 하잖아요, 그게 무서운 거죠.",
+      n: "★ makes it look easy = 쉬워 보이게 한다. 최고의 칭찬입니다." },
+    { e: "He's been dancing since he was a kid, you know.", k: "어릴 때부터 춤췄대요, 아시죠.",
+      n: "since he was a kid = 어릴 때부터. 문장 끝의 you know 는 '아시다시피'." },
+    { e: "Honestly, he could dance in his sleep.", k: "솔직히 자면서도 출 것 같아요.",
+      n: "★ in his sleep = 자면서도. 몸에 완전히 뱄다는 과장된 칭찬." },
+    { e: "The control! Not one wasted move.", k: "그 절제력! 버리는 동작이 하나도 없어요.",
+      n: "control = 몸을 다루는 절제력. wasted move = 헛된 동작." }
+  ]
+},
+
+"He works so hard.": {
+  where: "공연 중간, 땀에 젖은 모습을 보고",
+  lines: [
+    { w: "them", e: "He hasn't stopped once.", k: "한 번도 안 쉬었어요." },
+    { w: "me", e: "He works so hard. And he's such a professional about it.", k: "정말 열심히 해요. 게다가 아주 프로답고요." },
+    { w: "them", e: "Two hours straight and not one mistake.", k: "두 시간 내리 하는데 실수 하나 없어요." }
+  ],
+  replies: [
+    { e: "Two hours straight and not one mistake.", k: "두 시간 내리 하는데 실수 하나 없어요.",
+      n: "★ straight = 쉬지 않고 내리. not one = 하나도 없는." },
+    { e: "They say he rehearses more than anyone.", k: "누구보다 연습을 많이 한대요.",
+      n: "★ They say ~ = ~라고들 해요. rehearse = 연습하다." },
+    { e: "He plans everything down to the second.", k: "초 단위까지 다 계획해요.",
+      n: "★ down to the second = 초 단위까지. 꼼꼼함을 말하는 표현." },
+    { e: "That's why he's lasted this long.", k: "그러니까 이렇게 오래 가는 거죠.",
+      n: "lasted = 버텨 왔다. 오래 활동한다는 뜻." }
+  ]
+},
+
+"He never lets us down.": {
+  where: "공연이 끝나고 나오면서",
+  lines: [
+    { w: "them", e: "I had such high expectations and somehow it was more.", k: "기대를 엄청 했는데 그 이상이었어요." },
+    { w: "me", e: "He never lets us down. This show was perfect.", k: "실망시키는 법이 없어요. 이번 공연 완벽했어요." },
+    { w: "them", e: "Every single time. I don't know how he does it.", k: "매번 그래요. 어떻게 하는지 모르겠어요." }
+  ],
+  replies: [
+    { e: "Every single time. I don't know how he does it.", k: "매번 그래요. 어떻게 하는지 모르겠어요.",
+      n: "★ Every single time = 한 번도 빠짐없이. single 이 강조입니다." },
+    { e: "He raises the bar every tour, honestly.", k: "솔직히 투어마다 기준을 높여요.",
+      n: "★ raise the bar = 기준을 더 높이다." },
+    { e: "That's why I keep coming back.", k: "그래서 계속 오는 거예요.",
+      n: "keep coming back = 계속 다시 오다." },
+    { e: "Worth every hour of that flight.", k: "비행기 탄 시간이 하나도 안 아까워요.",
+      n: "Worth every ~ = ~ 하나하나가 아깝지 않다." }
+  ]
+},
+
+"He writes his own songs.": {
+  where: "곡 이야기가 나왔을 때",
+  lines: [
+    { w: "them", e: "This track is so different from the last album.", k: "이 곡은 지난 앨범이랑 완전히 다르네요." },
+    { w: "me", e: "He writes his own songs, so it changes with him.", k: "곡을 직접 쓰니까, 본인이 변하면 곡도 변하죠." },
+    { w: "them", e: "I didn't know that. That explains a lot.", k: "몰랐어요. 그래서 그렇구나." }
+  ],
+  replies: [
+    { e: "I didn't know that. That explains a lot.", k: "몰랐어요. 그래서 그렇구나.",
+      n: "★ That explains a lot = 그래서 그랬구나. 이해됐다는 뜻." },
+    { e: "Produces a lot of it too, doesn't he?", k: "프로듀싱도 많이 하죠, 그쵸?",
+      n: "★ 끝의 doesn't he? 는 '그렇죠?'라는 확인. 앞의 He 가 생략됐습니다." },
+    { e: "You can hear it. It sounds like him.", k: "들으면 알아요. 그 사람 느낌이 나요.",
+      n: "sounds like him = 그 사람다운 소리가 난다." },
+    { e: "And everything he makes is good. No filler.", k: "게다가 만드는 것마다 좋아요. 버릴 게 없어요.",
+      n: "★ filler = 채우려고 넣은 곡. No filler = 버릴 곡이 없다." }
+  ]
+},
+
+"He knows how to own a stage.": {
+  where: "무대 연출이 좋았을 때",
+  lines: [
+    { w: "them", e: "That lighting change was insane.", k: "그 조명 바뀌는 거 미쳤어요." },
+    { w: "me", e: "He knows how to own a stage. Every moment is planned.", k: "무대를 장악할 줄 알아요. 순간순간이 다 계획된 거예요." },
+    { w: "them", e: "You can tell he's involved in the whole thing.", k: "전부 직접 관여하는 게 보여요." }
+  ],
+  replies: [
+    { e: "You can tell he's involved in the whole thing.", k: "전부 직접 관여하는 게 보여요.",
+      n: "★ involved in = ~에 관여하는. the whole thing = 전체." },
+    { e: "It's like a film, not just a concert.", k: "공연이 아니라 영화 같아요.",
+      n: "It's like ~ = 마치 ~ 같다." },
+    { e: "Even the transitions are thought through.", k: "곡 사이 넘어가는 것까지 다 생각해 놨어요.",
+      n: "★ transitions = 무대 전환. thought through = 끝까지 생각해 둔." },
+    { e: "Nobody does staging like him.", k: "무대 연출은 아무도 못 따라가요.",
+      n: "staging = 무대를 꾸미고 짜는 것." }
+  ]
+},
+
+"He's the whole package.": {
+  where: "최애 이야기를 정리하듯",
+  lines: [
+    { w: "them", e: "So what made him your bias?", k: "그래서 왜 최애가 된 거예요?" },
+    { w: "me", e: "Honestly? He's the whole package. Dance, music, everything.", k: "솔직히요? 다 갖췄어요. 춤, 음악, 전부요." },
+    { w: "them", e: "Hard to argue with that.", k: "반박할 수가 없네요." }
+  ],
+  replies: [
+    { e: "Hard to argue with that.", k: "반박할 수가 없네요.",
+      n: "★ Hard to argue with that = 맞는 말이라 할 말이 없다. It's 가 생략." },
+    { e: "Same for me. And he's kind with it.", k: "저도요. 게다가 성격도 좋고요.",
+      n: "★ kind with it = 그 와중에 착하기까지. 덧붙이는 말입니다." },
+    { e: "See, that's why everyone ends up loving him.", k: "봐요, 그래서 다들 결국 좋아하게 돼요.",
+      n: "★ end up -ing = 결국 ~하게 되다." },
+    { e: "Fair. Mine's more of a vibe thing, honestly.", k: "그러네요. 저는 그냥 느낌이에요, 솔직히.",
+      n: "★ a vibe thing = 설명하기 힘든 느낌. Fair = 그 말 맞네요." }
+  ]
+},
+
+"You can tell he really cares.": {
+  where: "팬들에게 인사하는 모습을 보고",
+  lines: [
+    { w: "them", e: "He's been talking to us for ten minutes.", k: "벌써 십 분째 우리한테 말하고 있어요." },
+    { w: "me", e: "You can tell he really cares. It's not an act.", k: "진심인 게 보여요. 꾸며낸 게 아니에요." },
+    { w: "them", e: "That's the bit that gets me, every time.", k: "저는 그 부분에서 매번 울컥해요." }
+  ],
+  replies: [
+    { e: "That's the bit that gets me, every time.", k: "저는 그 부분에서 매번 울컥해요.",
+      n: "★ gets me = 마음을 울린다. the bit = 그 부분." },
+    { e: "He remembers things fans said years ago.", k: "몇 년 전에 팬들이 한 말도 기억해요.",
+      n: "years ago = 몇 년 전에." },
+    { e: "It's why this fandom is the way it is.", k: "그래서 이 팬덤이 이런 거예요.",
+      n: "the way it is = 지금 이런 모습. 따뜻하다는 뜻입니다." },
+    { e: "Don't. I'm already crying.", k: "그만하세요. 저 벌써 울어요.",
+      n: "★ Don't. 한 단어로 '그 얘기 하지 마세요'. 감동해서 하는 말." }
+  ]
+},
+
 /* ---------- 택시 · 차 부르기 ---------- */
 
 "Where can I get a taxi?": {

@@ -249,6 +249,23 @@ var SETS = [
     { e: "I'll pay extra if you can come back.", k: "돌아와 주시면 요금 더 드릴게요", n: "★ pay extra = 추가로 내다. 이렇게 말하면 대개 돌아와 줍니다." },
     { e: "This is for you. Thank you so much.", k: "이거 받으세요. 정말 고맙습니다", n: "팁을 건네며. 돈 이야기를 길게 안 해도 이 한마디면 됩니다." }
   ]
+},
+
+{
+  id: "bias", icon: "💜", name: "최애 자랑하기",
+  note: "옆자리 팬과 최애 이야기로 몇 시간도 갑니다. 어려운 말 필요 없어요. 짧게 툭 던지면 상대가 받아 줍니다.",
+  items: [
+    { e: "He's even better in person.", k: "실물이 훨씬 낫네요", n: "★ in person = 실제로 보면. 직접 보고 나서 하는 말입니다." },
+    { e: "His dancing is on another level.", k: "춤이 차원이 달라요", n: "★ on another level = 수준이 다르다. 칭찬으로 아주 자주 씁니다." },
+    { e: "He works so hard.", k: "정말 열심히 해요", n: "부지런함을 말하는 가장 쉬운 문장. 뒤에 프로다운 면을 덧붙이기 좋아요." },
+    { e: "He never lets us down.", k: "우릴 실망시키는 법이 없어요", n: "★ let someone down = 실망시키다. 내려놓는다는 뜻이 아닙니다." },
+    { e: "He writes his own songs.", k: "곡을 직접 써요", n: "★ his own = 자기 자신의. 직접 만든다는 뜻입니다." },
+    { e: "He knows how to own a stage.", k: "무대를 장악할 줄 알아요", n: "★ own a stage = 무대를 휘어잡다. 소유가 아닙니다." },
+    { e: "He's the whole package.", k: "다 갖췄어요", n: "★ the whole package = 외모·실력·성격 다 갖춘 사람." },
+    { e: "You can tell he really cares.", k: "진심인 게 보여요", n: "★ You can tell = 티가 난다, 알 수 있다. cares = 마음을 쓴다." },
+    { e: "Have you seen Hope on the Street?", k: "홉 온 더 스트릿 보셨어요?", n: "콘텐츠 이야기를 여는 말. 제목만 바꾸면 무엇에든 쓸 수 있어요." },
+    { e: "The man is a genius.", k: "그 사람 천재예요", n: "★ The man = 그 사람(감탄조). He 보다 힘이 실립니다." }
+  ]
 }
 
 ];
