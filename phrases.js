@@ -118,7 +118,17 @@ var SETS = [
     { e: "Is this on sale?", k: "이거 할인하는 거예요?" },
     { e: "I'll take it.", k: "이걸로 할게요", n: "사겠다고 정했을 때." },
     { e: "Could I get a receipt?", k: "영수증 주실 수 있어요?", n: "환불하려면 꼭 챙기세요." },
-    { e: "Can I return this?", k: "이거 환불돼요?" }
+    { e: "Can I return this?", k: "이거 환불돼요?" },
+    { e: "I'd like to return this.", k: "이거 반품하려고요", n: "★ 반품 창구에서 먼저 하는 말. return = 물건을 되돌려 주는 것." },
+    { e: "It doesn't fit.", k: "안 맞아요", n: "반품 이유로 가장 흔합니다. 이 한마디면 충분해요." },
+    { e: "Can I exchange it for a bigger size?", k: "더 큰 사이즈로 교환돼요?", n: "★ exchange = 교환, refund = 환불. 둘은 다릅니다." },
+    { e: "I bought it yesterday.", k: "어제 샀어요", n: "산 날짜를 말해 두면 처리가 빨라집니다. 영수증도 같이 내세요." },
+    { e: "How does this machine work?", k: "이 기계 어떻게 써요?", n: "★ 셀프 계산대 앞에서. 직원이 옆에 서 있으니 부르면 됩니다." },
+    { e: "It's not scanning.", k: "안 찍혀요", n: "★ 바코드가 안 읽힐 때. 직원이 와서 번호를 직접 칩니다." },
+    { e: "Unexpected item in the bagging area.", k: "봉투 놓는 곳에 예상치 못한 물건이 있습니다", n: "★ 기계가 하는 말입니다. 봉투 자리에 딴 걸 올려두면 나와요. 놀라지 마세요.", h: true },
+    { e: "Which aisle is the bread in?", k: "빵은 몇 번 통로에 있어요?", n: "★ aisle = 진열대 사이 통로. 발음은 '아일'이고 s 는 안 읽습니다." },
+    { e: "Do you sell SIM cards?", k: "유심 파세요?", n: "여행 첫날 편의점이나 마트에서. SIM 은 '심'으로 읽습니다." },
+    { e: "Do you have this in stock?", k: "이거 재고 있어요?", n: "★ in stock = 재고가 있는. 진열대에 없을 때 물어보세요." }
   ]
 },
 
@@ -137,7 +147,15 @@ var SETS = [
     { e: "I missed my train.", k: "기차를 놓쳤어요" },
     { e: "Is there a pharmacy nearby?", k: "근처에 약국 있어요?", n: "nearby 를 붙이면 ‘근처에’." },
     { e: "I don't feel well.", k: "몸이 안 좋아요" },
-    { e: "Could you help me?", k: "좀 도와주실 수 있어요?", n: "막막할 때 이 한마디로 시작하세요." }
+    { e: "Could you help me?", k: "좀 도와주실 수 있어요?", n: "막막할 때 이 한마디로 시작하세요." },
+    { e: "I need to see a doctor.", k: "의사를 봐야 할 것 같아요", n: "★ see a doctor = 진료를 받다. 병원에 가고 싶다는 말입니다." },
+    { e: "Where's the first aid room?", k: "의무실이 어디예요?", n: "★ first aid room = 의무실. 공연장·공항에 반드시 있습니다. medic 이라고도 해요." },
+    { e: "I have a headache.", k: "머리가 아파요", n: "★ 아픈 곳은 I have a ~ 로 말합니다. stomachache(배), toothache(이), sore throat(목)." },
+    { e: "Do you have anything for a cold?", k: "감기약 있어요?", n: "약국에서. anything for ~ = ~에 듣는 것." },
+    { e: "I'm allergic to penicillin.", k: "페니실린 알레르기가 있어요", n: "★ 진료받을 때 꼭 해야 하는 말. 약 이름만 바꿔 쓰세요." },
+    { e: "Could you call an ambulance?", k: "구급차 좀 불러 주세요", n: "★ 응급 상황. 미국·캐나다는 911, 영국·유럽은 112." },
+    { e: "My bag was stolen.", k: "가방을 도둑맞았어요", n: "★ was stolen = 도둑맞았다. 잃어버린 것(lost)과 구분해 말해야 합니다. 보험 청구에도 다릅니다." },
+    { e: "I've lost my passport.", k: "여권을 잃어버렸어요", n: "★ 가장 큰일. 대사관에 연락해야 합니다. 여권 사본을 미리 찍어 두세요." }
   ]
 },
 
@@ -240,8 +258,8 @@ var SETS = [
 },
 
 {
-  id: "ride", icon: "🚕", name: "택시 · 차 부르기",
-  note: "공항에서 차를 잡고, 기사와 주고받는 말입니다. 그랩·우버는 만나는 자리를 정확히 말하는 게 전부예요.",
+  id: "ride", icon: "🚕", name: "택시 · 버스 · 지하철",
+  note: "타고 다니며 쓰는 말입니다. 택시는 요금과 만나는 자리, 버스·지하철은 카드와 방향이 전부예요.",
   items: [
     { e: "Where can I get a taxi?", k: "택시 어디서 타요?", n: "공항에 내려서 제일 먼저 묻게 되는 말." },
     { e: "Where's the pickup point for Grab?", k: "그랩 타는 곳이 어디예요?", n: "★ pickup point = 차를 타는 지정 장소. 공항은 앱 차량 자리가 따로 있습니다." },
@@ -249,7 +267,20 @@ var SETS = [
     { e: "I think I left something in your car.", k: "차에 물건을 두고 내린 것 같아요", n: "left = 두고 내리다. 앱 안에서 기사에게 바로 연락할 수 있습니다." },
     { e: "Could you come back for me?", k: "저한테 다시 와 주실 수 있어요?", n: "come back for me = 나를 위해 돌아오다." },
     { e: "I'll pay extra if you can come back.", k: "돌아와 주시면 요금 더 드릴게요", n: "★ pay extra = 추가로 내다. 이렇게 말하면 대개 돌아와 줍니다." },
-    { e: "This is for you. Thank you so much.", k: "이거 받으세요. 정말 고맙습니다", n: "팁을 건네며. 돈 이야기를 길게 안 해도 이 한마디면 됩니다." }
+    { e: "This is for you. Thank you so much.", k: "이거 받으세요. 정말 고맙습니다", n: "팁을 건네며. 돈 이야기를 길게 안 해도 이 한마디면 됩니다." },
+    { e: "How much is it to the city centre?", k: "시내까지 얼마예요?", n: "★ 타기 전에 묻는 말. 미터기 없는 택시는 먼저 값을 정해야 합니다." },
+    { e: "Could you use the meter, please?", k: "미터기 켜 주시겠어요?", n: "★ 바가지를 막는 가장 확실한 한마디. 정중하게 말하면 됩니다." },
+    { e: "Can you drop me here?", k: "여기서 내려 주실 수 있어요?", n: "★ drop me = 내려 주다. 목적지 전에 내리고 싶을 때." },
+    { e: "Keep the change.", k: "잔돈은 괜찮아요", n: "거스름돈을 팁으로 줄 때. 짧고 자연스럽습니다." },
+    { e: "Where's the ticket machine?", k: "발권기가 어디예요?", n: "ticket machine = 무인 발권기. 창구보다 줄이 짧습니다." },
+    { e: "Where do I tap my card?", k: "카드 어디에 찍어요?", n: "★ tap = 카드를 대다. 요즘은 교통카드 없이 신용카드를 바로 대는 곳이 많아요." },
+    { e: "Is there a day pass?", k: "하루 이용권 있어요?", n: "★ day pass = 1일권. 서너 번 탈 거면 이게 쌉니다." },
+    { e: "Which line should I take?", k: "몇 호선 타야 해요?", n: "★ line = 노선. 번호가 아니라 색이나 이름으로 부르는 도시가 많습니다." },
+    { e: "Is this the right side for downtown?", k: "시내 방향이 이쪽 맞아요?", n: "★ 승강장을 잘못 서면 반대로 갑니다. 타기 전에 꼭 확인하세요." },
+    { e: "Can I pay with a card on the bus?", k: "버스에서 카드로 낼 수 있어요?", n: "현금만 받는 버스도 아직 있습니다. 잔돈을 안 거슬러 주기도 해요." },
+    { e: "I need to get off at the next stop.", k: "다음 정거장에서 내려야 해요", n: "★ get off = 내리다. 사람이 많아 길을 비켜 달라 할 때도 씁니다." },
+    { e: "Does this train stop at every station?", k: "이 열차 모든 역에 서요?", n: "★ 급행은 몇 정거장을 건너뜁니다. express(급행) / local(완행)." },
+    { e: "How many stops is it?", k: "몇 정거장이에요?", n: "stops = 정거장 수. 내릴 때를 가늠하기 좋습니다." }
   ]
 },
 
@@ -274,14 +305,29 @@ var SETS = [
 },
 
 {
-  id: "museum", icon: "🖼️", name: "미술관 · 박물관",
-  note: "들어가기 전과 안에서 쓰는 말입니다. 작가 이름만 바꾸면 어디서든 그대로 쓸 수 있어요.",
+  id: "museum", icon: "🎟️", name: "미술관 · 영화관 · 박람회",
+  note: "표 끊고 들어가서 구경하는 자리라면 어디든 같습니다. 작품 이름만 바꾸면 영화관·박람회에서도 그대로 써요.",
   items: [
     { e: "Where do I buy tickets?", k: "표는 어디서 사요?", n: "온라인 예매가 더 싼 곳이 많으니 미리 확인해 두세요." },
     { e: "Where can I find the Monet room?", k: "모네 전시실이 어디예요?", n: "★ 작가 이름만 바꾸면 됩니다. room 대신 section 이라고도 해요." },
     { e: "Is photography allowed?", k: "사진 찍어도 되나요?", n: "★ 플래시만 금지인 곳이 많습니다. No flash 라는 답이 자주 와요." },
     { e: "Is there an audio guide in English?", k: "영어 오디오 가이드 있어요?", n: "audio guide = 음성 안내기. 대여료를 받는 곳도 있습니다." },
-    { e: "Where's the nearest place to eat?", k: "제일 가까운 먹을 데가 어디예요?", n: "★ 고속도로 휴게소는 services(영국) 또는 rest stop(미국)이라고 합니다." }
+    { e: "Where's the nearest place to eat?", k: "제일 가까운 먹을 데가 어디예요?", n: "★ 고속도로 휴게소는 services(영국) 또는 rest stop(미국)이라고 합니다." },
+    { e: "Two adults, please.", k: "어른 두 장 주세요", n: "표 살 때. 인원과 종류만 말하면 됩니다." },
+    { e: "Is there a student discount?", k: "학생 할인 있어요?", n: "discount = 할인. 교사·경로 할인도 있으니 물어볼 만합니다." },
+    { e: "Where do I leave my bag?", k: "가방은 어디에 맡겨요?", n: "★ 큰 가방은 못 들고 들어갑니다. cloakroom(물품 보관소)을 찾으세요." },
+    { e: "Which way to the exhibition?", k: "전시는 어느 쪽이에요?", n: "★ Which way to ~ = ~는 어느 쪽인가요. 동사 없이 짧게 묻는 말." },
+    { e: "How long does it take to see everything?", k: "다 보려면 얼마나 걸려요?", n: "시간 계획을 세울 때. 큰 미술관은 하루로도 모자랍니다." },
+    { e: "Is this included in the ticket?", k: "이건 표에 포함된 건가요?", n: "★ 특별전은 따로 돈을 받는 경우가 많습니다." },
+    { e: "What time do you close?", k: "몇 시에 닫아요?", n: "★ 닫기 30분 전부터 전시실을 차례로 닫습니다." },
+    { e: "Is there a lift?", k: "승강기 있어요?", n: "★ lift = 승강기(영국). 미국은 elevator. 오래된 건물엔 없을 수도 있어요." },
+    { e: "Where are the toilets?", k: "화장실이 어디예요?", n: "★ toilets(영국) / restroom(미국). 미국에서 toilet 은 변기를 뜻해 어색합니다." },
+    { e: "Is there a gift shop?", k: "기념품 가게 있어요?", n: "gift shop = 기념품 가게. 대개 출구 쪽에 있습니다." },
+    { e: "Could I have a map?", k: "지도 한 장 주실 수 있어요?", n: "대개 무료입니다. 영어판이 따로 있는 곳도 있어요." },
+    { e: "What's this one about?", k: "이 작품은 무슨 내용이에요?", n: "★ What's it about = 무엇에 관한 것인가. 작품·영화·책에 다 씁니다." },
+    { e: "Who painted this?", k: "이거 누가 그렸어요?", n: "painted = 그렸다. 조각이면 Who made this?" },
+    { e: "Is this the original?", k: "이거 진품이에요?", n: "★ original = 진품. 복제품은 replica 나 copy 라고 합니다." },
+    { e: "I could look at this all day.", k: "이건 하루 종일 봐도 좋겠어요", n: "작품 앞에서 감탄할 때. 같이 온 사람에게 하는 말." }
   ]
 }
 
