@@ -873,7 +873,10 @@
       c.appendChild(el("h3", "rc-t", r.title || "제목 없음"));
       c.appendChild(el("p", "rc-s", splitSents(r.text).length + "문장 · " + pretty(r.at)));
       c.appendChild(el("p", "rc-p", String(r.text).slice(0, 80) + (r.text.length > 80 ? "…" : "")));
-      c.onclick = function () { RD.id = r.id; renderRead(); window.scrollTo(0, 0); };
+      c.onclick = function () {
+        RD.id = r.id; renderRead(); window.scrollTo(0, 0);
+        backArm(function () { readStop(); RD.id = ""; renderRead(); });
+      };
       box.appendChild(c);
     });
   }
@@ -1467,10 +1470,38 @@
   /* ==========================================================
      화면
      ========================================================== */
+  /* ---------- 폰 뒤로가기 ----------
+     화면 하나짜리 앱이라, 묶음에 들어가도 브라우저가 보기엔 이동이 없습니다.
+     그래서 뒤로가기를 누르면 앱을 통째로 빠져나갑니다.
+     안으로 들어갈 때 돌아갈 자리를 하나 만들어 두고, 뒤로가기를 받으면
+     그 자리로 돌아옵니다. 자리는 한 번에 하나만 둡니다. */
+  var backClose = null, backSkip = false;
+
+  function backArm(close) {
+    if (backClose) { backClose = close; return; }   // 이미 있으면 갈아끼우기만
+    backClose = close;
+    try { history.pushState({ b: 1 }, ""); } catch (e) {}
+  }
+  function backFire() {                              // 앱 안의 ← 단추가 부릅니다
+    if (!backClose) return false;
+    try { history.back(); return true; } catch (e) { return false; }
+  }
+  function backDisarm() {                            // 탭을 옮겨 자리가 무효가 될 때
+    if (!backClose) return;
+    backClose = null; backSkip = true;
+    try { history.back(); } catch (e) { backSkip = false; }
+  }
+  window.addEventListener("popstate", function () {
+    if (backSkip) { backSkip = false; return; }
+    var f = backClose; backClose = null;
+    if (f) f();
+  });
+
   var VIEWS = ["today", "find", "read", "reward", "me"];
   var STAGES = ["home", "stage-card", "stage-talk", "stage-fast", "stage-listen", "stage-done"];
 
   function showView(n) {
+    backDisarm();                   // 탭을 옮기면 쌓아둔 뒤로가기 자리는 버립니다
     if (LIS.on) listenStop(true);   // 다른 곳으로 가면 듣기는 멈춥니다
     VIEWS.forEach(function (v) { $("view-" + v).hidden = (v !== n); });
     [].slice.call(document.querySelectorAll(".tab")).forEach(function (t) {
@@ -1891,7 +1922,10 @@
         b.innerHTML = '<span class="si">' + esc(s.icon) + '</span>' +
           '<div class="sn">' + esc(s.name) + '</div>' +
           '<div class="sd">' + s.items.length + '개 · 익힘 ' + got + '개</div>';
-        b.onclick = function () { findSet = s.id; renderFind(); };
+        b.onclick = function () {
+          findSet = s.id; renderFind();
+          backArm(function () { findSet = null; renderFind(); });
+        };
         box.appendChild(b);
       });
       return;
@@ -1907,7 +1941,10 @@
       var s2 = SET_BY_ID[findSet];
       var back = el("button", "back-tag", "← 전체 묶음");
       back.type = "button";
-      back.onclick = function () { findSet = null; renderFind(); };
+      back.onclick = function () {
+        if (backFire()) return;              // 쌓아둔 자리가 있으면 그걸로 돌아갑니다
+        findSet = null; renderFind();
+      };
       box.appendChild(back);
       var h = el("h2", "sec-title", s2.icon + " " + s2.name);
       box.appendChild(h);
@@ -2348,7 +2385,10 @@
     $("btn-read-new").onclick = function () { $("read-editor").hidden = false; };
     $("rd-cancel").onclick = function () { $("read-editor").hidden = true; };
     $("rd-save").onclick = saveRead;
-    $("btn-read-back").onclick = function () { readStop(); RD.id = ""; renderRead(); };
+    $("btn-read-back").onclick = function () {
+      if (backFire()) return;
+      readStop(); RD.id = ""; renderRead();
+    };
     $("btn-read-play").onclick = readPlay;
     $("btn-read-tr").onclick = readTranslate;
     $("btn-read-del").onclick = function () {
