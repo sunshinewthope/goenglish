@@ -50,7 +50,9 @@ var SETS = [
     { e: "What time is the last train?", k: "막차가 몇 시예요?", n: "밤에 돌아다닐 때 꼭 필요." },
     { e: "Is this seat taken?", k: "여기 자리 있나요?", n: "빈자리인지 물을 때." },
     { e: "Which exit should I take?", k: "몇 번 출구로 나가요?", n: "지하철에서." },
-    { e: "I think I'm lost.", k: "길을 잃은 것 같아요", n: "도움을 청하는 첫마디로 좋습니다." }
+    { e: "I think I'm lost.", k: "길을 잃은 것 같아요", n: "도움을 청하는 첫마디로 좋습니다." },
+    { e: "Could you help me lift my bag?", k: "가방 올리는 것 좀 도와주실 수 있어요?", n: "기차 선반에 짐 올릴 때. lift = 들어 올리다." },
+    { e: "You're a star, thank you!", k: "정말 멋진 분이세요, 고맙습니다!", n: "★ You're a star = 고마울 때 하는 칭찬. 연예인이라는 뜻이 아닙니다." }
   ]
 },
 
@@ -93,7 +95,13 @@ var SETS = [
     { e: "Just water is fine.", k: "물이면 돼요", n: "음료를 권할 때." },
     { e: "Could we get the check?", k: "계산서 주세요", n: "영국에서는 check 대신 bill 을 씁니다." },
     { e: "Could I get a to-go box?", k: "포장해 갈 통 주실 수 있어요?", n: "남은 음식을 싸갈 때." },
-    { e: "That was delicious.", k: "정말 맛있었어요", n: "나오면서 한마디 하면 좋습니다." }
+    { e: "That was delicious.", k: "정말 맛있었어요", n: "나오면서 한마디 하면 좋습니다." },
+    { e: "Is the tip included?", k: "팁이 포함되어 있나요?", n: "★ 미국은 대개 안 들어 있어 15~20% 따로 줍니다. 유럽은 service charge 로 이미 들어간 곳이 많아요." },
+    { e: "Do I pay now or later?", k: "지금 계산해요, 나중에 해요?", n: "카페는 먼저, 식당은 나중이 보통인데 가게마다 달라요." },
+    { e: "Do you have iced coffee?", k: "아이스커피 있어요?", n: "★ 유럽은 아이스커피가 없는 곳이 많습니다. iced 를 빼면 뜨거운 게 나와요." },
+    { e: "Could I get some cold water?", k: "시원한 물 좀 주실 수 있어요?", n: "★ 유럽은 미지근한 물이 기본. with ice 를 붙이면 확실합니다." },
+    { e: "I dropped my fork.", k: "포크를 떨어뜨렸어요", n: "이 말만 하면 새로 가져다줍니다. 주워서 쓰지 마세요." },
+    { e: "There's no toilet paper.", k: "휴지가 없어요", n: "★ toilet paper 가 화장실 휴지. tissue 는 코 푸는 휴지예요." }
   ]
 },
 
@@ -207,6 +215,39 @@ var SETS = [
     { e: "Nice talking to you.", k: "이야기 즐거웠어요", n: "헤어질 때." },
     { e: "Have a good one.", k: "좋은 하루 보내세요", n: "Have a good day 의 가벼운 말." },
     { e: "Enjoy your trip.", k: "여행 잘하세요" }
+  ]
+},
+
+{
+  id: "border", icon: "🛂", name: "입국 심사",
+  note: "심사관이 묻는 말입니다. 짧고 사실대로 답하면 됩니다. 묻지 않은 말을 덧붙일 필요 없어요. 숙소 주소와 돌아오는 항공권은 미리 꺼내 두세요.",
+  items: [
+    { e: "What's the purpose of your visit?", k: "방문 목적이 뭐예요?", n: "가장 먼저 나오는 질문. Tourism. 한 단어면 충분합니다.", h: true },
+    { e: "How long will you be staying?", k: "얼마나 머무르세요?", n: "Ten days. 처럼 기간만 답하면 됩니다.", h: true },
+    { e: "Where will you be staying?", k: "어디서 묵으세요?", n: "호텔 이름과 도시. 주소를 보여 주면 가장 확실합니다.", h: true },
+    { e: "Do you have a return ticket?", k: "돌아가는 표 있어요?", n: "return ticket = 귀국 항공권. 날짜를 말하거나 표를 보여 주세요.", h: true },
+    { e: "Who are you traveling with?", k: "누구와 같이 오셨어요?", n: "혼자면 I'm traveling alone.", h: true },
+    { e: "Have you been to the US before?", k: "미국에 와 본 적 있어요?", n: "처음이면 No, this is my first time.", h: true },
+    { e: "What do you do for work?", k: "직업이 뭐예요?", n: "★ for work 가 붙으면 직업을 묻는 말입니다. 직업 이름만 답하면 돼요.", h: true },
+    { e: "Are you bringing any food?", k: "음식 가져오셨어요?", n: "★ 과일·고기·씨앗은 반입 금지. 과자류는 괜찮지만 있으면 있다고 하세요.", h: true },
+    { e: "How much cash are you carrying?", k: "현금 얼마나 갖고 계세요?", n: "★ 만 달러가 넘으면 반드시 신고해야 합니다. 그 아래면 대략만 말하면 돼요.", h: true },
+    { e: "I'm here for a concert.", k: "콘서트 보러 왔어요", n: "관광 목적을 구체적으로 말할 때. 심사관이 되묻는 일이 줄어듭니다." },
+    { e: "I'm traveling alone.", k: "혼자 왔어요", n: "traveling alone = 혼자 여행하는." },
+    { e: "Here's my hotel booking.", k: "숙소 예약증이에요", n: "말보다 보여 주는 게 빠릅니다. 폰에 미리 띄워 두세요." }
+  ]
+},
+
+{
+  id: "ride", icon: "🚕", name: "택시 · 차 부르기",
+  note: "공항에서 차를 잡고, 기사와 주고받는 말입니다. 그랩·우버는 만나는 자리를 정확히 말하는 게 전부예요.",
+  items: [
+    { e: "Where can I get a taxi?", k: "택시 어디서 타요?", n: "공항에 내려서 제일 먼저 묻게 되는 말." },
+    { e: "Where's the pickup point for Grab?", k: "그랩 타는 곳이 어디예요?", n: "★ pickup point = 차를 타는 지정 장소. 공항은 앱 차량 자리가 따로 있습니다." },
+    { e: "I'm at Terminal 2, door 5.", k: "2터미널 5번 문 앞이에요", n: "★ 기사에게는 터미널과 문 번호를 말해야 찾습니다. 건물 이름만으론 못 찾아요." },
+    { e: "I think I left something in your car.", k: "차에 물건을 두고 내린 것 같아요", n: "left = 두고 내리다. 앱 안에서 기사에게 바로 연락할 수 있습니다." },
+    { e: "Could you come back for me?", k: "저한테 다시 와 주실 수 있어요?", n: "come back for me = 나를 위해 돌아오다." },
+    { e: "I'll pay extra if you can come back.", k: "돌아와 주시면 요금 더 드릴게요", n: "★ pay extra = 추가로 내다. 이렇게 말하면 대개 돌아와 줍니다." },
+    { e: "This is for you. Thank you so much.", k: "이거 받으세요. 정말 고맙습니다", n: "팁을 건네며. 돈 이야기를 길게 안 해도 이 한마디면 됩니다." }
   ]
 }
 
