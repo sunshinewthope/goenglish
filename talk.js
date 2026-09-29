@@ -1316,6 +1316,141 @@ var TALK = {
 
 /* ---------- 잘 안 들리는 말 ---------- */
 
+/* ---------- 미술관 · 박물관 ---------- */
+
+"Where do I buy tickets?": {
+  where: "입구에 들어서며",
+  lines: [
+    { w: "me", e: "Excuse me, where do I buy tickets?", k: "실례합니다, 표는 어디서 사요?" },
+    { w: "them", e: "Desk on your right. Or online — it's cheaper.", k: "오른쪽 데스크요. 아니면 온라인이 더 싸요." },
+    { w: "me", e: "Oh, I'll check online then. Thanks.", k: "아, 그럼 온라인으로 볼게요. 고맙습니다." }
+  ],
+  replies: [
+    { e: "Desk on your right. Or online — it's cheaper.", k: "오른쪽 데스크요. 아니면 온라인이 더 싸요.",
+      n: "★ 온라인이 싸다고 알려 주는 경우가 많습니다. desk = 매표소." },
+    { e: "It's free entry. You just walk in.", k: "무료예요. 그냥 들어가시면 돼요.",
+      n: "★ free entry = 무료 입장. 영국 국립 박물관은 대개 무료입니다." },
+    { e: "Machines by the door, or the queue over there.", k: "문 옆 기계나, 저쪽 줄이요.",
+      n: "Machines = 무인 발권기. 동사 없이 명사만 던집니다." },
+    { e: "You'll need to book a time slot first.", k: "먼저 시간대를 예약하셔야 해요.",
+      n: "★ time slot = 입장 시간대. 요즘은 예약제인 곳이 많습니다." }
+  ]
+},
+
+"Where can I find the Monet room?": {
+  where: "보고 싶은 작가를 찾아",
+  lines: [
+    { w: "me", e: "Where can I find the Monet room?", k: "모네 전시실이 어디예요?" },
+    { w: "them", e: "Second floor, turn left at the top of the stairs.", k: "2층이요, 계단 올라가서 왼쪽이요." },
+    { w: "me", e: "Thank you so much.", k: "정말 고맙습니다." }
+  ],
+  replies: [
+    { e: "Second floor, turn left at the top of the stairs.", k: "2층이요, 계단 올라가서 왼쪽이요.",
+      n: "at the top of the stairs = 계단 끝에서." },
+    { e: "Room twelve. It's on the map, here.", k: "12번 방이요. 지도에 있어요, 여기요.",
+      n: "지도를 건네줍니다. Room 번호로 안내하는 곳이 많아요." },
+    { e: "They've moved it, actually. It's in the east wing now.", k: "사실 옮겼어요. 지금은 동관에 있어요.",
+      n: "★ wing = 건물의 한쪽 동. east wing = 동쪽 건물." },
+    { e: "That one's closed for restoration, I'm afraid.", k: "아쉽지만 그 방은 복원 작업으로 닫았어요.",
+      n: "★ restoration = 복원. 전시실이 닫히는 흔한 이유입니다." }
+  ]
+},
+
+"Is photography allowed?": {
+  where: "작품 앞에서 폰을 들다가",
+  lines: [
+    { w: "me", e: "Sorry, is photography allowed?", k: "죄송한데, 사진 찍어도 되나요?" },
+    { w: "them", e: "Yes, but no flash please.", k: "네, 다만 플래시는 안 됩니다." },
+    { w: "me", e: "Understood, thank you.", k: "알겠습니다, 고맙습니다." }
+  ],
+  replies: [
+    { e: "Yes, but no flash please.", k: "네, 다만 플래시는 안 됩니다.",
+      n: "★ 가장 흔한 답입니다. 플래시가 작품을 상하게 해서요." },
+    { e: "In this room, yes. Not in the next one.", k: "이 방은 돼요. 다음 방은 안 되고요.",
+      n: "방마다 규정이 다른 경우입니다." },
+    { e: "For personal use only, not commercial.", k: "개인 소장용만요, 상업용은 안 돼요.",
+      n: "★ personal use = 개인적으로 쓰는 것. 에스엔에스는 대개 괜찮습니다." },
+    { e: "Sorry, not with the special exhibition.", k: "죄송해요, 특별전은 안 돼요.",
+      n: "special exhibition = 특별 전시. 대여 작품이라 금지인 경우가 많아요." }
+  ]
+},
+
+"Is there an audio guide in English?": {
+  where: "안내 데스크에서",
+  lines: [
+    { w: "me", e: "Is there an audio guide in English?", k: "영어 오디오 가이드 있어요?" },
+    { w: "them", e: "There is. It's five pounds, or free on the app.", k: "있어요. 5파운드고요, 앱으로는 무료예요." },
+    { w: "me", e: "I'll use the app. Thank you.", k: "앱으로 할게요. 고맙습니다." }
+  ],
+  replies: [
+    { e: "There is. It's five pounds, or free on the app.", k: "있어요. 5파운드고요, 앱으로는 무료예요.",
+      n: "★ 요즘은 앱으로 무료인 곳이 많습니다. 이어폰을 챙겨 가세요." },
+    { e: "Yes — bring your own headphones though.", k: "네, 다만 이어폰은 직접 가져오셔야 해요.",
+      n: "your own = 본인 것. though 가 끝에 붙어 '다만'." },
+    { e: "Not for this exhibition, sorry. Just the leaflet.", k: "이 전시는 없어요, 죄송해요. 안내지만 있어요.",
+      n: "★ leaflet = 종이 안내지(영국). 미국은 brochure." },
+    { e: "There's a QR code by each piece instead.", k: "대신 작품마다 큐알 코드가 있어요.",
+      n: "★ piece = 작품 한 점. instead = 대신에." }
+  ]
+},
+
+"Where's the nearest place to eat?": {
+  where: "구경을 마치고 배가 고플 때",
+  lines: [
+    { w: "me", e: "Where's the nearest place to eat?", k: "제일 가까운 먹을 데가 어디예요?" },
+    { w: "them", e: "There's a café downstairs, or loads of places across the road.", k: "아래층에 카페 있고요, 길 건너에 많아요." },
+    { w: "me", e: "Across the road sounds good. Thanks.", k: "길 건너가 좋겠네요. 고맙습니다." }
+  ],
+  replies: [
+    { e: "There's a café downstairs, or loads of places across the road.", k: "아래층에 카페 있고요, 길 건너에 많아요.",
+      n: "★ loads of = 아주 많은(영국). a lot of 와 같습니다." },
+    { e: "The café here's pricey. I'd walk five minutes.", k: "여기 카페는 비싸요. 저라면 오 분 걸어가겠어요.",
+      n: "★ pricey = 비싼. I'd = 저라면 ~하겠다, 조언입니다." },
+    { e: "Depends what you fancy. Sandwiches or a sit-down?", k: "뭐 드시고 싶으냐에 따라요. 샌드위치요, 앉아서 드실 거예요?",
+      n: "★ a sit-down = 앉아서 먹는 제대로 된 식사." },
+    { e: "Nothing close, I'm afraid. Nearest is the services.", k: "아쉽지만 가까운 덴 없어요. 제일 가까운 게 휴게소예요.",
+      n: "★ services = 고속도로 휴게소(영국). 미국은 rest stop." }
+  ]
+},
+
+"Sorry, I'd rather not. I'm terrible at photos.": {
+  where: "사진을 찍어 달라는 부탁을 받고",
+  lines: [
+    { w: "them", e: "Excuse me, could you take a photo of us?", k: "실례합니다, 저희 사진 좀 찍어 주실 수 있어요?" },
+    { w: "me", e: "Sorry, I'd rather not. I'm terrible at photos.", k: "죄송해요, 사양할게요. 사진을 정말 못 찍어서요." },
+    { w: "them", e: "No worries at all! We'll ask someone else.", k: "전혀 괜찮아요! 다른 분한테 부탁할게요." }
+  ],
+  replies: [
+    { e: "No worries at all! We'll ask someone else.", k: "전혀 괜찮아요! 다른 분한테 부탁할게요.",
+      n: "★ 거절해도 전혀 기분 나빠하지 않습니다. 편하게 거절하세요." },
+    { e: "Oh come on, anyone can press a button!", k: "에이, 누르기만 하면 되는데요!",
+      n: "★ Oh come on = 에이, 그러지 마시고. 장난스럽게 조르는 말." },
+    { e: "That's okay. Thanks anyway!", k: "괜찮아요. 그래도 고마워요!",
+      n: "Thanks anyway = 안 됐어도 고맙다. 거절당했을 때 하는 인사." },
+    { e: "Honestly same, I always cut people's heads off.", k: "저도 그래요, 늘 머리를 잘라 먹어요.",
+      n: "★ cut people's heads off = 사진에서 머리가 잘리다. 농담입니다." }
+  ]
+},
+
+"I'll try, but I'm really bad at this.": {
+  where: "부탁을 받아들이면서 미리 말해 둘 때",
+  lines: [
+    { w: "them", e: "Would you mind taking one of us?", k: "저희 사진 한 장 찍어 주실 수 있을까요?" },
+    { w: "me", e: "I'll try, but I'm really bad at this.", k: "해볼게요, 근데 제가 정말 못 찍어요." },
+    { w: "them", e: "Anything's fine, honestly. Just press the big button.", k: "아무거나 괜찮아요, 진짜로. 큰 버튼만 누르시면 돼요." }
+  ],
+  replies: [
+    { e: "Anything's fine, honestly. Just press the big button.", k: "아무거나 괜찮아요, 진짜로. 큰 버튼만 누르시면 돼요.",
+      n: "Anything's fine = 아무거나 괜찮다. 부담을 덜어 주는 말." },
+    { e: "Ha, you can't be worse than my husband.", k: "하하, 저희 남편보다 못 찍진 않으실 거예요.",
+      n: "★ can't be worse than ~ = ~보다 나쁠 수는 없다. 농담입니다." },
+    { e: "Take a few and we'll pick one!", k: "몇 장 찍어 주시면 저희가 고를게요!",
+      n: "a few = 몇 장. 여러 장 찍어 주면 좋습니다." },
+    { e: "Just get the building behind us, that's all we need.", k: "저희 뒤에 건물만 나오게요, 그거면 돼요.",
+      n: "that's all we need = 그것만 되면 된다." }
+  ]
+},
+
 /* ---------- 최애 자랑하기 ---------- */
 
 "The whole show tells a story.": {

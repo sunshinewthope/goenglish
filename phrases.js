@@ -214,7 +214,9 @@ var SETS = [
     { e: "It's my first time in this city.", k: "이 도시는 처음이에요" },
     { e: "Nice talking to you.", k: "이야기 즐거웠어요", n: "헤어질 때." },
     { e: "Have a good one.", k: "좋은 하루 보내세요", n: "Have a good day 의 가벼운 말." },
-    { e: "Enjoy your trip.", k: "여행 잘하세요" }
+    { e: "Enjoy your trip.", k: "여행 잘하세요" },
+    { e: "Sorry, I'd rather not. I'm terrible at photos.", k: "죄송해요, 사양할게요. 사진을 정말 못 찍어서요", n: "★ I'd rather not = 안 하고 싶어요. 가장 부드러운 거절입니다." },
+    { e: "I'll try, but I'm really bad at this.", k: "해볼게요, 근데 제가 정말 못 찍어요", n: "미리 말해 두고 찍어 주는 경우. 부담을 덜어 줍니다." }
   ]
 },
 
@@ -268,6 +270,18 @@ var SETS = [
     { e: "The whole show tells a story.", k: "공연 전체가 하나의 이야기예요", n: "기승전결이 있다는 말을 영어로는 이렇게 합니다." },
     { e: "Every song has its own concept.", k: "곡마다 컨셉이 뚜렷해요", n: "★ its own = 저마다의. concept 은 그대로 씁니다." },
     { e: "He always thanks his dancers and band.", k: "늘 댄서와 밴드에게 고마워해요", n: "★ 스태프를 챙기는 사람이라는 칭찬. give credit to 도 같은 뜻이에요." }
+  ]
+},
+
+{
+  id: "museum", icon: "🖼️", name: "미술관 · 박물관",
+  note: "들어가기 전과 안에서 쓰는 말입니다. 작가 이름만 바꾸면 어디서든 그대로 쓸 수 있어요.",
+  items: [
+    { e: "Where do I buy tickets?", k: "표는 어디서 사요?", n: "온라인 예매가 더 싼 곳이 많으니 미리 확인해 두세요." },
+    { e: "Where can I find the Monet room?", k: "모네 전시실이 어디예요?", n: "★ 작가 이름만 바꾸면 됩니다. room 대신 section 이라고도 해요." },
+    { e: "Is photography allowed?", k: "사진 찍어도 되나요?", n: "★ 플래시만 금지인 곳이 많습니다. No flash 라는 답이 자주 와요." },
+    { e: "Is there an audio guide in English?", k: "영어 오디오 가이드 있어요?", n: "audio guide = 음성 안내기. 대여료를 받는 곳도 있습니다." },
+    { e: "Where's the nearest place to eat?", k: "제일 가까운 먹을 데가 어디예요?", n: "★ 고속도로 휴게소는 services(영국) 또는 rest stop(미국)이라고 합니다." }
   ]
 }
 
