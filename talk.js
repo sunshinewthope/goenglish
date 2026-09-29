@@ -1316,6 +1316,944 @@ var TALK = {
 
 /* ---------- 잘 안 들리는 말 ---------- */
 
+"Could you say that again?": {
+  where: "못 알아들었을 때",
+  lines: [
+    { w: "them", e: "It's just past the roundabout on your right.", k: "회전교차로 지나서 오른쪽이에요." },
+    { w: "me", e: "Sorry, could you say that again?", k: "죄송한데, 다시 말씀해 주실 수 있어요?" },
+    { w: "them", e: "Course. Past the roundabout, then right.", k: "그럼요. 회전교차로 지나서, 오른쪽이요." }
+  ],
+  replies: [
+    { e: "Course. Past the roundabout, then right.", k: "그럼요. 회전교차로 지나서, 오른쪽이요.", n: "★ roundabout = 회전교차로(영국). 다시 말할 땐 짧게 끊어 줍니다." },
+    { e: "Sorry, I speak too fast. Past. The. Roundabout.", k: "죄송해요, 제가 말이 빨라서. 회전. 교차로. 지나서.", n: "일부러 또박또박 끊어 말해 줍니다." },
+    { e: "Which bit? The street name?", k: "어느 부분이요? 길 이름이요?", n: "★ bit = 부분. 되물으니 어느 부분인지 말하면 됩니다." }
+  ]
+},
+
+"I don't speak much English.": {
+  where: "말이 빨라 따라가기 힘들 때",
+  lines: [
+    { w: "me", e: "Sorry, I don't speak much English.", k: "죄송해요, 영어를 잘 못해요." },
+    { w: "them", e: "That's okay! I'll slow down.", k: "괜찮아요! 천천히 말할게요." },
+    { w: "me", e: "Thank you, that helps.", k: "고마워요, 도움이 돼요." }
+  ],
+  replies: [
+    { e: "That's okay! I'll slow down.", k: "괜찮아요! 천천히 말할게요.", n: "slow down = 천천히 말하다." },
+    { e: "You're doing great. Take your time.", k: "잘하고 계세요. 천천히 하세요.", n: "You're doing great = 잘하고 있어요." },
+    { e: "No worries — shall we use a translator app?", k: "괜찮아요. 번역 앱 쓸까요?", n: "★ shall we ~? = ~할까요? 제안하는 말입니다." }
+  ]
+},
+
+"I think there's been a mistake.": {
+  where: "계산서가 이상할 때",
+  lines: [
+    { w: "me", e: "Sorry, I think there's been a mistake with the bill.", k: "죄송한데, 계산서가 잘못된 것 같아요." },
+    { w: "them", e: "Let me take a look... ah, you're right. Apologies.", k: "볼게요… 아, 맞네요. 죄송합니다." },
+    { w: "me", e: "No problem at all.", k: "괜찮아요." }
+  ],
+  replies: [
+    { e: "Let me take a look... ah, you're right. Apologies.", k: "볼게요… 아, 맞네요. 죄송합니다.", n: "★ Apologies = 죄송합니다. I 가 빠진 정중한 사과." },
+    { e: "What seems to be the problem?", k: "어떤 점이 문제신가요?", n: "★ What seems to be ~ = 무엇이 문제인지 정중히 묻는 말." },
+    { e: "Oh no, sorry — that table's order went on yours.", k: "아이고, 죄송해요. 저 테이블 주문이 손님 것에 들어갔네요.", n: "went on yours = 손님 계산서에 올라갔다." }
+  ]
+},
+
+"This isn't what I ordered.": {
+  where: "다른 음식이 나왔을 때",
+  lines: [
+    { w: "me", e: "Sorry, this isn't what I ordered.", k: "죄송한데, 제가 주문한 게 아니에요." },
+    { w: "them", e: "Oh no! What did you order?", k: "어머! 뭘 주문하셨어요?" },
+    { w: "me", e: "The chicken, not the fish.", k: "생선이 아니라 닭이요." }
+  ],
+  replies: [
+    { e: "Oh no! What did you order?", k: "어머! 뭘 주문하셨어요?", n: "Oh no! 로 놀라며 바로 되묻습니다." },
+    { e: "I'm so sorry. I'll get that changed right away.", k: "정말 죄송합니다. 바로 바꿔 드릴게요.", n: "right away = 즉시." },
+    { e: "Let me check the ticket — hang on.", k: "주문서 확인할게요. 잠시만요.", n: "★ ticket = 여기선 주방 주문서." }
+  ]
+},
+
+"I lost my wallet.": {
+  where: "지갑을 잃어버리고 직원에게",
+  lines: [
+    { w: "me", e: "Excuse me, I lost my wallet. Has anyone handed one in?", k: "실례합니다, 지갑을 잃어버렸어요. 누가 맡기고 갔나요?" },
+    { w: "them", e: "Let me check lost property. What does it look like?", k: "분실물 확인해 볼게요. 어떻게 생겼어요?" },
+    { w: "me", e: "Brown, with a blue card inside.", k: "갈색이고, 안에 파란 카드가 있어요." }
+  ],
+  replies: [
+    { e: "Let me check lost property. What does it look like?", k: "분실물 확인해 볼게요. 어떻게 생겼어요?", n: "★ lost property = 분실물 보관소(영국). 미국은 lost and found." },
+    { e: "Nothing's been handed in yet. Leave your number?", k: "아직 들어온 건 없어요. 연락처 남기시겠어요?", n: "handed in = 맡겨진. Leave your number? 앞이 생략됐습니다." },
+    { e: "Have you retraced your steps? Where were you last?", k: "왔던 길 되짚어 보셨어요? 마지막으로 어디 계셨어요?", n: "★ retrace your steps = 왔던 길을 되짚다." }
+  ]
+},
+
+"My phone died.": {
+  where: "배터리가 나갔을 때",
+  lines: [
+    { w: "me", e: "My phone died. Is there anywhere to charge it?", k: "폰 배터리가 나갔어요. 충전할 데 있어요?" },
+    { w: "them", e: "There's a socket by the bar. Help yourself.", k: "바 옆에 콘센트 있어요. 쓰세요." },
+    { w: "me", e: "You're a lifesaver.", k: "정말 고마워요." }
+  ],
+  replies: [
+    { e: "There's a socket by the bar. Help yourself.", k: "바 옆에 콘센트 있어요. 쓰세요.", n: "★ socket = 콘센트(영국). 미국은 outlet." },
+    { e: "I've got a power bank you can borrow.", k: "보조 배터리 있어요, 빌려 드릴게요.", n: "power bank = 보조 배터리." },
+    { e: "Sorry, we don't allow charging. Fire rules.", k: "죄송해요, 충전은 안 돼요. 소방 규정이라서요.", n: "Fire rules = 소방 규정." }
+  ]
+},
+
+"I missed my train.": {
+  where: "기차를 놓치고 창구에서",
+  lines: [
+    { w: "me", e: "I missed my train. Can I use this ticket on the next one?", k: "기차를 놓쳤어요. 이 표로 다음 차 탈 수 있어요?" },
+    { w: "them", e: "Normally no, but I'll let it slide.", k: "원래는 안 되는데, 이번엔 봐 드릴게요." },
+    { w: "me", e: "Thank you so much.", k: "정말 고맙습니다." }
+  ],
+  replies: [
+    { e: "Normally no, but I'll let it slide.", k: "원래는 안 되는데, 이번엔 봐 드릴게요.", n: "★ let it slide = 눈감아 주다." },
+    { e: "You'll need to buy a new one, I'm afraid.", k: "아쉽지만 새로 사셔야 해요.", n: "I'm afraid 로 거절을 부드럽게." },
+    { e: "Next one's in twenty. Just hop on, it's fine.", k: "다음 차가 이십 분 뒤예요. 그냥 타세요, 괜찮아요.", n: "hop on = 올라타다." }
+  ]
+},
+
+"Is there a pharmacy nearby?": {
+  where: "약이 필요할 때",
+  lines: [
+    { w: "me", e: "Is there a pharmacy nearby?", k: "근처에 약국 있어요?" },
+    { w: "them", e: "There's a Boots two streets down.", k: "두 블록 내려가면 부츠 있어요." },
+    { w: "me", e: "Is it open this late?", k: "이 시간에도 열어요?" }
+  ],
+  replies: [
+    { e: "There's a Boots two streets down.", k: "두 블록 내려가면 부츠 있어요.", n: "★ Boots 는 영국의 약국 체인. 미국은 CVS, Walgreens." },
+    { e: "The one on the corner, but it shuts at six.", k: "모퉁이에 있는데, 6시에 닫아요.", n: "shuts = 닫는다. closes 와 같습니다." },
+    { e: "Nearest is by the station. Ten-minute walk.", k: "제일 가까운 건 역 옆이요. 걸어서 십 분이요.", n: "The 가 빠진 Nearest is ~." }
+  ]
+},
+
+"I don't feel well.": {
+  where: "몸이 안 좋을 때",
+  lines: [
+    { w: "me", e: "Sorry, I don't feel well. Is there somewhere I can sit?", k: "죄송해요, 몸이 안 좋아요. 앉을 데 있을까요?" },
+    { w: "them", e: "Come with me, there's a quiet room.", k: "따라오세요, 조용한 방이 있어요." },
+    { w: "me", e: "Thank you, I just need a minute.", k: "고마워요, 잠깐이면 괜찮아질 거예요." }
+  ],
+  replies: [
+    { e: "Come with me, there's a quiet room.", k: "따라오세요, 조용한 방이 있어요.", n: "quiet room = 공연장의 안정실." },
+    { e: "Do you need medical? I can call someone.", k: "의료진 필요하세요? 불러 드릴 수 있어요.", n: "★ medical = 의료진. 공연장에서 이렇게 줄여 씁니다." },
+    { e: "Sit here. I'll get you some water.", k: "여기 앉으세요. 물 갖다 드릴게요.", n: "get you ~ = ~를 갖다 드리다." }
+  ]
+},
+
+"Could you help me?": {
+  where: "도움이 필요할 때",
+  lines: [
+    { w: "me", e: "Sorry, could you help me for a second?", k: "죄송한데, 잠깐 도와주실 수 있어요?" },
+    { w: "them", e: "Sure, what's up?", k: "네, 무슨 일이세요?" },
+    { w: "me", e: "I can't work out which door to use.", k: "어느 문으로 들어가야 할지 모르겠어요." }
+  ],
+  replies: [
+    { e: "Sure, what's up?", k: "네, 무슨 일이세요?", n: "★ What's up? = 무슨 일이세요? 인사로도 쓰이지만 여기선 용건을 묻는 말." },
+    { e: "Of course. What do you need?", k: "그럼요. 뭐가 필요하세요?", n: "What do you need? 로 바로 용건을 묻습니다." },
+    { e: "I'll try! I'm not from here, mind.", k: "해볼게요! 저도 여기 사람은 아니지만요.", n: "★ 끝의 mind 는 '참고로'라는 덧붙임입니다." }
+  ]
+},
+
+"This is so good.": {
+  where: "음식이나 공연이 좋을 때",
+  lines: [
+    { w: "them", e: "Well? What do you think?", k: "어때요? 어떠세요?" },
+    { w: "me", e: "This is so good.", k: "이거 진짜 맛있어요." },
+    { w: "them", e: "Told you! I come here every week.", k: "제가 말했죠! 저 매주 와요." }
+  ],
+  replies: [
+    { e: "Told you! I come here every week.", k: "제가 말했죠! 저 매주 와요.", n: "★ I 가 빠진 Told you! = 내 말이 맞죠." },
+    { e: "Right? Wait till you try the dessert.", k: "그쵸? 디저트도 드셔 보세요.", n: "Wait till you ~ = ~해 보시면 더 놀라실 거예요." },
+    { e: "Glad you like it. It's my favourite too.", k: "마음에 드신다니 좋네요. 저도 제일 좋아해요.", n: "I'm 이 빠진 Glad you like it." }
+  ]
+},
+
+"I could stay here all day.": {
+  where: "좋은 곳에 앉아서",
+  lines: [
+    { w: "them", e: "Shall we head off?", k: "이제 갈까요?" },
+    { w: "me", e: "Honestly, I could stay here all day.", k: "솔직히 하루 종일 있어도 좋겠어요." },
+    { w: "them", e: "Same. Five more minutes then.", k: "저도요. 그럼 오 분만 더요." }
+  ],
+  replies: [
+    { e: "Same. Five more minutes then.", k: "저도요. 그럼 오 분만 더요.", n: "Five more minutes = 오 분만 더." },
+    { e: "We've got time. No rush at all.", k: "시간 있어요. 전혀 안 급해요.", n: "No rush at all = 전혀 안 급하다." },
+    { e: "Me too, but the show starts at eight!", k: "저도요, 근데 공연이 여덟 시예요!", n: "현실을 일깨우는 말." }
+  ]
+},
+
+"Worth the walk.": {
+  where: "한참 걸어 도착해서",
+  lines: [
+    { w: "them", e: "That was further than I thought.", k: "생각보다 멀었네요." },
+    { w: "me", e: "Worth the walk, though.", k: "그래도 걸어온 보람 있네요." },
+    { w: "them", e: "Definitely. Look at that view.", k: "정말요. 저 경치 좀 봐요." }
+  ],
+  replies: [
+    { e: "Definitely. Look at that view.", k: "정말요. 저 경치 좀 봐요.", n: "Definitely = 정말 그래요." },
+    { e: "My legs disagree, but yeah.", k: "제 다리는 반대지만, 그렇긴 하네요.", n: "★ My legs disagree = 다리는 동의 안 한다. 농담입니다." },
+    { e: "Told you it'd be worth it.", k: "그럴 만하다고 했잖아요.", n: "it'd = it would." }
+  ]
+},
+
+"The view is amazing.": {
+  where: "전망 좋은 곳에서",
+  lines: [
+    { w: "me", e: "The view is amazing.", k: "경치가 정말 좋네요." },
+    { w: "them", e: "Isn't it? Even better at sunset.", k: "그쵸? 해질 때가 더 좋아요." },
+    { w: "me", e: "I might come back for that.", k: "그거 보러 다시 와야겠어요." }
+  ],
+  replies: [
+    { e: "Isn't it? Even better at sunset.", k: "그쵸? 해질 때가 더 좋아요.", n: "★ Isn't it? = 그렇죠? 동의를 구하는 맞장구." },
+    { e: "You should see it from the top floor.", k: "꼭대기 층에서 보셔야 해요.", n: "You should see ~ = 꼭 보셔야 해요." },
+    { e: "Gets busy later, so you timed it well.", k: "이따 붐벼요, 시간 잘 맞춰 오셨네요.", n: "timed it well = 때를 잘 맞췄다." }
+  ]
+},
+
+"It's quieter than I expected.": {
+  where: "생각보다 한산할 때",
+  lines: [
+    { w: "me", e: "It's quieter than I expected.", k: "생각보다 조용하네요." },
+    { w: "them", e: "Midweek. Come Saturday and it's mayhem.", k: "주중이라서요. 토요일에 오면 난리도 아니에요." },
+    { w: "me", e: "I'll stick to midweek then.", k: "그럼 주중에 와야겠네요." }
+  ],
+  replies: [
+    { e: "Midweek. Come Saturday and it's mayhem.", k: "주중이라서요. 토요일에 오면 난리도 아니에요.", n: "★ mayhem = 아수라장. midweek = 주중." },
+    { e: "Give it an hour. It fills up fast.", k: "한 시간만 기다려 보세요. 금방 찹니다.", n: "fills up = 사람이 차다." },
+    { e: "Lucky. Usually you can't move in here.", k: "운 좋으시네요. 보통은 움직이지도 못해요.", n: "can't move = 사람이 너무 많다." }
+  ]
+},
+
+"That's a shame.": {
+  where: "아쉬운 소식을 들었을 때",
+  lines: [
+    { w: "them", e: "The rooftop's closed for the winter.", k: "옥상은 겨울이라 닫았어요." },
+    { w: "me", e: "Oh, that's a shame.", k: "아, 아쉽네요." },
+    { w: "them", e: "I know. It reopens in April, though.", k: "그러니까요. 4월에 다시 열긴 해요." }
+  ],
+  replies: [
+    { e: "I know. It reopens in April, though.", k: "그러니까요. 4월에 다시 열긴 해요.", n: "★ I know = 그러니까요. 맞장구입니다." },
+    { e: "Isn't it? Everyone says the same.", k: "그쵸? 다들 그러세요.", n: "the same = 같은 말." },
+    { e: "There's a terrace downstairs if that helps.", k: "아래층에 테라스는 있어요, 도움이 될지 모르겠지만.", n: "if that helps = 도움이 된다면." }
+  ]
+},
+
+"It's a bit much for me.": {
+  where: "양이나 값이 부담스러울 때",
+  lines: [
+    { w: "them", e: "Shall we get the sharing platter?", k: "모둠 요리 시킬까요?" },
+    { w: "me", e: "It's a bit much for me, honestly.", k: "솔직히 저한테는 좀 과해요." },
+    { w: "them", e: "Fair enough. Let's just get starters.", k: "그럴 만해요. 그럼 전채만 시켜요." }
+  ],
+  replies: [
+    { e: "Fair enough. Let's just get starters.", k: "그럴 만해요. 그럼 전채만 시켜요.", n: "★ starters = 전채(영국). 미국은 appetizers." },
+    { e: "Same, actually. Shall we split one?", k: "사실 저도요. 하나 나눠 먹을까요?", n: "split = 나누다." },
+    { e: "No worries. Order whatever you fancy.", k: "괜찮아요. 드시고 싶은 걸로 시키세요.", n: "★ whatever you fancy = 마음에 드는 아무거나(영국)." }
+  ]
+},
+
+"Not bad at all.": {
+  where: "기대보다 괜찮을 때",
+  lines: [
+    { w: "them", e: "Sorry, it's a bit of a basic place.", k: "죄송해요, 좀 소박한 곳이라." },
+    { w: "me", e: "Not bad at all, actually.", k: "사실 전혀 나쁘지 않은데요." },
+    { w: "them", e: "Right? Cheap and cheerful.", k: "그쵸? 싸고 좋아요." }
+  ],
+  replies: [
+    { e: "Right? Cheap and cheerful.", k: "그쵸? 싸고 좋아요.", n: "★ cheap and cheerful = 값싸고 괜찮은. 통째로 쓰는 말입니다." },
+    { e: "Glad you think so. I was worried.", k: "그렇게 봐주시니 다행이에요. 걱정했거든요.", n: "I was worried = 걱정했어요." },
+    { e: "Wait for the food before you decide!", k: "음식 나오고 판단하세요!", n: "before you decide = 판단하기 전에." }
+  ]
+},
+
+"Do you have an English menu?": {
+  where: "메뉴를 받아 들고",
+  lines: [
+    { w: "me", e: "Do you have an English menu?", k: "영어 메뉴 있어요?" },
+    { w: "them", e: "We do — one moment, I'll grab one.", k: "있어요. 잠시만요, 가져다 드릴게요." },
+    { w: "me", e: "Thank you.", k: "고맙습니다." }
+  ],
+  replies: [
+    { e: "We do — one moment, I'll grab one.", k: "있어요. 잠시만요, 가져다 드릴게요.", n: "We do 로 짧게 긍정. grab = 가져오다." },
+    { e: "There's a QR code on the table with translations.", k: "탁자에 큐알 코드 있어요, 번역돼 있어요.", n: "translations = 번역된 것." },
+    { e: "Not printed, but I can talk you through it.", k: "인쇄된 건 없는데, 제가 설명해 드릴게요.", n: "★ talk you through = 차근차근 설명해 주다." }
+  ]
+},
+
+"What's in this?": {
+  where: "재료가 궁금할 때",
+  lines: [
+    { w: "me", e: "Sorry, what's in this one?", k: "죄송한데, 이건 뭐가 들어가요?" },
+    { w: "them", e: "Chicken, cream and a bit of garlic.", k: "닭고기, 크림, 마늘 조금이요." },
+    { w: "me", e: "Sounds good. I'll take it.", k: "맛있겠네요. 그걸로 할게요." }
+  ],
+  replies: [
+    { e: "Chicken, cream and a bit of garlic.", k: "닭고기, 크림, 마늘 조금이요.", n: "a bit of = 약간의." },
+    { e: "Mostly veg. Any allergies I should know about?", k: "주로 채소예요. 알레르기 있으세요?", n: "★ veg = vegetables 줄임말. 알레르기를 되묻습니다." },
+    { e: "Let me double-check with the kitchen.", k: "주방에 다시 확인해 볼게요.", n: "double-check = 한 번 더 확인하다." }
+  ]
+},
+
+"Is this spicy?": {
+  where: "매운 걸 못 먹을 때",
+  lines: [
+    { w: "me", e: "Is this spicy?", k: "이거 매워요?" },
+    { w: "them", e: "A little kick, nothing crazy.", k: "살짝 매워요, 심하진 않아요." },
+    { w: "me", e: "I can handle a little.", k: "조금은 괜찮아요." }
+  ],
+  replies: [
+    { e: "A little kick, nothing crazy.", k: "살짝 매워요, 심하진 않아요.", n: "★ kick = 매운 맛. nothing crazy = 심하지 않다." },
+    { e: "Very. I'd go for something else, honestly.", k: "많이요. 솔직히 다른 걸 고르시는 게 나아요.", n: "go for ~ = ~를 고르다." },
+    { e: "Not at all. We can add chilli if you want.", k: "전혀요. 원하시면 고추 넣어 드려요.", n: "chilli = 고추. add = 넣다." }
+  ]
+},
+
+"I'll have the same.": {
+  where: "같이 온 사람과 주문할 때",
+  lines: [
+    { w: "them", e: "And for you?", k: "손님은요?" },
+    { w: "me", e: "I'll have the same, please.", k: "같은 걸로 주세요." },
+    { w: "them", e: "Two of those then. Anything to drink?", k: "그럼 두 개요. 음료는요?" }
+  ],
+  replies: [
+    { e: "Two of those then. Anything to drink?", k: "그럼 두 개요. 음료는요?", n: "Two of those = 그거 두 개. then = 그럼." },
+    { e: "Good choice. Same size?", k: "잘 고르셨어요. 같은 크기로요?", n: "Same size? 만으로 묻습니다." },
+    { e: "Sorry, that was our last one. Something else?", k: "죄송해요, 그게 마지막이었어요. 다른 걸로 하시겠어요?", n: "our last one = 마지막 남은 것." }
+  ]
+},
+
+"Could I get this without onions?": {
+  where: "빼고 싶은 재료가 있을 때",
+  lines: [
+    { w: "me", e: "Could I get this without onions?", k: "이거 양파 빼고 주실 수 있어요?" },
+    { w: "them", e: "No problem, I'll make a note.", k: "문제없어요, 적어 둘게요." },
+    { w: "me", e: "Thanks a lot.", k: "정말 고맙습니다." }
+  ],
+  replies: [
+    { e: "No problem, I'll make a note.", k: "문제없어요, 적어 둘게요.", n: "make a note = 메모해 두다." },
+    { e: "It comes mixed in, I'm afraid. Sorry.", k: "아쉽지만 섞여서 나와요. 죄송해요.", n: "★ comes mixed in = 이미 섞여 조리된다." },
+    { e: "Sure. Anything else you'd like left out?", k: "네. 더 빼드릴 거 있으세요?", n: "left out = 빼다." }
+  ]
+},
+
+"Just water is fine.": {
+  where: "음료를 권할 때",
+  lines: [
+    { w: "them", e: "Can I get you something to drink?", k: "음료 드릴까요?" },
+    { w: "me", e: "Just water is fine, thanks.", k: "물이면 괜찮아요, 고맙습니다." },
+    { w: "them", e: "Still or sparkling?", k: "그냥 물이요, 탄산수요?" }
+  ],
+  replies: [
+    { e: "Still or sparkling?", k: "그냥 물이요, 탄산수요?", n: "★ still = 탄산 없는 물, sparkling = 탄산수. 반드시 묻습니다." },
+    { e: "Tap water okay?", k: "수돗물 괜찮으세요?", n: "★ tap water = 수돗물. 유럽에선 공짜로 줍니다." },
+    { e: "Sure, I'll bring a jug for the table.", k: "네, 한 병 갖다 드릴게요.", n: "jug = 물병. for the table = 테이블용으로." }
+  ]
+},
+
+"Could I get a to-go box?": {
+  where: "남은 음식을 싸 갈 때",
+  lines: [
+    { w: "me", e: "Could I get a to-go box?", k: "포장 용기 하나 주실 수 있어요?" },
+    { w: "them", e: "Of course. I'll box it up for you.", k: "그럼요. 담아 드릴게요." },
+    { w: "me", e: "That's great, thanks.", k: "좋아요, 고맙습니다." }
+  ],
+  replies: [
+    { e: "Of course. I'll box it up for you.", k: "그럼요. 담아 드릴게요.", n: "box it up = 담아 주다." },
+    { e: "Sure — we call it a doggy bag here!", k: "네, 여기선 도기백이라고 해요!", n: "★ doggy bag = 남은 음식 포장. 개와 상관없습니다." },
+    { e: "Yep, there's a small charge for the container.", k: "네, 용기 값이 조금 있어요.", n: "container = 용기." }
+  ]
+},
+
+"That was delicious.": {
+  where: "식사를 마치고 나가며",
+  lines: [
+    { w: "them", e: "How was everything?", k: "식사는 어떠셨어요?" },
+    { w: "me", e: "That was delicious. Really.", k: "정말 맛있었어요. 진심으로요." },
+    { w: "them", e: "So glad to hear it. Come back soon!", k: "그렇게 말씀해 주시니 기쁘네요. 또 오세요!" }
+  ],
+  replies: [
+    { e: "So glad to hear it. Come back soon!", k: "그렇게 말씀해 주시니 기쁘네요. 또 오세요!", n: "I'm 이 빠진 So glad to hear it." },
+    { e: "I'll pass that on to the chef.", k: "주방장에게 전할게요.", n: "★ pass on = 전해 주다." },
+    { e: "That's lovely, thank you. Which was your favourite?", k: "감사합니다. 어떤 게 제일 좋으셨어요?", n: "favourite = 제일 좋아하는 것(영국식 철자)." }
+  ]
+},
+
+"How much is this?": {
+  where: "가격표가 없을 때",
+  lines: [
+    { w: "me", e: "Excuse me, how much is this?", k: "실례합니다, 이거 얼마예요?" },
+    { w: "them", e: "That one's fifteen, but it's two for twenty-five.", k: "그건 15인데, 두 개면 25예요." },
+    { w: "me", e: "Oh, I'll take two then.", k: "아, 그럼 두 개 할게요." }
+  ],
+  replies: [
+    { e: "That one's fifteen, but it's two for twenty-five.", k: "그건 15인데, 두 개면 25예요.", n: "★ two for twenty-five = 두 개에 25. 묶음 할인입니다." },
+    { e: "Let me scan it — the label's come off.", k: "찍어 볼게요. 가격표가 떨어졌네요.", n: "come off = 떨어지다." },
+    { e: "Twelve, down from twenty. It's in the sale.", k: "20에서 내려서 12예요. 세일 상품이에요.", n: "down from ~ = ~에서 내린." }
+  ]
+},
+
+"Could I get a bag?": {
+  where: "계산하면서",
+  lines: [
+    { w: "me", e: "Could I get a bag, please?", k: "봉투 하나 주실 수 있어요?" },
+    { w: "them", e: "Sure, that's twenty p.", k: "네, 20펜스예요." },
+    { w: "me", e: "That's fine.", k: "괜찮아요." }
+  ],
+  replies: [
+    { e: "Sure, that's twenty p.", k: "네, 20펜스예요.", n: "★ p = 펜스(영국 동전). 봉투는 대개 유료입니다." },
+    { e: "Paper or plastic?", k: "종이요, 비닐이요?", n: "미국 마트에서 늘 묻는 말입니다." },
+    { e: "We've only got the big ones, is that okay?", k: "큰 것밖에 없는데 괜찮으세요?", n: "the big ones = 큰 것들." }
+  ]
+},
+
+"Is this on sale?": {
+  where: "세일 표시가 애매할 때",
+  lines: [
+    { w: "me", e: "Is this on sale?", k: "이거 세일하는 거예요?" },
+    { w: "them", e: "It is — thirty percent off at the till.", k: "네, 계산대에서 30퍼센트 빠져요." },
+    { w: "me", e: "Brilliant.", k: "잘됐네요." }
+  ],
+  replies: [
+    { e: "It is — thirty percent off at the till.", k: "네, 계산대에서 30퍼센트 빠져요.", n: "★ till = 계산대(영국). 미국은 register." },
+    { e: "Only the ones with the red tag, sorry.", k: "빨간 표 붙은 것만요, 죄송해요.", n: "tag = 가격표." },
+    { e: "Sale ended yesterday, I'm afraid.", k: "아쉽지만 세일은 어제 끝났어요.", n: "I'm afraid 로 나쁜 소식을 부드럽게." }
+  ]
+},
+
+"I'll take it.": {
+  where: "사기로 마음먹었을 때",
+  lines: [
+    { w: "them", e: "How's that one looking?", k: "그거 어떠세요?" },
+    { w: "me", e: "Yeah, I'll take it.", k: "네, 이걸로 할게요." },
+    { w: "them", e: "Lovely. I'll ring that up for you.", k: "좋아요. 계산해 드릴게요." }
+  ],
+  replies: [
+    { e: "Lovely. I'll ring that up for you.", k: "좋아요. 계산해 드릴게요.", n: "★ ring up = 계산하다. 옛날 금전등록기에서 온 말." },
+    { e: "Great choice. Want me to keep the hanger?", k: "잘 고르셨어요. 옷걸이는 빼 드릴까요?", n: "hanger = 옷걸이." },
+    { e: "Perfect. Paying by card?", k: "좋아요. 카드로 하세요?", n: "Are you 가 빠진 Paying by card?" }
+  ]
+},
+
+"Could I get a receipt?": {
+  where: "계산 후",
+  lines: [
+    { w: "me", e: "Could I get a receipt?", k: "영수증 주실 수 있어요?" },
+    { w: "them", e: "Printed or emailed?", k: "종이요, 이메일이요?" },
+    { w: "me", e: "Printed, please.", k: "종이로 주세요." }
+  ],
+  replies: [
+    { e: "Printed or emailed?", k: "종이요, 이메일이요?", n: "요즘 가게에서 자주 묻습니다." },
+    { e: "It's in the bag already.", k: "봉투에 이미 넣었어요.", n: "already = 이미." },
+    { e: "Course. Keep it for the tax refund.", k: "그럼요. 세금 환급받으려면 잘 보관하세요.", n: "★ tax refund = 세금 환급. 여행자에게 중요합니다." }
+  ]
+},
+
+"Can I return this?": {
+  where: "환불하러 가서",
+  lines: [
+    { w: "me", e: "Can I return this? It doesn't fit.", k: "이거 환불돼요? 안 맞아서요." },
+    { w: "them", e: "Do you have the receipt?", k: "영수증 있으세요?" },
+    { w: "me", e: "Yes, here it is.", k: "네, 여기요." }
+  ],
+  replies: [
+    { e: "Do you have the receipt?", k: "영수증 있으세요?", n: "환불의 첫 질문입니다. 영수증을 챙기세요." },
+    { e: "We can exchange, but no refunds on sale items.", k: "교환은 되는데, 세일 상품은 환불이 안 돼요.", n: "★ exchange = 교환, refund = 환불. 둘은 다릅니다." },
+    { e: "Sure. It'll go back on the same card.", k: "네. 같은 카드로 돌아갑니다.", n: "go back on ~ = ~로 환급되다." }
+  ]
+},
+
+"Is this the right way to the museum?": {
+  where: "걷다가 방향이 맞는지 확인할 때",
+  lines: [
+    { w: "me", e: "Sorry, is this the right way to the museum?", k: "죄송한데, 박물관 이쪽 방향 맞아요?" },
+    { w: "them", e: "Yep, keep going, it's on the left.", k: "네, 쭉 가시면 왼쪽에 있어요." },
+    { w: "me", e: "Great, thanks.", k: "잘됐네요, 고맙습니다." }
+  ],
+  replies: [
+    { e: "Yep, keep going, it's on the left.", k: "네, 쭉 가시면 왼쪽에 있어요.", n: "keep going = 계속 가세요." },
+    { e: "You've gone a bit far. It's back that way.", k: "좀 지나치셨어요. 저쪽으로 돌아가셔야 해요.", n: "gone a bit far = 조금 지나쳤다." },
+    { e: "It is, but the entrance is round the back.", k: "맞는데, 입구는 뒤쪽이에요.", n: "round the back = 뒤로 돌아서." }
+  ]
+},
+
+"Which platform is it?": {
+  where: "기차역 전광판 앞에서",
+  lines: [
+    { w: "me", e: "Excuse me, which platform is it for Oxford?", k: "실례합니다, 옥스퍼드행은 몇 번 승강장이에요?" },
+    { w: "them", e: "Platform four, but it changes sometimes.", k: "4번이요, 근데 가끔 바뀌어요." },
+    { w: "me", e: "I'll keep an eye on the board. Thanks.", k: "전광판 계속 볼게요. 고맙습니다." }
+  ],
+  replies: [
+    { e: "Platform four, but it changes sometimes.", k: "4번이요, 근데 가끔 바뀌어요.", n: "platform = 승강장. 영국 기차역에서 늘 씁니다." },
+    { e: "It's not up yet. Check the board in ten.", k: "아직 안 떴어요. 십 분 뒤에 전광판 보세요.", n: "★ not up yet = 아직 안 떴다. in ten = 십 분 뒤에." },
+    { e: "Nine, right at the end. You'll have to hurry.", k: "9번이요, 맨 끝에요. 서두르셔야 해요.", n: "right at the end = 맨 끝에." }
+  ]
+},
+
+"Where do I transfer?": {
+  where: "지하철에서 갈아탈 곳을 물을 때",
+  lines: [
+    { w: "me", e: "Where do I transfer for the airport?", k: "공항 가려면 어디서 갈아타요?" },
+    { w: "them", e: "Change at King's Cross, then take the blue line.", k: "킹스크로스에서 갈아타고 파란 노선 타세요." },
+    { w: "me", e: "King's Cross, blue line. Got it.", k: "킹스크로스, 파란 노선. 알겠어요." }
+  ],
+  replies: [
+    { e: "Change at King's Cross, then take the blue line.", k: "킹스크로스에서 갈아타고 파란 노선 타세요.", n: "★ 영국은 transfer 대신 change 를 씁니다." },
+    { e: "You don't — this one goes straight there.", k: "안 갈아타셔도 돼요. 이게 바로 가요.", n: "You don't 뒤가 생략됐습니다. straight there = 바로 그곳까지." },
+    { e: "Two more stops, then follow the signs.", k: "두 정거장 더 가서 표지판 따라가세요.", n: "stops = 정거장. 동사 없이 시작합니다." }
+  ]
+},
+
+"How long does it take?": {
+  where: "가는 데 걸리는 시간을 물을 때",
+  lines: [
+    { w: "me", e: "How long does it take to get there?", k: "거기까지 얼마나 걸려요?" },
+    { w: "them", e: "Half an hour, give or take.", k: "삼십 분쯤이요." },
+    { w: "me", e: "That's fine. Thanks.", k: "괜찮네요. 고맙습니다." }
+  ],
+  replies: [
+    { e: "Half an hour, give or take.", k: "삼십 분쯤이요.", n: "★ give or take = 대략. 앞뒤로 조금 차이 난다는 뜻." },
+    { e: "Depends on traffic. Could be twenty, could be an hour.", k: "차 막히기 나름이에요. 이십 분일 수도, 한 시간일 수도.", n: "Depends on ~ = ~에 달렸다." },
+    { e: "Not long at all — fifteen minutes tops.", k: "얼마 안 걸려요. 길어야 십오 분이요.", n: "★ tops = 최대로 잡아서." }
+  ]
+},
+
+"Is it walking distance?": {
+  where: "걸어갈 만한지 물을 때",
+  lines: [
+    { w: "me", e: "Is it walking distance from here?", k: "여기서 걸어갈 만한 거리예요?" },
+    { w: "them", e: "Easily. Ten minutes, straight down.", k: "그럼요. 십 분, 쭉 내려가시면 돼요." },
+    { w: "me", e: "I'll walk then. Cheers.", k: "그럼 걸어갈게요. 고마워요." }
+  ],
+  replies: [
+    { e: "Easily. Ten minutes, straight down.", k: "그럼요. 십 분, 쭉 내려가시면 돼요.", n: "Easily = 당연히 가능해요. 한 단어로 답합니다." },
+    { e: "You could, but it's uphill the whole way.", k: "걸을 순 있는데, 계속 오르막이에요.", n: "uphill = 오르막. the whole way = 내내." },
+    { e: "I wouldn't. Grab a bus, it's much easier.", k: "저라면 안 걸어요. 버스 타세요, 훨씬 편해요.", n: "★ I wouldn't = 저라면 안 그러겠어요. 조언하는 말." }
+  ]
+},
+
+"Could you show me on the map?": {
+  where: "말로 들어선 잘 모르겠을 때",
+  lines: [
+    { w: "me", e: "Sorry, could you show me on the map?", k: "죄송한데, 지도에서 짚어 주실 수 있어요?" },
+    { w: "them", e: "Sure, hand it over. We're here, you want here.", k: "그럼요, 줘 보세요. 여기가 지금 자리고, 여기로 가시면 돼요." },
+    { w: "me", e: "Oh, that's much clearer. Thank you.", k: "아, 훨씬 명확하네요. 고맙습니다." }
+  ],
+  replies: [
+    { e: "Sure, hand it over. We're here, you want here.", k: "그럼요, 줘 보세요. 여기가 지금 자리고, 여기로 가시면 돼요.", n: "hand it over = 이리 줘 보세요. you want here = 여기로 가셔야 해요." },
+    { e: "Let me just put it in your phone instead.", k: "그냥 폰에 찍어 드릴게요.", n: "instead = 대신에. 지도 대신 폰을 씁니다." },
+    { e: "I can't read maps either, honestly. Let's ask someone.", k: "솔직히 저도 지도를 못 봐요. 누구한테 물어봐요.", n: "either = 저도 마찬가지로 못한다." }
+  ]
+},
+
+"Could you let me know when we get there?": {
+  where: "버스에서 기사나 옆사람에게",
+  lines: [
+    { w: "me", e: "Could you let me know when we get there?", k: "도착하면 알려 주실 수 있어요?" },
+    { w: "them", e: "Course. I'll give you a shout.", k: "그럼요. 불러 드릴게요." },
+    { w: "me", e: "That's really kind, thank you.", k: "정말 감사해요." }
+  ],
+  replies: [
+    { e: "Course. I'll give you a shout.", k: "그럼요. 불러 드릴게요.", n: "★ Of 가 빠진 Course. give a shout = 불러 주다." },
+    { e: "Sure, it's about six stops. Sit tight.", k: "네, 여섯 정거장쯤이요. 편히 계세요.", n: "★ Sit tight = 가만히 계세요." },
+    { e: "I'm getting off before you, sorry. Ask the driver.", k: "제가 먼저 내려서요, 죄송해요. 기사님한테 물어보세요.", n: "getting off = 내리다." }
+  ]
+},
+
+"One ticket to Oxford, please.": {
+  where: "매표소에서",
+  lines: [
+    { w: "me", e: "One ticket to Oxford, please.", k: "옥스퍼드 표 한 장 주세요." },
+    { w: "them", e: "Single or return?", k: "편도예요, 왕복이에요?" },
+    { w: "me", e: "Return, please.", k: "왕복으로 주세요." }
+  ],
+  replies: [
+    { e: "Single or return?", k: "편도예요, 왕복이에요?", n: "★ single = 편도, return = 왕복 (영국). 미국은 one-way, round-trip." },
+    { e: "Sure. Any railcard?", k: "네. 할인 카드 있으세요?", n: "railcard = 기차 할인 카드. 없으면 No 하면 됩니다." },
+    { e: "Next one's in forty minutes, is that okay?", k: "다음 차가 사십 분 뒤인데 괜찮으세요?", n: "Next one = 다음 기차." }
+  ]
+},
+
+"What time is the last train?": {
+  where: "늦은 시간 역에서",
+  lines: [
+    { w: "me", e: "What time is the last train back?", k: "돌아가는 막차가 몇 시예요?" },
+    { w: "them", e: "Quarter past eleven off platform two.", k: "11시 15분, 2번 승강장에서요." },
+    { w: "me", e: "Good, I've got time.", k: "다행이다, 시간 있네요." }
+  ],
+  replies: [
+    { e: "Quarter past eleven off platform two.", k: "11시 15분, 2번 승강장에서요.", n: "★ quarter past eleven = 11시 15분. quarter to 면 15분 전입니다." },
+    { e: "You've just missed it, I'm afraid.", k: "아쉽지만 방금 놓치셨어요.", n: "★ I'm afraid 는 나쁜 소식을 부드럽게 전하는 말." },
+    { e: "Half twelve on weekends, earlier on Sundays.", k: "주말엔 12시 반, 일요일은 더 일러요.", n: "half twelve = 12시 반 (영국)." }
+  ]
+},
+
+"Which exit should I take?": {
+  where: "역 안에서 출구를 찾을 때",
+  lines: [
+    { w: "me", e: "Which exit should I take for the arena?", k: "공연장 가려면 몇 번 출구로 나가요?" },
+    { w: "them", e: "Exit C. Just follow the crowd, honestly.", k: "C 출구요. 솔직히 사람들 따라가시면 돼요." },
+    { w: "me", e: "Ha, fair enough. Thanks.", k: "하하, 그러네요. 고맙습니다." }
+  ],
+  replies: [
+    { e: "Exit C. Just follow the crowd, honestly.", k: "C 출구요. 솔직히 사람들 따라가시면 돼요.", n: "follow the crowd = 사람들 따라가다." },
+    { e: "Any of them, they all come out the same side.", k: "아무 데나요, 다 같은 쪽으로 나와요.", n: "come out = (출구가) 나오다." },
+    { e: "Take the one signposted for the stadium.", k: "경기장이라고 써 있는 쪽으로 나가세요.", n: "signposted = 표지판이 붙은." }
+  ]
+},
+
+"I think I'm lost.": {
+  where: "길을 잃고 누군가에게",
+  lines: [
+    { w: "me", e: "Sorry to bother you — I think I'm lost.", k: "죄송한데, 길을 잃은 것 같아요." },
+    { w: "them", e: "No bother. Where are you trying to get to?", k: "괜찮아요. 어디 가시려고요?" },
+    { w: "me", e: "The arena. I came out the wrong exit.", k: "공연장이요. 출구를 잘못 나왔어요." }
+  ],
+  replies: [
+    { e: "No bother. Where are you trying to get to?", k: "괜찮아요. 어디 가시려고요?", n: "trying to get to = 가려고 하는 곳." },
+    { e: "Happens to everyone here. What's the address?", k: "여기선 다들 그래요. 주소가 어떻게 돼요?", n: "Happens to everyone = 다들 그래요. It 이 빠졌습니다." },
+    { e: "Show me on your phone and I'll point you.", k: "폰으로 보여 주시면 방향 알려 드릴게요.", n: "point you = 방향을 가리켜 주다." }
+  ]
+},
+
+"What time is check-out?": {
+  where: "체크인하면서 미리 확인",
+  lines: [
+    { w: "me", e: "What time is check-out?", k: "체크아웃 몇 시예요?" },
+    { w: "them", e: "Eleven, but you can leave bags after.", k: "11시요, 그 뒤에도 짐은 맡기실 수 있어요." },
+    { w: "me", e: "That's useful, thanks.", k: "유용하네요, 고맙습니다." }
+  ],
+  replies: [
+    { e: "Eleven, but you can leave bags after.", k: "11시요, 그 뒤에도 짐은 맡기실 수 있어요.", n: "leave bags = 짐을 맡기다." },
+    { e: "Ten thirty, I'm afraid. It's quite early here.", k: "아쉽지만 10시 30분이요. 여긴 좀 일러요." , n: "quite early = 꽤 이른." },
+    { e: "Midday. Late check-out's ten pounds if you want it.", k: "정오요. 늦은 체크아웃은 10파운드예요.", n: "★ Midday = 정오. late check-out = 연장 퇴실." }
+  ]
+},
+
+"Is breakfast included?": {
+  where: "프런트에서",
+  lines: [
+    { w: "me", e: "Is breakfast included?", k: "조식 포함인가요?" },
+    { w: "them", e: "It is, seven to ten in the room downstairs.", k: "네, 7시부터 10시까지 아래층에서요." },
+    { w: "me", e: "Lovely, thank you.", k: "좋네요, 고맙습니다." }
+  ],
+  replies: [
+    { e: "It is, seven to ten in the room downstairs.", k: "네, 7시부터 10시까지 아래층에서요.", n: "It is 로 짧게 긍정합니다. downstairs = 아래층." },
+    { e: "Not on this rate, but it's eight pounds extra.", k: "이 요금엔 안 들어가요, 8파운드 추가예요.", n: "★ rate = 요금제. extra = 추가로." },
+    { e: "Yes — continental only, though. No hot food.", k: "네, 근데 간단한 것만요. 따뜻한 음식은 없어요.", n: "continental = 빵·커피 정도의 간단한 조식." }
+  ]
+},
+
+"Could I get an extra towel?": {
+  where: "프런트에 전화해서",
+  lines: [
+    { w: "me", e: "Could I get an extra towel, please?", k: "수건 하나 더 주실 수 있어요?" },
+    { w: "them", e: "Of course. I'll send one up.", k: "그럼요. 올려 보내 드릴게요." },
+    { w: "me", e: "Thank you.", k: "고맙습니다." }
+  ],
+  replies: [
+    { e: "Of course. I'll send one up.", k: "그럼요. 올려 보내 드릴게요.", n: "★ send up = 위층으로 올려 보내다." },
+    { e: "Sure, there should be spares in the wardrobe too.", k: "네, 옷장에도 여분이 있을 거예요.", n: "spares = 여분. wardrobe = 옷장." },
+    { e: "No problem. Room number?", k: "네. 방 번호가요?", n: "동사 없이 Room number? 만으로 묻습니다." }
+  ]
+},
+
+"The wifi isn't working.": {
+  where: "인터넷이 안 될 때",
+  lines: [
+    { w: "me", e: "Sorry, the wifi isn't working in my room.", k: "죄송한데, 방에서 와이파이가 안 돼요." },
+    { w: "them", e: "Try reconnecting — the password changed today.", k: "다시 연결해 보세요. 오늘 비밀번호가 바뀌었어요." },
+    { w: "me", e: "Ah, that explains it.", k: "아, 그래서였군요." }
+  ],
+  replies: [
+    { e: "Try reconnecting — the password changed today.", k: "다시 연결해 보세요. 오늘 비밀번호가 바뀌었어요.", n: "reconnecting = 다시 연결하기." },
+    { e: "It's been patchy all day. I'll report it.", k: "하루 종일 들쭉날쭉했어요. 알려 둘게요.", n: "★ patchy = 되다 말다 하는. report it = 신고하다." },
+    { e: "Which floor? The third one's always weak.", k: "몇 층이세요? 3층이 늘 약해요.", n: "weak = (신호가) 약한." }
+  ]
+},
+
+"The room is a bit cold.": {
+  where: "방이 추울 때",
+  lines: [
+    { w: "me", e: "The room is a bit cold. Is there a heater?", k: "방이 좀 추운데요. 난방기 있어요?" },
+    { w: "them", e: "There's a dial by the window. Turn it right.", k: "창가에 조절기가 있어요. 오른쪽으로 돌리세요." },
+    { w: "me", e: "I'll try that, thanks.", k: "해볼게요, 고맙습니다." }
+  ],
+  replies: [
+    { e: "There's a dial by the window. Turn it right.", k: "창가에 조절기가 있어요. 오른쪽으로 돌리세요.", n: "dial = 돌리는 조절기." },
+    { e: "I'll bring up an extra duvet.", k: "이불 하나 더 갖다 드릴게요.", n: "★ duvet = 두툼한 이불. 영국에서 흔한 말입니다." },
+    { e: "Sorry about that — the heating comes on at six.", k: "죄송해요. 난방은 6시에 들어와요.", n: "comes on = 켜지다." }
+  ]
+},
+
+"Is a late check-out possible?": {
+  where: "하루 더 쓰고 싶을 때",
+  lines: [
+    { w: "me", e: "Is a late check-out possible?", k: "늦은 체크아웃 가능할까요?" },
+    { w: "them", e: "Until two, yes. There's a small charge.", k: "2시까지는 가능해요. 약간의 요금이 있고요." },
+    { w: "me", e: "That works. Let's do that.", k: "괜찮네요. 그렇게 할게요." }
+  ],
+  replies: [
+    { e: "Until two, yes. There's a small charge.", k: "2시까지는 가능해요. 약간의 요금이 있고요.", n: "a small charge = 소액 요금." },
+    { e: "Not today, sorry — we're fully booked.", k: "오늘은 안 돼요, 죄송해요. 예약이 꽉 찼어요.", n: "fully booked = 예약이 다 찬." },
+    { e: "Let me check with housekeeping and call you back.", k: "객실 정비팀에 물어보고 다시 연락드릴게요.", n: "housekeeping = 객실 정비. call you back = 다시 전화하다." }
+  ]
+},
+
+"Could you call a taxi for me?": {
+  where: "나가기 전에 프런트에서",
+  lines: [
+    { w: "me", e: "Could you call a taxi for me?", k: "택시 좀 불러 주실 수 있어요?" },
+    { w: "them", e: "Certainly. Where are you headed?", k: "물론이죠. 어디로 가세요?" },
+    { w: "me", e: "The arena, please.", k: "공연장이요." }
+  ],
+  replies: [
+    { e: "Certainly. Where are you headed?", k: "물론이죠. 어디로 가세요?", n: "★ headed = 향하는. Where are you headed? = 어디 가세요?" },
+    { e: "Sure, it'll be about ten minutes. Wait in the lobby.", k: "네, 십 분쯤 걸려요. 로비에서 기다리세요.", n: "lobby = 로비." },
+    { e: "An app would be quicker at this hour, honestly.", k: "솔직히 이 시간엔 앱이 더 빨라요.", n: "at this hour = 이 시간대에는." }
+  ]
+},
+
+"Which floor is it on?": {
+  where: "시설 위치를 물을 때",
+  lines: [
+    { w: "me", e: "Which floor is it on?", k: "몇 층에 있어요?" },
+    { w: "them", e: "Second floor. Lift's just round the corner.", k: "2층이요. 승강기는 저 모퉁이 돌면 있어요." },
+    { w: "me", e: "Thanks very much.", k: "정말 고맙습니다." }
+  ],
+  replies: [
+    { e: "Second floor. Lift's just round the corner.", k: "2층이요. 승강기는 저 모퉁이 돌면 있어요.", n: "★ lift = 승강기(영국). 미국은 elevator." },
+    { e: "Ground floor, actually — same as reception.", k: "사실 1층이요. 프런트랑 같은 층이에요.", n: "★ ground floor 가 영국의 1층입니다. first floor 는 2층이에요." },
+    { e: "Top floor. Worth it for the view.", k: "꼭대기 층이요. 전망 때문에 올라갈 만해요.", n: "Worth it = 그럴 만한 값어치가 있다." }
+  ]
+},
+
+"There you go.": {
+  where: "직원이 문제를 해결해 주고",
+  lines: [
+    { w: "them", e: "There you go. All sorted.", k: "됐습니다. 다 처리됐어요." },
+    { w: "me", e: "Oh, that was quick. Thank you.", k: "아, 빠르네요. 고맙습니다." },
+    { w: "them", e: "No problem. Anything else?", k: "별말씀을요. 더 필요한 거 있으세요?" }
+  ],
+  replies: [
+    { e: "No problem. Anything else?", k: "별말씀을요. 더 필요한 거 있으세요?", n: "Anything else 가 한 덩어리로 붙습니다." },
+    { e: "Happy to help. Have a good one.", k: "도와드려서 기뻐요. 좋은 하루 보내세요.", n: "Happy to help = 도움이 됐다니 좋네요." },
+    { e: "That's what I'm here for.", k: "그러라고 있는 거죠.", n: "겸손하게 받는 말. 직역하면 어색하니 통째로 외우세요." }
+  ]
+},
+
+"Go ahead.": {
+  where: "좁은 문 앞에서 서로 양보할 때",
+  lines: [
+    { w: "me", e: "Oh, sorry — after you.", k: "아, 죄송해요. 먼저 가세요." },
+    { w: "them", e: "No, go ahead.", k: "아니에요, 먼저 가세요." },
+    { w: "me", e: "Thanks.", k: "고마워요." }
+  ],
+  replies: [
+    { e: "No, go ahead.", k: "아니에요, 먼저 가세요.", n: "★ No 로 시작하지만 양보하는 말입니다." },
+    { e: "Please, after you. I'm not in a rush.", k: "먼저 가세요. 저는 안 급해요.", n: "after you = 먼저 가세요. in a rush = 급한." },
+    { e: "We'll be here all day! You first.", k: "이러다 하루 종일 가겠어요! 먼저 가세요.", n: "서로 양보할 때 하는 농담입니다." }
+  ]
+},
+
+"Never mind.": {
+  where: "말하려다 그만둘 때",
+  lines: [
+    { w: "me", e: "Sorry, could I ask — actually, never mind.", k: "저기, 뭐 좀 여쭤볼게요. 아, 아니에요." },
+    { w: "them", e: "You sure? It's no trouble.", k: "괜찮으세요? 어렵지 않은데요." },
+    { w: "me", e: "Yeah, I figured it out. Thanks anyway.", k: "네, 알아냈어요. 그래도 고마워요." }
+  ],
+  replies: [
+    { e: "You sure? It's no trouble.", k: "괜찮으세요? 어렵지 않은데요.", n: "Are 가 빠진 You sure? no trouble = 번거롭지 않다." },
+    { e: "Okay, but shout if you need anything.", k: "네, 필요하시면 부르세요.", n: "shout = 부르세요. 소리치라는 게 아닙니다." },
+    { e: "No worries. Changed your mind?", k: "괜찮아요. 마음 바뀌셨어요?", n: "Changed your mind? 앞의 Have you 가 빠졌습니다." }
+  ]
+},
+
+"No worries.": {
+  where: "상대가 실수로 부딪히고 사과할 때",
+  lines: [
+    { w: "them", e: "Oh gosh, I'm so sorry!", k: "어머, 정말 죄송해요!" },
+    { w: "me", e: "No worries, you're fine.", k: "괜찮아요, 신경 쓰지 마세요." },
+    { w: "them", e: "Thanks, it's so packed in here.", k: "고마워요, 여기 사람이 너무 많네요." }
+  ],
+  replies: [
+    { e: "Thanks, it's so packed in here.", k: "고마워요, 여기 사람이 너무 많네요.", n: "packed = 꽉 찬. 공연장에서 자주 씁니다." },
+    { e: "Still, sorry — I didn't see you there.", k: "그래도 죄송해요. 못 봤어요.", n: "Still = 그래도. 한 번 더 사과하는 말." },
+    { e: "You're too nice. I nearly took you out!", k: "너무 좋게 봐주시네요. 하마터면 넘어뜨릴 뻔했어요!", n: "take someone out = 여기선 '넘어뜨리다'. 농담입니다." }
+  ]
+},
+
+"I'm all right, thanks.": {
+  where: "권하는 것을 사양할 때",
+  lines: [
+    { w: "them", e: "Can I get you another drink?", k: "음료 하나 더 드릴까요?" },
+    { w: "me", e: "I'm all right, thanks.", k: "괜찮아요, 고맙습니다." },
+    { w: "them", e: "No problem. Just the bill then?", k: "네. 그럼 계산서만 드릴까요?" }
+  ],
+  replies: [
+    { e: "No problem. Just the bill then?", k: "네. 그럼 계산서만 드릴까요?", n: "bill = 계산서(영국). 미국은 check 를 씁니다." },
+    { e: "Sure. Let me know if you change your mind.", k: "네. 마음 바뀌시면 말씀하세요.", n: "change your mind = 마음이 바뀌다." },
+    { e: "Okay! Water's free if you want some.", k: "네! 물은 공짜니까 필요하면 말씀하세요.", n: "free = 공짜. 사양해도 물은 권하는 경우가 많아요." }
+  ]
+},
+
+"It's on me.": {
+  where: "계산하려는 친구를 말리며",
+  lines: [
+    { w: "them", e: "Let me get this one.", k: "이번엔 제가 낼게요." },
+    { w: "me", e: "No, it's on me. You got the tickets.", k: "아니에요, 제가 낼게요. 표는 그쪽이 샀잖아요." },
+    { w: "them", e: "Fine, but I'm buying the next round.", k: "알겠어요, 근데 다음은 제가 살게요." }
+  ],
+  replies: [
+    { e: "Fine, but I'm buying the next round.", k: "알겠어요, 근데 다음은 제가 살게요.", n: "next round = 다음 차례. 술집에서 온 말이지만 널리 씁니다." },
+    { e: "Are you sure? That's really kind.", k: "정말요? 정말 고마워요.", n: "That's really kind = 마음이 참 곱네요." },
+    { e: "Absolutely not, we're splitting it.", k: "절대 안 돼요, 반씩 내요.", n: "★ split = 나눠 내다. 강하게 거절하는 농담조입니다." }
+  ]
+},
+
+"I'm gonna grab a coffee.": {
+  where: "줄에서 잠깐 빠지며",
+  lines: [
+    { w: "me", e: "I'm gonna grab a coffee. Want one?", k: "커피 좀 사 올게요. 드실래요?" },
+    { w: "them", e: "Ooh, yes please. Just a flat white.", k: "오, 좋아요. 플랫화이트 하나요." },
+    { w: "me", e: "Got it. Back in five.", k: "알겠어요. 오 분이면 와요." }
+  ],
+  replies: [
+    { e: "Ooh, yes please. Just a flat white.", k: "오, 좋아요. 플랫화이트 하나요.", n: "flat white = 우유 커피의 한 종류. 영국·호주에서 흔합니다." },
+    { e: "I'm good, thanks. I've had three already.", k: "저는 괜찮아요. 벌써 세 잔 마셨어요.", n: "★ I'm good = 됐어요(사양). '나는 착하다'가 아닙니다." },
+    { e: "Only if you let me pay you back.", k: "돈 드릴 수 있으면요.", n: "Only if ~ = ~해야만. pay you back = 돈을 갚다." }
+  ]
+},
+
+"Do you want me to wait?": {
+  where: "상대가 뭔가를 하러 갈 때",
+  lines: [
+    { w: "them", e: "I just need to pop to the loo.", k: "화장실만 잠깐 다녀올게요." },
+    { w: "me", e: "Do you want me to wait?", k: "기다릴까요?" },
+    { w: "them", e: "Would you? I'll be two minutes.", k: "그래 주실래요? 금방 와요." }
+  ],
+  replies: [
+    { e: "Would you? I'll be two minutes.", k: "그래 주실래요? 금방 와요.", n: "★ Would you? 만으로 '그래 주시겠어요?'가 됩니다." },
+    { e: "No need, I'll find you inside.", k: "괜찮아요, 안에서 찾을게요.", n: "No need = 그럴 필요 없어요." },
+    { e: "If you don't mind! I hate losing people.", k: "괜찮으시면요! 사람 놓치는 거 싫어서요.", n: "losing people = 일행을 놓치는 것." }
+  ]
+},
+
+"Do you live around here?": {
+  where: "현지 사람과 이야기하다가",
+  lines: [
+    { w: "me", e: "Do you live around here?", k: "이 근처 사세요?" },
+    { w: "them", e: "About twenty minutes out, yeah.", k: "이십 분쯤 떨어진 곳에요." },
+    { w: "me", e: "Nice. You must know all the good spots.", k: "좋네요. 좋은 데 많이 아시겠어요." }
+  ],
+  replies: [
+    { e: "About twenty minutes out, yeah.", k: "이십 분쯤 떨어진 곳에요.", n: "out = 중심에서 떨어진." },
+    { e: "Born and raised. Never left!", k: "나고 자랐어요. 한 번도 안 떠났죠!", n: "Born and raised = 나고 자랐다." },
+    { e: "No, I'm visiting too, actually.", k: "아뇨, 사실 저도 놀러 온 거예요.", n: "visiting = 방문 중인. 같은 처지라는 뜻." }
+  ]
+},
+
+"Have a good one.": {
+  where: "가게를 나서며",
+  lines: [
+    { w: "them", e: "That's you all done.", k: "다 됐습니다." },
+    { w: "me", e: "Thanks. Have a good one.", k: "고맙습니다. 좋은 하루 보내세요." },
+    { w: "them", e: "You too, take care.", k: "그쪽도요, 잘 가세요." }
+  ],
+  replies: [
+    { e: "You too, take care.", k: "그쪽도요, 잘 가세요.", n: "take care = 잘 지내세요. 헤어질 때 인사입니다." },
+    { e: "Cheers, you as well!", k: "고마워요, 그쪽도요!", n: "★ Cheers 는 영국에서 '고마워요'로도 씁니다. 건배가 아니에요." },
+    { e: "Thanks! Enjoy the rest of your day.", k: "고마워요! 남은 하루 잘 보내세요.", n: "the rest of your day = 남은 하루." }
+  ]
+},
+
+"Enjoy your trip.": {
+  where: "여행 이야기를 마치고 헤어질 때",
+  lines: [
+    { w: "them", e: "Right, my bus is here. Nice chatting!", k: "아, 버스 왔네요. 이야기 즐거웠어요!" },
+    { w: "me", e: "You too. Enjoy your trip.", k: "저도요. 여행 잘하세요." },
+    { w: "them", e: "Thanks! Safe travels to you too.", k: "고마워요! 그쪽도 조심히 다니세요." }
+  ],
+  replies: [
+    { e: "Thanks! Safe travels to you too.", k: "고마워요! 그쪽도 조심히 다니세요.", n: "Safe travels = 조심히 가세요." },
+    { e: "Will do! Hope the show's amazing.", k: "그럴게요! 공연 멋지길 바라요.", n: "Will do = 그럴게요. I 가 빠졌습니다." },
+    { e: "Cheers. Maybe see you around!", k: "고마워요. 또 봬요!", n: "see you around = 또 봐요(막연하게)." }
+  ]
+},
+
+"Is this seat 12?": {
+  where: "좌석을 찾으며",
+  lines: [
+    { w: "me", e: "Sorry, is this seat 12?", k: "죄송한데, 여기가 12번 자리예요?" },
+    { w: "them", e: "Let's see... yeah, you're right here.", k: "어디 보자… 네, 바로 여기예요." },
+    { w: "me", e: "Perfect, thank you.", k: "좋아요, 고맙습니다." }
+  ],
+  replies: [
+    { e: "Let's see... yeah, you're right here.", k: "어디 보자… 네, 바로 여기예요.", n: "Let's see = 어디 보자. 혼잣말처럼 나옵니다." },
+    { e: "No, 12's one row back.", k: "아뇨, 12번은 한 줄 뒤예요.", n: "one row back = 한 줄 뒤. 12's = 12 is." },
+    { e: "I think so? The numbers are tiny.", k: "아마도요? 번호가 너무 작아서요.", n: "끝을 올려 말하면 확신이 없다는 뜻입니다." }
+  ]
+},
+
+"I've been waiting years for this.": {
+  where: "공연 시작을 기다리며",
+  lines: [
+    { w: "them", e: "You look emotional already!", k: "벌써 울컥하신 것 같아요!" },
+    { w: "me", e: "I've been waiting years for this.", k: "이걸 몇 년을 기다렸어요." },
+    { w: "them", e: "Then tonight's going to hit different.", k: "그럼 오늘 밤은 특별하겠네요." }
+  ],
+  replies: [
+    { e: "Then tonight's going to hit different.", k: "그럼 오늘 밤은 특별하겠네요.", n: "★ hit different = 느낌이 다르다. 요즘 말입니다." },
+    { e: "Same, I had tickets in 2020 and it got cancelled.", k: "저도요, 2020년에 표 샀는데 취소됐어요.", n: "got cancelled = 취소됐다." },
+    { e: "Then you deserve a good spot. Come stand here.", k: "그럼 좋은 자리에 계셔야죠. 여기 서세요.", n: "deserve = ~할 자격이 있다." }
+  ]
+},
+
+"Do you want me to take one of you?": {
+  where: "누가 혼자 사진을 찍고 있을 때",
+  lines: [
+    { w: "me", e: "Do you want me to take one of you?", k: "제가 찍어 드릴까요?" },
+    { w: "them", e: "Would you? That's so kind!", k: "그래 주실래요? 정말 친절하시네요!" },
+    { w: "me", e: "Of course. Say when.", k: "그럼요. 준비되면 말씀하세요." }
+  ],
+  replies: [
+    { e: "Would you? That's so kind!", k: "그래 주실래요? 정말 친절하시네요!", n: "That's so kind = 정말 친절하시네요." },
+    { e: "Oh, yes please! Get the sign behind me.", k: "아, 좋아요! 뒤에 간판 나오게 찍어 주세요.", n: "get ~ = 사진에 ~를 넣다." },
+    { e: "I'm okay, thanks — but could we do a selfie?", k: "괜찮아요, 고마워요. 근데 같이 셀카 찍을래요?", n: "★ 사양하면서 다른 제안을 합니다." }
+  ]
+},
+
+"Where did you get that?": {
+  where: "남이 든 굿즈를 보고",
+  lines: [
+    { w: "me", e: "That's gorgeous — where did you get that?", k: "그거 예쁘네요. 어디서 사셨어요?" },
+    { w: "them", e: "The stand by the entrance. They still had some.", k: "입구 쪽 부스요. 아직 남아 있었어요." },
+    { w: "me", e: "I'll run over now. Thanks!", k: "지금 가봐야겠어요. 고마워요!" }
+  ],
+  replies: [
+    { e: "The stand by the entrance. They still had some.", k: "입구 쪽 부스요. 아직 남아 있었어요.", n: "stand = 판매 부스. by ~ = ~ 옆에." },
+    { e: "Online, sadly. It's not at the venue.", k: "아쉽게도 인터넷이요. 여기선 안 팔아요.", n: "sadly 를 끼워 아쉬움을 나타냅니다." },
+    { e: "A friend made it for me, actually.", k: "사실 친구가 만들어 줬어요.", n: "made it for me = 나를 위해 만들어 줬다." }
+  ]
+},
+
+"I can't believe I'm here.": {
+  where: "불이 꺼지고 함성이 터질 때",
+  lines: [
+    { w: "them", e: "Here we go!", k: "시작한다!" },
+    { w: "me", e: "I can't believe I'm here.", k: "제가 여기 있다는 게 안 믿겨요." },
+    { w: "them", e: "Believe it! Now scream with me.", k: "믿으세요! 이제 같이 소리 질러요." }
+  ],
+  replies: [
+    { e: "Believe it! Now scream with me.", k: "믿으세요! 이제 같이 소리 질러요.", n: "Believe it! 로 되받는 말장난입니다." },
+    { e: "Neither can I, and I live here!", k: "저도요, 저는 여기 사는데도요!", n: "★ Neither can I = 저도 안 믿겨요. 부정에 맞장구치는 말." },
+    { e: "Soak it up. It goes so fast.", k: "마음껏 느끼세요. 금방 지나가요.", n: "soak it up = 흠뻑 느끼다." }
+  ]
+},
+
 "You all set?": {
   where: "계산대에서 점원이",
   lines: [

@@ -1150,31 +1150,12 @@
     $("ls-cue").textContent = "";
     $("ls-count").textContent = (LIS.spoken + 1) + "번째";
 
-    var g2 = S.cfg.lgap, mul = (g2 === 2 ? 1.8 : 1.1);
-    var gapMs = Math.round(Math.max(1400, row.e.length * 70) * mul);
     var seq;
-
-    // 대화가 있는 표현이면 주고받는 모습으로 들려줍니다
     if (S.cfg.ltalk && hasTalk(row.e)) {
       $("ls-set").textContent = "💬 " + row.sname;
-      seq = talkSeq(row, gapMs);
-    } else if (LIS.dir === "ko") {
-      /* 뜻 → 영어. 한국어를 듣고 영어가 입에서 나오게 하는 연습입니다.
-         답을 미리 보지 않도록 영어는 말할 때 화면에 냅니다. */
-      $("ls-en").textContent = "";
-      $("ls-ko").textContent = row.k;
-      seq = [{ ko: row.k, wait: 400 }];
-      seq.push({ cue: "영어로 말해 보세요",
-                 wait: g2 ? Math.round(gapMs * 1.25) : 900 });
-      seq.push({ cue: "", showEn: row.e, en: row.e, wait: 500 });
-      seq.push({ en: row.e, echo: true, wait: 800 });
+      seq = talkSeq(row);
     } else {
-      /* 영어 → 뜻. 알아듣는 연습입니다. */
-      seq = [{ en: row.e, wait: 450 }];
-      if (LIS.ko) seq.push({ ko: row.k, show: row.k, wait: 350 });
-      else seq.push({ show: row.k, wait: 250 });
-      if (g2) seq.push({ cue: "따라 말해 보세요", wait: gapMs });
-      seq.push({ cue: "", en: row.e, echo: true, wait: 900 });
+      seq = soloSeq(row);
     }
 
     /* 한 표현에 너무 오래 머물면 그냥 넘깁니다.
@@ -1213,10 +1194,12 @@
     $("ls-cue").textContent = "";
     $("ls-count").textContent = (LIS.spoken + 1) + "번째";
 
-    var seq = [{ en: f.e, wait: 500 }];
-    if (LIS.ko) seq.push({ ko: f.k, show: f.k, wait: 400 });
+    // 리듬은 다른 것들과 같게 — 듣고, 뜻 보고, 틈, 한 번 더
+    var seq = [{ en: f.e, wait: 400 }], gap = gapFor(f.e);
+    if (LIS.ko) seq.push({ ko: f.k, show: f.k, wait: 350 });
     else seq.push({ show: f.k, wait: 300 });
-    seq.push({ cue: "한 번 더", en: f.e, echo: true, wait: 800 });
+    if (gap) seq.push({ cue: "따라 말해 보세요", wait: gap });
+    seq.push({ cue: "", en: f.e, echo: true, wait: 800 });
 
     var myI = LIS.i;
     if (LIS.guard) clearTimeout(LIS.guard);
@@ -1233,36 +1216,79 @@
     });
   }
 
-  /* 대화 한 토막을 소리로만 듣는 차례로 바꿉니다.
-     상대가 말하고 → 내가 답할 틈 → 내 답 → 돌아오는 답.
-     돌아오는 답은 매번 다른 것이 뽑힙니다. */
-  function talkSeq(row, gapMs) {
+  /* ── 듣기 리듬 ──────────────────────────────────────────────
+     낱개든 대화든 틈은 늘 같은 자리에 한 번만 옵니다.
+     어떤 건 따라 말할 틈이 있고 어떤 건 그냥 지나가면 헷갈리니까요.
+
+       뜻 → 영어 :  (상대 말) → 내가 할 말의 뜻 → [틈] → 영어
+       영어 → 뜻 :  (상대 말) → 영어 → 뜻 → [틈] → 영어 한 번 더
+
+     틈은 내가 말해야 하는 문장 길이에 맞춰 잡습니다.
+     ─────────────────────────────────────────────────────────── */
+  function gapFor(text) {
+    if (!S.cfg.lgap) return 0;
+    var mul = (S.cfg.lgap === 2 ? 2.0 : 1.3);
+    return Math.round(Math.max(2000, String(text || "").length * 90) * mul);
+  }
+
+  function sayLine(seq, e, k, wait) {
+    seq.push({ showEn: e, en: e, wait: 300 });
+    if (LIS.ko) seq.push({ ko: k, show: k, wait: wait });
+    else seq.push({ show: k, wait: wait });
+  }
+
+  /* 대화가 없는 표현 — 혼자 나오는 한 문장 */
+  function soloSeq(row) {
+    var seq = [], gap = gapFor(row.e);
+    if (LIS.dir === "ko") {
+      $("ls-en").textContent = "";
+      $("ls-ko").textContent = row.k;
+      seq.push({ ko: row.k, show: row.k, wait: 350 });
+      if (gap) seq.push({ cue: "영어로 말해 보세요", wait: gap });
+      seq.push({ cue: "", showEn: row.e, en: row.e, wait: 900 });
+    } else {
+      sayLine(seq, row.e, row.k, 350);
+      if (gap) seq.push({ cue: "따라 말해 보세요", wait: gap });
+      seq.push({ cue: "", en: row.e, echo: true, wait: 900 });
+    }
+    return seq;
+  }
+
+  /* 대화가 있는 표현 — 상대 말이 먼저 오고, 내 차례에서 같은 리듬 */
+  function talkSeq(row) {
     var t = TALK[row.e];
     var pi = practiceIdx(row.e, t.lines);
     if (pi < 0) pi = 0;
+    var mine = t.lines[pi];
     var seq = [], i;
 
+    $("ls-en").textContent = "";
+
+    // 내 차례 전에 상대가 하는 말
     for (i = 0; i < pi; i++) {
-      seq.push({ cue: "상대가 이렇게 말해요", showEn: t.lines[i].e, en: t.lines[i].e, wait: 300 });
-      if (LIS.ko) seq.push({ ko: t.lines[i].k, show: t.lines[i].k, wait: 300 });
-      else seq.push({ show: t.lines[i].k, wait: 250 });
+      seq.push({ cue: "상대가 이렇게 말해요" });
+      sayLine(seq, t.lines[i].e, t.lines[i].k, 400);
     }
 
-    // 내 차례 — 뜻만 주고 영어로 말해 보게 합니다
-    $("ls-en").textContent = "";
-    if (LIS.ko) seq.push({ cue: "", ko: t.lines[pi].k, show: t.lines[pi].k, wait: 300 });
-    else seq.push({ show: t.lines[pi].k, wait: 250 });
-    if (S.cfg.lgap) seq.push({ cue: "뭐라고 답할까요?", wait: Math.round(gapMs * 1.1) });
-    seq.push({ cue: "이렇게 말하면 돼요", showEn: t.lines[pi].e, en: t.lines[pi].e, wait: 450 });
+    var gap = gapFor(mine.e);
+    if (LIS.dir === "ko") {
+      seq.push({ cue: "", ko: mine.k, show: mine.k, wait: 350 });
+      if (gap) seq.push({ cue: "영어로 말해 보세요", wait: gap });
+      seq.push({ cue: "내가 할 말", showEn: mine.e, en: mine.e, wait: 500 });
+    } else {
+      seq.push({ cue: "내가 할 말" });
+      sayLine(seq, mine.e, mine.k, 350);
+      if (gap) seq.push({ cue: "따라 말해 보세요", wait: gap });
+      seq.push({ cue: "", en: mine.e, echo: true, wait: 500 });
+    }
 
-    // 돌아오는 답 하나
+    // 돌아오는 답 하나 — 매번 다른 것이 뽑힙니다
     var rep = null;
     if (t.replies && t.replies.length) rep = t.replies[Math.floor(Math.random() * t.replies.length)];
     else { for (i = pi + 1; i < t.lines.length; i++) if (t.lines[i].w === "them") { rep = t.lines[i]; break; } }
     if (rep) {
-      seq.push({ cue: "이런 답이 돌아와요", showEn: rep.e, en: rep.e, wait: 300 });
-      if (LIS.ko) seq.push({ ko: rep.k, show: rep.k, wait: 700 });
-      else seq.push({ show: rep.k, wait: 600 });
+      seq.push({ cue: "이런 답이 돌아와요" });
+      sayLine(seq, rep.e, rep.k, 800);
     }
     return seq;
   }
