@@ -1318,6 +1318,63 @@ var TALK = {
 
 /* ---------- 최애 자랑하기 ---------- */
 
+"The whole show tells a story.": {
+  where: "공연이 끝나고 나오며",
+  lines: [
+    { w: "them", e: "I wasn't expecting it to be that... put together?", k: "이렇게까지… 짜임새 있을 줄은 몰랐어요." },
+    { w: "me", e: "I know. The whole show tells a story — beginning, middle, end.", k: "그쵸. 공연 전체가 하나의 이야기예요. 시작, 중간, 끝이 있어요." },
+    { w: "them", e: "That's rare. Most shows are just a list of songs.", k: "드문 일이에요. 보통은 그냥 곡 나열이잖아요." }
+  ],
+  replies: [
+    { e: "That's rare. Most shows are just a list of songs.", k: "드문 일이에요. 보통은 그냥 곡 나열이잖아요.",
+      n: "★ a list of songs = 곡을 그냥 늘어놓은 것. 짜임새가 없다는 뜻." },
+    { e: "And the pacing! It never drags.", k: "게다가 완급 조절이요! 처지는 데가 없어요.",
+      n: "★ pacing = 흐름의 완급. drag = 늘어지다." },
+    { e: "By the end I'd forgotten I was standing.", k: "끝날 때쯤엔 서 있는 것도 잊었어요.",
+      n: "I'd = I had. 몰입했다는 뜻의 칭찬입니다." },
+    { e: "You can tell someone thought about the order.", k: "곡 순서를 누가 고민한 게 보여요.",
+      n: "the order = 곡 순서. thought about = 고민했다." }
+  ]
+},
+
+"Every song has its own concept.": {
+  where: "무대 전환을 보며",
+  lines: [
+    { w: "them", e: "The set changed again! That's the fourth time.", k: "세트가 또 바뀌었어요! 벌써 네 번째예요." },
+    { w: "me", e: "Every song has its own concept. And he's singing live through all of it.", k: "곡마다 컨셉이 뚜렷해요. 게다가 전부 라이브로 부르고요." },
+    { w: "them", e: "Live and dancing like that. That's the part I can't get over.", k: "라이브로 저렇게 춤까지요. 그게 제일 믿기지 않아요." }
+  ],
+  replies: [
+    { e: "Live and dancing like that. That's the part I can't get over.", k: "라이브로 저렇게 춤까지요. 그게 제일 믿기지 않아요.",
+      n: "★ can't get over = 도저히 믿기지 않는다. 좋은 뜻입니다." },
+    { e: "The set design alone must have cost a fortune.", k: "무대 세트만 해도 엄청 들었겠어요.",
+      n: "★ cost a fortune = 돈이 엄청 들다. alone = ~만 해도." },
+    { e: "Each one feels like a different show.", k: "하나하나가 다른 공연 같아요.",
+      n: "feels like ~ = ~처럼 느껴진다." },
+    { e: "No backing track either. That's all him.", k: "반주에 녹음도 안 깔아요. 다 본인이에요.",
+      n: "★ backing track = 미리 녹음해 깔아 두는 소리. That's all him = 전부 본인이 하는 것." }
+  ]
+},
+
+"He always thanks his dancers and band.": {
+  where: "앙코르에서 스태프를 소개할 때",
+  lines: [
+    { w: "them", e: "He's bringing everyone out on stage.", k: "다 무대로 불러내네요." },
+    { w: "me", e: "He always thanks his dancers and band. Every single show.", k: "늘 댄서랑 밴드에게 고마워해요. 매 공연마다요." },
+    { w: "them", e: "That says a lot about someone.", k: "그거 보면 사람 됨됨이가 보이죠." }
+  ],
+  replies: [
+    { e: "That says a lot about someone.", k: "그거 보면 사람 됨됨이가 보이죠.",
+      n: "★ says a lot about ~ = ~에 대해 많은 걸 말해 준다. 됨됨이를 뜻합니다." },
+    { e: "He names them one by one, did you notice?", k: "한 명씩 이름을 부르던데, 보셨어요?",
+      n: "one by one = 하나씩. did you notice? = 알아채셨어요?" },
+    { e: "The crew look like they actually enjoy working with him.", k: "스태프들이 같이 일하는 걸 정말 즐거워하는 것 같아요.",
+      n: "★ crew = 함께 일하는 사람들. look like they ~ = ~해 보인다." },
+    { e: "That's why people stay with him for years.", k: "그러니까 사람들이 몇 년씩 같이 하는 거죠.",
+      n: "stay with him = 곁에 남다. 오래 함께한다는 뜻." }
+  ]
+},
+
 "Have you seen Hope on the Street?": {
   where: "줄 서서 콘텐츠 이야기가 나왔을 때",
   lines: [

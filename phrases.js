@@ -264,7 +264,10 @@ var SETS = [
     { e: "He's the whole package.", k: "다 갖췄어요", n: "★ the whole package = 외모·실력·성격 다 갖춘 사람." },
     { e: "You can tell he really cares.", k: "진심인 게 보여요", n: "★ You can tell = 티가 난다, 알 수 있다. cares = 마음을 쓴다." },
     { e: "Have you seen Hope on the Street?", k: "홉 온 더 스트릿 보셨어요?", n: "콘텐츠 이야기를 여는 말. 제목만 바꾸면 무엇에든 쓸 수 있어요." },
-    { e: "The man is a genius.", k: "그 사람 천재예요", n: "★ The man = 그 사람(감탄조). He 보다 힘이 실립니다." }
+    { e: "The man is a genius.", k: "그 사람 천재예요", n: "★ The man = 그 사람(감탄조). He 보다 힘이 실립니다." },
+    { e: "The whole show tells a story.", k: "공연 전체가 하나의 이야기예요", n: "기승전결이 있다는 말을 영어로는 이렇게 합니다." },
+    { e: "Every song has its own concept.", k: "곡마다 컨셉이 뚜렷해요", n: "★ its own = 저마다의. concept 은 그대로 씁니다." },
+    { e: "He always thanks his dancers and band.", k: "늘 댄서와 밴드에게 고마워해요", n: "★ 스태프를 챙기는 사람이라는 칭찬. give credit to 도 같은 뜻이에요." }
   ]
 }
 
