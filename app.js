@@ -243,7 +243,8 @@
     return { seen: {}, ptr: 0, days: {}, sessions: 0, rewards: [],
              heard: {}, heardDay: {}, listenXp: 0, listenMin: 0, links: [], reads: [], fastPtr: 0,
              cfg: { per: 15, newPer: 5, sets: sets, lmin: 10, lko: 1, lgap: 1, ldir: "auto",
-                    news: 1, nnum: 7, nlen: 2, nen: 0, nchain: 1, nrate: 100 },
+                    news: 1, nnum: 7, nlen: 2, nen: 0, nchain: 1, nrate: 100,
+                    yt: 0, ytCh: "", ytPat: "", ytMax: 6 },
              theme: "auto", lastBackup: "" };
   }
 
@@ -281,6 +282,15 @@
     if (S.cfg.nchain !== 0 && S.cfg.nchain !== 1) S.cfg.nchain = 1;
     if ([85, 100, 115].indexOf(S.cfg.nrate) < 0) S.cfg.nrate = 100;
     if (typeof S.cfg.kvoice !== "string") S.cfg.kvoice = "";
+    if (S.cfg.yt !== 0 && S.cfg.yt !== 1) S.cfg.yt = 0;
+    if (typeof S.cfg.ytCh !== "string") S.cfg.ytCh = "";
+    if (typeof S.cfg.ytPat !== "string") S.cfg.ytPat = "";
+    if ([3, 6, 10, 20].indexOf(S.cfg.ytMax) < 0) S.cfg.ytMax = 6;
+    if (typeof S.cfg.rssKey !== "string") S.cfg.rssKey = "";
+    if (!S.cfg.ytCh) {                      // 처음에는 확인해 둔 채널로 시작합니다
+      S.cfg.ytCh = YT_CHANS[0].id;
+      S.cfg.ytPat = YT_CHANS[0].pat;
+    }
   }
 
   function load() {
@@ -1521,8 +1531,16 @@
      두고(localStorage) 어디에도 올리지 않습니다 — 신문 기사이기 때문입니다.
      제목만 들으면 무슨 말인지 모르니 첫 문장을 한두 개 붙여 읽습니다. */
   var NKEY = "eng_go_news";
-  /* count 같은 옵션은 열쇠가 있어야 씁니다. 기본값(10꼭지)으로도 넉넉합니다. */
+  /* count 같은 옵션은 열쇠가 있어야 씁니다. 기본값(10꼭지)으로도 넉넉합니다.
+     열쇠 없이도 되지만, 짧은 사이에 여러 피드를 부르면 막힐 때가 있습니다
+     (429). 무료 열쇠를 넣어 두면 하루 1만 건까지 열립니다.
+     ★ 열쇠는 이 기기 안(localStorage)에만 둡니다. 저장소가 공개라
+        소스에 적어 두면 누구나 가져다 쓸 수 있기 때문입니다. */
   var N_API = "https://api.rss2json.com/v1/api.json?rss_url=";
+  function napi(u) {
+    return N_API + encodeURIComponent(u) +
+      (S && S.cfg && S.cfg.rssKey ? "&api_key=" + encodeURIComponent(S.cfg.rssKey) : "");
+  }
 
   /* 신문사마다 전문의 상태가 많이 다릅니다.
      경향은 사진 설명과 부제가 기사 앞에 그대로 붙어 와서(“…포즈를 취하고
@@ -1678,7 +1696,7 @@
     function fin(rows) { if (done) return; done = true; if (to) clearTimeout(to); cb(rows); }
     to = setTimeout(function () { fin([]); }, 13000);
     try {
-      fetch(N_API + encodeURIComponent(f.u))
+      fetch(napi(f.u))
         .then(function (r) { return r.json(); })
         .then(function (d) {
           var out = [];
@@ -1973,6 +1991,181 @@
   }
 
   /* ==========================================================
+     유튜브 브리핑 — 기계 목소리 대신 사람 목소리로
+     ==========================================================
+     채널 RSS(youtube.com/feeds/videos.xml)는 열쇠 없이 열립니다. 다만
+     거기에 **영상 길이가 없습니다.** 그래서 두 겹으로 거릅니다.
+       1) 제목으로 코너 고르기 — 짧은 코너만 올리는 채널이 없기 때문입니다
+          (타이글 브리핑은 4~6분으로 딱 맞았지만 넉 달째 안 올립니다)
+       2) 플레이어가 영상을 문 뒤 getDuration() 으로 길이를 재서, 넘치면 건너뛰기
+     찾다 실패하면 조용히 있지 말고 원래 뉴스 읽어 주기로 넘어갑니다. */
+  var YT_CHANS = [
+    { id: "UCnfwIKyFYRuqZzzKBDt6JOA", n: "매일경제TV", pat: "",
+      note: "2~3분짜리 뉴스 리포트를 자주 올려요. 긴 종목상담 방송은 길이 제한이 걸러 줍니다" },
+    { id: "UCbMjg2EvXs_RUGW-KrdM3pw", n: "SBS Biz",
+      pat: "뉴욕증시 전략|애프터마켓 브리핑|투자의 날",
+      note: "3~6분짜리 코너만 골라 듣습니다" },
+    { id: "UCPTy0BNqiv-0SdAvFgrXvXg", n: "매경 자이앤트", pat: "숏클립",
+      note: "1분 안팎 숏클립. 아주 짧게 훑고 싶을 때" },
+    { id: "UCdOjVxkj5JA0iDu3_xcsTyQ", n: "증시각도기TV", pat: "시황",
+      note: "한국·미국 시황을 매일. 다만 20~30분이라 길이 제한을 늘려야 합니다" }
+  ];
+
+  var YTS = { on: false, gen: 0, busy: false, list: [], i: 0, player: null, tm: null };
+
+  /* rss2json 이 유튜브 피드도 중계해 줍니다. 제목은 손대지 않습니다 —
+     코너 이름이 대괄호 안에 있어서 떼면 걸러낼 수가 없습니다. */
+  function ytFetch(cb) {
+    var u = "https://www.youtube.com/feeds/videos.xml?channel_id=" + S.cfg.ytCh;
+    var done = false, to = setTimeout(function () { if (!done) { done = true; cb([]); } }, 13000);
+    try {
+      fetch(napi(u))
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (done) return; done = true; clearTimeout(to);
+          var out = [], pat = null;
+          if (S.cfg.ytPat) { try { pat = new RegExp(S.cfg.ytPat); } catch (e) {} }
+          ((d && d.items) || []).forEach(function (it) {
+            var t = plain(it.title);
+            /* 주소가 세 모양으로 옵니다. 쇼츠도 챙겨야 합니다 —
+               쇼츠는 길이가 짧아 오히려 차에서 듣기 좋습니다.
+                 watch?v=XXXXXXXXXXX / shorts/XXXXXXXXXXX / yt:video:XXXXXXXXXXX */
+            var m = String(it.link || "").match(/(?:v=|shorts\/|video:)([A-Za-z0-9_-]{11})/) ||
+                    String(it.guid || "").match(/(?:v=|shorts\/|video:)([A-Za-z0-9_-]{11})/);
+            if (!t || !m) return;
+            if (pat && !pat.test(t)) return;
+            out.push({ t: t, v: m[1], at: Date.parse(String(it.pubDate || "").replace(" ", "T") + "Z") || 0 });
+          });
+          out.sort(function (a, b) { return b.at - a.at; });
+          cb(out);
+        })["catch"](function () { if (!done) { done = true; clearTimeout(to); cb([]); } });
+    } catch (e) { if (!done) { done = true; clearTimeout(to); cb([]); } }
+  }
+
+  /* 유튜브 플레이어 스크립트는 한 번만 불러옵니다. */
+  var ytApiWanted = [];
+  function ytApi(cb) {
+    if (window.YT && window.YT.Player) { cb(); return; }
+    ytApiWanted.push(cb);
+    if (ytApiWanted.length > 1) return;            // 이미 부르는 중
+    window.onYouTubeIframeAPIReady = function () {
+      var q = ytApiWanted; ytApiWanted = [];
+      q.forEach(function (f) { try { f(); } catch (e) {} });
+    };
+    var s = document.createElement("script");
+    s.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(s);
+  }
+
+  function ytKill() {
+    if (YTS.tm) { clearTimeout(YTS.tm); YTS.tm = null; }
+    if (YTS.player) {
+      try { YTS.player.destroy(); } catch (e) {}
+      YTS.player = null;
+    }
+    var host = $("yt-frame");
+    if (host) host.innerHTML = "<div id='yt-slot'></div>";
+  }
+
+  function ytPlay() {
+    if (!YTS.on) return;
+    var g = YTS.gen;
+    if (YTS.i >= YTS.list.length) { ytGiveUp("쓸 만한 영상이 없어요."); return; }
+
+    var it = YTS.list[YTS.i];
+    $("yt-title").textContent = it.t;
+    $("yt-note").textContent = (YTS.i + 1) + " / " + YTS.list.length + " · 길이를 확인하는 중…";
+    ytKill();
+
+    ytApi(function () {
+      if (!YTS.on || g !== YTS.gen) return;
+      try {
+        YTS.player = new YT.Player("yt-slot", {
+          videoId: it.v,
+          playerVars: { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1 },
+          events: {
+            onReady: function (ev) {
+              if (!YTS.on || g !== YTS.gen) return;
+              var secs = 0;
+              try { secs = ev.target.getDuration() || 0; } catch (e) {}
+              // 길이는 조금 늦게 옵니다. 0 이면 잠깐 뒤에 다시 봅니다.
+              if (!secs) { YTS.tm = setTimeout(function () { ytCheckLen(g, ev.target); }, 1500); return; }
+              ytCheckLen(g, ev.target, secs);
+            },
+            onStateChange: function (ev) {
+              if (!YTS.on || g !== YTS.gen) return;
+              if (ev.data === 0) ytEnd();          // 0 = 끝남
+            },
+            onError: function () {
+              if (!YTS.on || g !== YTS.gen) return;
+              YTS.i++; ytPlay();
+            }
+          }
+        });
+      } catch (e) { ytGiveUp("영상을 열지 못했어요."); }
+    });
+  }
+
+  function ytCheckLen(g, p, known) {
+    if (!YTS.on || g !== YTS.gen) return;
+    var secs = known;
+    if (!secs) { try { secs = p.getDuration() || 0; } catch (e) { secs = 0; } }
+    var cap = S.cfg.ytMax * 60;
+    if (secs && secs > cap) {
+      // 너무 길면 듣다 말게 되니 아예 다음 것으로 넘어갑니다
+      YTS.i++;
+      $("yt-note").textContent = Math.round(secs / 60) + "분짜리라 건너뜁니다…";
+      YTS.tm = setTimeout(ytPlay, 600);
+      return;
+    }
+    $("yt-note").textContent = secs
+      ? (Math.floor(secs / 60) + "분 " + (secs % 60 < 10 ? "0" : "") + Math.round(secs % 60) + "초")
+      : "재생 중";
+    try { p.playVideo(); } catch (e) {}
+  }
+
+  function ytEnd() {
+    var go = YTS.chain;
+    ytQuiet(true);
+    if (go) { listenStart(false); return; }
+    showStage("home"); renderHome();
+  }
+  function ytGiveUp(msg) {
+    toast(msg + " 뉴스를 읽어 드릴게요.");
+    var go = YTS.chain;
+    ytQuiet(false);
+    newsStart(go);                       // 사람 목소리가 안 되면 원래 방식으로
+  }
+  function ytQuiet(keepWake) {
+    YTS.on = false; YTS.busy = false; YTS.gen++;
+    ytKill();
+    if (!keepWake) wakeOff();
+  }
+  function ytStop() {
+    if (!YTS.on && !YTS.busy) return;
+    ytQuiet(false);
+    showStage("home"); renderHome();
+  }
+
+  function ytStart(chain) {
+    YTS.chain = !!chain;
+    YTS.busy = true; YTS.list = []; YTS.i = 0; YTS.gen++;
+    wakeOn();
+    showStage("stage-yt");
+    $("yt-title").textContent = "영상을 찾는 중이에요";
+    $("yt-note").textContent = "";
+    ytKill();
+
+    ytFetch(function (rows) {
+      if (!YTS.busy) return;
+      if (!rows.length) { ytGiveUp("오늘 올라온 영상을 못 찾았어요."); return; }
+      YTS.list = rows.slice(0, 12);      // 길이에 걸려 건너뛸 것을 넉넉히 둡니다
+      YTS.i = 0; YTS.on = true;
+      ytPlay();
+    });
+  }
+
+  /* ==========================================================
      화면
      ========================================================== */
   /* ---------- 폰 뒤로가기 ----------
@@ -2004,12 +2197,13 @@
 
   var VIEWS = ["today", "find", "read", "reward", "me"];
   var STAGES = ["home", "stage-card", "stage-talk", "stage-fast", "stage-listen",
-                "stage-news", "stage-done"];
+                "stage-news", "stage-yt", "stage-done"];
 
   /* keepBack: 찾기에서 표현을 눌러 '오늘'로 넘어가는 것처럼, 화면은 옮기지만
      돌아갈 자리는 그대로 두어야 할 때 씁니다. 아래 탭을 눌러 옮길 때는 버립니다. */
   function showView(n, keepBack) {
     if (!keepBack) backDisarm();    // 탭을 옮기면 쌓아둔 뒤로가기 자리는 버립니다
+    if (YTS.on || YTS.busy) ytQuiet(false);
     if (NEWS.on || NEWS.busy) { NEWS.busy = false; newsQuiet(false); }
     if (LIS.on) listenStop(true);   // 다른 곳으로 가면 듣기는 멈춥니다
     VIEWS.forEach(function (v) { $("view-" + v).hidden = (v !== n); });
@@ -2079,11 +2273,19 @@
 
     $("btn-news").hidden = !S.cfg.news;
     if (S.cfg.news) {
-      var cached = newsCache();
-      var fresh = cached && cached.at && (Date.now() - cached.at < 40 * 60000);
-      $("news-note").textContent =
-        (S.cfg.nchain ? "경제 중심 · 끝나면 영어로 이어서" : "경제 중심 · 뉴스만") +
-        (fresh ? " — 받아 둔 것이 있어요" : "");
+      var chain = S.cfg.nchain ? " · 끝나면 영어로 이어서" : "";
+      if (S.cfg.yt) {
+        var ch = null;
+        YT_CHANS.forEach(function (c) { if (c.id === S.cfg.ytCh) ch = c; });
+        $("btn-news").querySelector(".dr-t").textContent = "뉴스 영상 보기";
+        $("news-note").textContent = (ch ? ch.n : "유튜브") + " · " + S.cfg.ytMax + "분 이내" + chain;
+      } else {
+        var cached = newsCache();
+        var fresh = cached && cached.at && (Date.now() - cached.at < 40 * 60000);
+        $("btn-news").querySelector(".dr-t").textContent = "뉴스 먼저 듣기";
+        $("news-note").textContent = "경제 중심" + chain +
+          (fresh ? " — 받아 둔 것이 있어요" : "");
+      }
     }
 
     renderNextReward();
@@ -2611,6 +2813,10 @@
     markSeg("#cfg-nen", "data-nen", String(S.cfg.nen));
     markSeg("#cfg-nchain", "data-nchain", String(S.cfg.nchain));
     markSeg("#cfg-nrate", "data-nrate", String(S.cfg.nrate));
+    markSeg("#cfg-yt", "data-yt", String(S.cfg.yt));
+    markSeg("#cfg-ytmax", "data-ytmax", String(S.cfg.ytMax));
+    renderYtCfg();
+    $("rss-key").value = S.cfg.rssKey || "";
     renderNewsNote();
 
     $("ldir-note").textContent = S.cfg.ldir === "auto"
@@ -2646,6 +2852,51 @@
     $("news-cfg-note").textContent = S.cfg.news
       ? ("대략 " + newsMins() + "분쯤 걸려요." + when)
       : "뉴스를 끄면 첫 화면에서 단추가 사라집니다.";
+  }
+
+  /* 유튜브 브리핑 설정 — 채널 고르기와 지금 뭐가 올라와 있는지 보기 */
+  function renderYtCfg() {
+    $("yt-cfg").hidden = !S.cfg.yt;
+    $("yt-mode-note").textContent = S.cfg.yt
+      ? "사람이 읽어 줍니다. 대신 광고가 붙고, 화면이 보여야 소리가 이어집니다."
+      : "골라낸 기사를 기계 목소리로 읽어 줍니다. 광고가 없고 길이가 일정해요.";
+    if (!S.cfg.yt) return;
+
+    var box = $("cfg-ytch"); box.innerHTML = "";
+    YT_CHANS.forEach(function (c) {
+      var on = S.cfg.ytCh === c.id;
+      var b = el("button", null, c.n); b.type = "button";
+      if (on) b.classList.add("on");
+      b.onclick = function () {
+        S.cfg.ytCh = c.id; S.cfg.ytPat = c.pat;
+        save(); $("yt-preview").innerHTML = ""; renderYtCfg();
+      };
+      box.appendChild(b);
+      if (on) $("ytch-note").textContent = c.note;
+    });
+  }
+
+  function ytPreview() {
+    var box = $("yt-preview");
+    box.innerHTML = "";
+    box.appendChild(el("p", "sec-note", "받아 오는 중이에요…"));
+    ytFetch(function (rows) {
+      box.innerHTML = "";
+      if (!rows.length) {
+        box.appendChild(el("p", "sec-note",
+          "이 채널에서 조건에 맞는 영상을 못 찾았어요."));
+        return;
+      }
+      rows.slice(0, 8).forEach(function (r) {
+        var d = el("div", "np-item");
+        var h = Math.round((Date.now() - r.at) / 3600000);
+        d.appendChild(el("p", "np-cat", h < 1 ? "방금" : (h < 48 ? h + "시간 전" : Math.round(h / 24) + "일 전")));
+        d.appendChild(el("p", "np-title", r.t));
+        box.appendChild(d);
+      });
+      box.appendChild(el("p", "sec-note",
+        "길이는 여기서 알 수 없어요. 틀어 본 뒤 " + S.cfg.ytMax + "분이 넘으면 다음 것으로 넘어갑니다."));
+    });
   }
 
   /* 차에서 듣기 전에, 어떤 글이 어떻게 읽힐지 눈으로 확인하는 자리입니다. */
@@ -3029,7 +3280,13 @@
 
     $("btn-go").onclick = start;
     $("btn-listen").onclick = function () { listenStart(false); };
-    $("btn-news").onclick = function () { newsStart(!!S.cfg.nchain); };
+    $("btn-news").onclick = function () {
+      if (S.cfg.yt) ytStart(!!S.cfg.nchain);
+      else newsStart(!!S.cfg.nchain);
+    };
+    $("btn-yt-next").onclick = function () { YTS.i++; ytPlay(); };
+    $("btn-yt-stop").onclick = function () { ytStop(); };
+    $("btn-yt-skip").onclick = function () { ytQuiet(true); listenStart(false); };
     $("btn-ns-next").onclick = function () { newsSkip(1); };
     $("btn-ns-again").onclick = function () { newsSkip(0); };
     $("btn-ns-stop").onclick = function () { newsStop(); };
@@ -3065,6 +3322,12 @@
 
     $("btn-add-link").onclick = addLink;
     $("btn-news-test").onclick = newsPreview;
+    $("btn-yt-test").onclick = ytPreview;
+    $("btn-rss-key").onclick = function () {
+      S.cfg.rssKey = $("rss-key").value.trim();
+      save();
+      toast(S.cfg.rssKey ? "열쇠를 넣었어요." : "열쇠를 지웠어요.");
+    };
 
     // 읽기
     $("btn-read-new").onclick = function () { $("read-editor").hidden = false; };
@@ -3138,7 +3401,8 @@
      ["#cfg-lfast", "data-lfast", "lfast"], ["#cfg-news", "data-news", "news"],
      ["#cfg-nnum", "data-nnum", "nnum"], ["#cfg-nlen", "data-nlen", "nlen"],
      ["#cfg-nen", "data-nen", "nen"], ["#cfg-nchain", "data-nchain", "nchain"],
-     ["#cfg-nrate", "data-nrate", "nrate"]]
+     ["#cfg-nrate", "data-nrate", "nrate"], ["#cfg-yt", "data-yt", "yt"],
+     ["#cfg-ytmax", "data-ytmax", "ytMax"]]
       .forEach(function (p) {
         [].slice.call(document.querySelectorAll(p[0] + " button")).forEach(function (b) {
           b.onclick = function () {

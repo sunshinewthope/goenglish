@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <!-- 고쳐서 다시 올릴 때는 아래 v= 숫자를 1씩 올리세요. -->
-<link rel="stylesheet" href="style.css?v=20">
+<link rel="stylesheet" href="style.css?v=21">
 </head>
 <body>
 
@@ -222,6 +222,28 @@
       <p class="ls-warn" id="ns-warn">화면이 켜져 있어야 소리가 이어집니다. 거치대에 두세요.</p>
     </div>
 
+    <!-- 유튜브 브리핑 (운전 중) -->
+    <div id="stage-yt" class="stage listen" hidden>
+      <div class="ls-head">
+        <span class="ls-time" id="yt-note"></span>
+      </div>
+
+      <p class="ns-title" id="yt-title">영상을 찾는 중이에요</p>
+      <div class="yt-wrap"><div id="yt-frame"><div id="yt-slot"></div></div></div>
+
+      <div class="ls-move">
+        <button type="button" id="btn-yt-next" class="ls-mv">⏭<span>다음 영상</span></button>
+        <button type="button" id="btn-yt-skip" class="ls-mv">🎧<span>영어로</span></button>
+      </div>
+
+      <button type="button" id="btn-yt-stop" class="ls-stop">
+        <span class="ls-stop-ico" aria-hidden="true">■</span>
+        <span>멈추기</span>
+      </button>
+      <p class="ls-warn" id="yt-warn">소리가 안 나면 화면 가운데 재생 단추를 한 번 눌러 주세요.
+        출발 전에 눌러 두면 그다음은 손 안 대도 됩니다.</p>
+    </div>
+
     <!-- 마무리 -->
     <div id="stage-done" class="stage" hidden>
       <div class="done-card">
@@ -359,6 +381,33 @@
       <button type="button" data-news="0">안 듣기</button>
     </div>
 
+    <p class="f-label">어떻게 들을까요</p>
+    <div class="seg col" id="cfg-yt">
+      <button type="button" data-yt="0">기사를 읽어 주기</button>
+      <button type="button" data-yt="1">유튜브 브리핑 보기</button>
+    </div>
+    <p class="sec-note" id="yt-mode-note"></p>
+
+    <div id="yt-cfg" hidden>
+      <p class="f-label">어느 채널</p>
+      <div class="seg col" id="cfg-ytch"></div>
+      <p class="sec-note" id="ytch-note"></p>
+
+      <p class="f-label">이보다 길면 건너뛰기</p>
+      <div class="seg" id="cfg-ytmax">
+        <button type="button" data-ytmax="3">3분</button>
+        <button type="button" data-ytmax="6">6분</button>
+        <button type="button" data-ytmax="10">10분</button>
+        <button type="button" data-ytmax="20">20분</button>
+      </div>
+      <p class="sec-note">유튜브는 영상 길이를 미리 알려 주지 않아요.
+        그래서 틀어 본 뒤 길면 다음 영상으로 넘어갑니다.
+        쓸 만한 게 하나도 없으면 기사 읽어 주기로 바뀝니다.</p>
+
+      <button type="button" id="btn-yt-test" class="ghost-btn">지금 올라온 영상 보기</button>
+      <div id="yt-preview" class="news-preview"></div>
+    </div>
+
     <p class="f-label">몇 꼭지나</p>
     <div class="seg" id="cfg-nnum">
       <button type="button" data-nnum="5">5개</button>
@@ -398,6 +447,17 @@
 
     <button type="button" id="btn-news-test" class="ghost-btn">지금 받아서 눈으로 보기</button>
     <div id="news-preview" class="news-preview"></div>
+
+    <p class="f-label">뉴스를 못 가져올 때</p>
+    <p class="sec-note">신문사 뉴스는 <b>rss2json</b> 이라는 중계 서비스를 거쳐 옵니다.
+      공짜로 쓰는 중이라 가끔 “너무 자주 부른다”며 막힐 때가 있어요.
+      그럴 때 <a href="https://rss2json.com/#rss_url=" target="_blank" rel="noopener">rss2json.com</a>
+      에서 무료 열쇠를 받아 넣어 두면 하루 1만 번까지 열립니다.
+      열쇠는 <b>이 폰 안에만</b> 저장되고 어디로도 보내지 않아요.</p>
+    <div class="linkrow">
+      <input type="text" id="rss-key" class="lk-in" placeholder="열쇠 (없어도 됩니다)" autocomplete="off">
+      <button type="button" id="btn-rss-key" class="lk-add">넣기</button>
+    </div>
 
     <h2 class="sec-title">듣기만 하기</h2>
     <p class="sec-note">운전할 때 쓰는 모드예요. 여기서 맞춰 두면 그대로 나옵니다.</p>
@@ -550,6 +610,6 @@
 
 <script src="phrases.js?v=11"></script>
 <script src="talk.js?v=14"></script>
-<script src="app.js?v=44"></script>
+<script src="app.js?v=46"></script>
 </body>
 </html>
