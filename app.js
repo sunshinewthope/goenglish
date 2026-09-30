@@ -2712,6 +2712,25 @@
      기기에 여러 개 깔려 있는 경우가 많은데 그동안 고를 수가 없었습니다. */
   var KO_SAMPLE = "코스피가 사흘 만에 반등했습니다.";
 
+  /* 목소리가 하나뿐이면 고를 것이 없습니다. 대개 제조사 기본 엔진만 켜져
+     있어서인데, 엔진을 구글로 바꾸면 훨씬 자연스러운 것이 생깁니다. */
+  function howToAddKoVoice() {
+    var ua = navigator.userAgent || "";
+    if (/Android/i.test(ua)) {
+      return ["설정 앱을 열고 맨 위 <b>돋보기</b>에 <b>텍스트 음성 변환</b>을 쳐서 찾으세요.",
+              "<b>기본 엔진</b>을 <b>Google 음성 서비스</b>로 바꾸세요. 목록에 없으면 Play 스토어에서 ‘Google 음성 서비스’를 먼저 받으세요.",
+              "엔진 옆 <b>톱니바퀴 → 음성 데이터 설치 → 한국어</b> 를 받으세요. 여러 종류가 보이면 다 받아도 됩니다.",
+              "받은 뒤 <b>크롬을 완전히 껐다</b> 켜야 목록에 뜹니다. (최근 앱에서 밀어서 종료)"];
+    }
+    if (/iPhone|iPad|iPod/i.test(ua)) {
+      return ["설정 → 손쉬운 사용 → 콘텐츠 말하기 → 음성 → 한국어",
+              "<b>고품질</b> 이 붙은 목소리 옆 내려받기 단추를 누르세요.",
+              "받은 뒤 브라우저를 껐다 켜세요."];
+    }
+    return ["윈도우는 기본으로 한국어 목소리가 하나뿐인 경우가 많습니다.",
+            "폰에서 들으실 거라면 폰에서 맞추시면 됩니다."];
+  }
+
   function renderKoVoices() {
     var box = $("kovoice-list");
     if (!box) return;
@@ -2736,10 +2755,36 @@
       };
       box.appendChild(b);
     });
-    box.appendChild(el("p", "sec-note",
-      koVoices.length > 1
-        ? "눌러서 들어 보고 마음에 드는 것으로 두세요. 대개 ‘Google’ 이 붙은 쪽이 자연스럽습니다."
-        : "목소리가 하나뿐이에요. 눌러서 들어 볼 수 있습니다."));
+    if (koVoices.length > 1) {
+      box.appendChild(el("p", "sec-note",
+        "눌러서 들어 보고 마음에 드는 것으로 두세요. 대개 ‘Google’ 이 붙은 쪽이 자연스럽습니다."));
+      return;
+    }
+
+    // 하나뿐이면 고를 것이 없으니, 늘리는 법을 알려 줍니다
+    var one = koVoices[0], isGoogle = /google/i.test(one.name || "");
+    var bad = el("div", "voice-none");
+    bad.appendChild(el("p", "vn-t", isGoogle
+      ? "구글 목소리를 쓰고 있어요."
+      : "목소리가 이거 하나뿐이에요."));
+    bad.appendChild(el("p", "vn-s", isGoogle
+      ? "이 기기에서 고를 수 있는 가장 나은 쪽입니다. 그래도 어색하면 읽는 속도를 ‘천천히’로 바꿔 보세요."
+      : "제조사 기본 목소리라 딱딱하게 들릴 수 있어요. 구글 목소리를 넣으면 한결 자연스러워집니다."));
+
+    var again = el("button", "voice-retry", "다시 찾기"); again.type = "button";
+    again.onclick = function () { pickVoice(); renderKoVoices(); };
+    bad.appendChild(again);
+
+    if (!isGoogle) {
+      var how = el("ol", "vn-how");
+      howToAddKoVoice().forEach(function (line) {
+        var li = el("li");
+        li.innerHTML = line;   // <b> 만 씁니다
+        how.appendChild(li);
+      });
+      bad.appendChild(how);
+    }
+    box.appendChild(bad);
   }
 
   /* 안드로이드는 getVoices() 가 처음에 빈 배열을 돌려줍니다.
