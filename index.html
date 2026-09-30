@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <!-- 고쳐서 다시 올릴 때는 아래 v= 숫자를 1씩 올리세요. -->
-<link rel="stylesheet" href="style.css?v=19">
+<link rel="stylesheet" href="style.css?v=20">
 </head>
 <body>
 
@@ -66,6 +66,11 @@
       <p class="mini" id="go-note"></p>
 
       <div class="drive">
+        <button type="button" id="btn-news" class="drive-btn news" hidden>
+          <span class="dr-ico" aria-hidden="true">📻</span>
+          <span class="dr-t">뉴스 먼저 듣기</span>
+          <span class="dr-s" id="news-note">경제 중심 · 끝나면 영어로 이어서</span>
+        </button>
         <button type="button" id="btn-listen" class="drive-btn">
           <span class="dr-ico" aria-hidden="true">🎧</span>
           <span class="dr-t">듣기만 하기</span>
@@ -191,6 +196,32 @@
       <p class="ls-warn" id="ls-warn">화면이 켜져 있어야 소리가 이어집니다. 거치대에 두세요.</p>
     </div>
 
+    <!-- 뉴스 (운전 중) -->
+    <div id="stage-news" class="stage listen" hidden>
+      <div class="ls-head">
+        <span class="ls-time" id="ns-time">0:00</span>
+        <span class="ls-count" id="ns-count"></span>
+      </div>
+
+      <div class="ls-body news-body">
+        <p class="ns-cat" id="ns-cat"></p>
+        <p class="ns-title" id="ns-title">뉴스를 가져오는 중이에요</p>
+        <p class="ns-lead" id="ns-lead">잠깐만요.</p>
+      </div>
+
+      <div class="ls-move">
+        <button type="button" id="btn-ns-again" class="ls-mv">↻<span>다시</span></button>
+        <button type="button" id="btn-ns-next" class="ls-mv">⏭<span>다음 뉴스</span></button>
+        <button type="button" id="btn-ns-skip" class="ls-mv">🎧<span>영어로</span></button>
+      </div>
+
+      <button type="button" id="btn-ns-stop" class="ls-stop">
+        <span class="ls-stop-ico" aria-hidden="true">■</span>
+        <span>멈추기</span>
+      </button>
+      <p class="ls-warn" id="ns-warn">화면이 켜져 있어야 소리가 이어집니다. 거치대에 두세요.</p>
+    </div>
+
     <!-- 마무리 -->
     <div id="stage-done" class="stage" hidden>
       <div class="done-card">
@@ -313,6 +344,48 @@
     <h2 class="sec-title">영어 목소리</h2>
     <p class="sec-note">골라서 들어 보세요. 마음에 드는 것으로 두면 계속 그 목소리로 읽습니다.</p>
     <div id="voice-list" class="voice-list"></div>
+
+    <h2 class="sec-title">뉴스</h2>
+    <p class="sec-note">가는 길에 먼저 듣습니다. 한국어로 읽어 줘요.
+      경향신문·동아일보에서 가져오고, 받아 온 글은 이 폰 안에만 둡니다.</p>
+
+    <div class="seg" id="cfg-news">
+      <button type="button" data-news="1">뉴스 듣기</button>
+      <button type="button" data-news="0">안 듣기</button>
+    </div>
+
+    <p class="f-label">몇 꼭지나</p>
+    <div class="seg" id="cfg-nnum">
+      <button type="button" data-nnum="5">5개</button>
+      <button type="button" data-nnum="7">7개</button>
+      <button type="button" data-nnum="10">10개</button>
+    </div>
+    <p class="sec-note">경제를 가장 많이 넣고, 정치와 문화를 하나씩 얹습니다.</p>
+
+    <p class="f-label">얼마나 자세히</p>
+    <div class="seg col" id="cfg-nlen">
+      <button type="button" data-nlen="0">제목만</button>
+      <button type="button" data-nlen="1">제목 + 첫 문장</button>
+      <button type="button" data-nlen="2">제목 + 두 문장</button>
+    </div>
+    <p class="sec-note" id="news-cfg-note"></p>
+
+    <p class="f-label">끝나면</p>
+    <div class="seg" id="cfg-nchain">
+      <button type="button" data-nchain="1">영어 듣기로 이어서</button>
+      <button type="button" data-nchain="0">뉴스만</button>
+    </div>
+
+    <p class="f-label">영어 뉴스도 한 꼭지</p>
+    <div class="seg" id="cfg-nen">
+      <button type="button" data-nen="1">맨 끝에 하나</button>
+      <button type="button" data-nen="0">안 넣기</button>
+    </div>
+    <p class="sec-note">BBC 경제 기사 제목과 첫 문장을 영어 그대로 읽어 줍니다.
+      뜻은 붙이지 않아요.</p>
+
+    <button type="button" id="btn-news-test" class="ghost-btn">지금 받아서 눈으로 보기</button>
+    <div id="news-preview" class="news-preview"></div>
 
     <h2 class="sec-title">듣기만 하기</h2>
     <p class="sec-note">운전할 때 쓰는 모드예요. 여기서 맞춰 두면 그대로 나옵니다.</p>
@@ -465,6 +538,6 @@
 
 <script src="phrases.js?v=11"></script>
 <script src="talk.js?v=14"></script>
-<script src="app.js?v=28"></script>
+<script src="app.js?v=35"></script>
 </body>
 </html>

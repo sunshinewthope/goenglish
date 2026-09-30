@@ -242,7 +242,8 @@
     SETS.forEach(function (s) { sets[s.id] = true; });
     return { seen: {}, ptr: 0, days: {}, sessions: 0, rewards: [],
              heard: {}, heardDay: {}, listenXp: 0, listenMin: 0, links: [], reads: [], fastPtr: 0,
-             cfg: { per: 15, newPer: 5, sets: sets, lmin: 10, lko: 1, lgap: 1, ldir: "auto" },
+             cfg: { per: 15, newPer: 5, sets: sets, lmin: 10, lko: 1, lgap: 1, ldir: "auto",
+                    news: 1, nnum: 7, nlen: 2, nen: 0, nchain: 1 },
              theme: "auto", lastBackup: "" };
   }
 
@@ -273,6 +274,11 @@
     if (["auto", "en", "ko"].indexOf(S.cfg.ldir) < 0) S.cfg.ldir = "auto";
     if (S.cfg.ltalk !== 0 && S.cfg.ltalk !== 1) S.cfg.ltalk = 1;
     if (S.cfg.lfast !== 0 && S.cfg.lfast !== 1) S.cfg.lfast = 1;
+    if (S.cfg.news !== 0 && S.cfg.news !== 1) S.cfg.news = 1;
+    if ([5, 7, 10].indexOf(S.cfg.nnum) < 0) S.cfg.nnum = 7;
+    if ([0, 1, 2].indexOf(S.cfg.nlen) < 0) S.cfg.nlen = 2;
+    if (S.cfg.nen !== 0 && S.cfg.nen !== 1) S.cfg.nen = 0;
+    if (S.cfg.nchain !== 0 && S.cfg.nchain !== 1) S.cfg.nchain = 1;
   }
 
   function load() {
@@ -1051,6 +1057,18 @@
     return out;
   }
 
+  /* 적게 들은 것부터 앞에 세웁니다. 들은 횟수가 같은 것끼리는 섞고요.
+     이게 없으면 목록 차례가 날마다 똑같아서, 10분 듣는 동안 앞쪽 스무 개
+     남짓만 되풀이해 듣게 됩니다. 뒤에 새로 넣은 표현은 자리가 한참 뒤라
+     영영 안 나옵니다. 새 표현은 들은 횟수가 0이니 저절로 맨 앞으로 옵니다. */
+  function byFewest(keys) {
+    var a = keys.map(function (e) {
+      return { e: e, n: (S.heard && S.heard[e]) || 0, r: Math.random() };
+    });
+    a.sort(function (x, y) { return (x.n - y.n) || (x.r - y.r); });
+    return a.map(function (x) { return x.e; });
+  }
+
   /* 들을 차례: 틀린 것 → 복습할 때가 된 것 → 새 것 → 나머지.
      오늘 이미 들은 것은 맨 뒤로 미룹니다.
      그래야 가는 길과 오는 길에 다른 표현이 나옵니다. */
@@ -1070,11 +1088,11 @@
        안 쌓여서 표현 전부가 '새 것'으로 분류되고, 그중 20개만 돌았습니다.
        10분이면 같은 스무 개를 세 바퀴 듣게 됩니다.
        어느 묶음이든 비슷한 말이 연달아 나오지 않게 섞어 줄 세웁니다. */
-    return withFast(spread(shuffle(hard)).concat(
-      spread(shuffle(due)),
-      spread(neu),
-      spread(shuffle(rest)),
-      spread(shuffle(later))
+    return withFast(spread(byFewest(hard)).concat(
+      spread(byFewest(due)),
+      spread(byFewest(neu)),
+      spread(byFewest(rest)),
+      spread(byFewest(later))
     ));
   }
 
@@ -1450,10 +1468,15 @@
   /* 화면 켜 두기 — 이게 없으면 화면이 꺼지면서 소리도 멎습니다.
      막히는 곳이 있어서(앱 안에 끼워 넣어 열 때 등), 안 되면 숨기지 않고 알려 줍니다. */
   function wakeNote(ok) {
-    $("ls-warn").textContent = ok
+    var msg = ok
       ? "화면을 켜 둡니다. 거치대에 두세요."
       : "이 화면은 저절로 꺼질 수 있어요. 폰 설정에서 ‘화면 자동 꺼짐’을 길게 해 두세요.";
-    $("ls-warn").className = "ls-warn" + (ok ? "" : " bad");
+    ["ls-warn", "ns-warn"].forEach(function (id) {
+      var n = $(id);
+      if (!n) return;
+      n.textContent = msg;
+      n.className = "ls-warn" + (ok ? "" : " bad");
+    });
   }
   function wakeOn() {
     try {
@@ -1466,6 +1489,371 @@
     } catch (e) { wakeNote(false); }
   }
   function wakeOff() { try { if (LIS.wake) { LIS.wake.release(); LIS.wake = null; } } catch (e) {} }
+
+  /* ==========================================================
+     뉴스 — 가는 길에 먼저 2~3분, 한국어로
+     ==========================================================
+     신문사 RSS 는 브라우저에서 바로 못 가져옵니다(허용 헤더가 없습니다).
+     rss2json 이 중계해 주므로 그것을 씁니다. 받아 온 글은 이 기기 안에만
+     두고(localStorage) 어디에도 올리지 않습니다 — 신문 기사이기 때문입니다.
+     제목만 들으면 무슨 말인지 모르니 첫 문장을 한두 개 붙여 읽습니다. */
+  var NKEY = "eng_go_news";
+  /* count 같은 옵션은 열쇠가 있어야 씁니다. 기본값(10꼭지)으로도 넉넉합니다. */
+  var N_API = "https://api.rss2json.com/v1/api.json?rss_url=";
+
+  /* 신문사마다 전문의 상태가 많이 다릅니다.
+     경향은 사진 설명과 부제가 기사 앞에 그대로 붙어 와서(“…포즈를 취하고
+     있다. 청와대사진기자단이재명 대통령이…”) 소리로 들으면 걸립니다.
+     연합은 첫 문장이 도중에 잘려 옵니다. 그래서 전문이 기사 첫 문장으로
+     바로 시작하는 동아일보와 뉴시스만 씁니다. */
+  var NFEEDS = [
+    { c: "eco", n: "뉴시스", u: "https://newsis.com/RSS/bank.xml" },      // 금융·증권
+    { c: "eco", n: "뉴시스", u: "https://newsis.com/RSS/economy.xml" },
+    { c: "eco", n: "동아", u: "https://rss.donga.com/economy.xml" },
+    { c: "pol", n: "동아", u: "https://rss.donga.com/politics.xml" },
+    { c: "cul", n: "동아", u: "https://rss.donga.com/culture.xml" }
+  ];
+
+  /* 같은 경제라도 송이값·치킨값보다 금리·환율·실적이 먼저 나오게 합니다. */
+  var MKT = [
+    [/코스피|코스닥|증시|주가|상장|공모주|자사주|공매도|배당|시가총액|증권/g, 6],
+    [/금리|한국은행|기준금리|연준|연방준비|FOMC|국채|채권|환율|달러|엔화|외환/g, 6],
+    [/실적|영업이익|매출|어닝|적자|흑자|인수|합병|유상증자|출자|자본확충|투자/g, 5],
+    [/물가|수출|수입|무역수지|경상수지|GDP|성장률|관세|유가|경기|내수|고용/g, 4],
+    [/반도체|삼성전자|하이닉스|현대차|이차전지|배터리|조선|방산|바이오|인공지능/g, 3],
+    [/부동산|아파트|대출|가계부채|세제|감세|증세|예산|연금/g, 2]
+  ];
+  function mktScore(it) {
+    var t = it.t + " " + plain(it.d).slice(0, 220), s = 0, i, m;
+    for (i = 0; i < MKT.length; i++) {
+      m = t.match(MKT[i][0]);
+      if (m) s += MKT[i][1] * Math.min(3, m.length);
+    }
+    return s;
+  }
+  var NFEED_EN = { c: "en", n: "BBC", u: "https://feeds.bbci.co.uk/news/business/rss.xml" };
+  var CAT_KO = { eco: "경제", pol: "정치", cul: "문화", en: "영어 뉴스" };
+
+  var NEWS = { on: false, gen: 0, items: [], i: 0, tm: null, tick: null,
+               startAt: 0, chain: false, busy: false };
+
+  /* ---------- 글 다듬기 ---------- */
+  var ENTS = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'",
+               nbsp: " ", middot: "·", hellip: "…", rsquo: "’", lsquo: "‘",
+               ldquo: "“", rdquo: "”", mdash: "—", ndash: "–" };
+  function unent(s) {
+    return String(s == null ? "" : s).replace(/&(#x[0-9a-f]+|#[0-9]+|[a-z]+);/gi,
+      function (m, b) {
+        if (b.charAt(0) === "#") {
+          var n = (b.charAt(1) === "x" || b.charAt(1) === "X")
+            ? parseInt(b.slice(2), 16) : parseInt(b.slice(1), 10);
+          if (!(n > 0) || n > 0x10ffff) return "";
+          try { return String.fromCodePoint ? String.fromCodePoint(n) : String.fromCharCode(n); }
+          catch (e) { return ""; }
+        }
+        var k = b.toLowerCase();
+        return ENTS.hasOwnProperty(k) ? ENTS[k] : m;
+      });
+  }
+  /* &amp;#13199; 처럼 두 번 싸인 것이 옵니다. 그래서 두 번 풉니다. */
+  function plain(s) {
+    var t = String(s == null ? "" : s).replace(/<[^>]*>/g, " ");
+    t = unent(unent(t)).replace(/[​﻿­]/g, "");
+    return t.replace(/\s+/g, " ").trim();
+  }
+
+  /* 한국 기사는 마침표 뒤에 띄어쓰기가 없는 데가 많습니다("…있다.30일 …").
+     그래서 띄어쓰기가 아니라 마침표로 끊고, 숫자나 약어 속의 점만 지나칩니다. */
+  function koSents(t) {
+    var out = [], buf = "", i, ch, prev, nx;
+    for (i = 0; i < t.length; i++) {
+      ch = t.charAt(i); buf += ch;
+      if (ch !== "." && ch !== "!" && ch !== "?") continue;
+      prev = t.charAt(i - 1); nx = t.charAt(i + 1);
+      if (ch === "." && /[0-9]/.test(prev) && /[0-9]/.test(nx)) continue;
+      if (ch === "." && /[A-Za-z]/.test(prev) && !/\s/.test(nx) && nx !== "") continue;
+      out.push(buf.trim()); buf = "";
+    }
+    if (buf.trim()) out.push(buf.trim());
+    return out;
+  }
+
+  /* 기사 첫머리에는 사진 설명과 부제가 붙어 옵니다.
+     ("1등급 양양송이. 양양군 제공" / "…1만2500원 올라···생산량 절반 감소")
+     눈으로 보면 넘기지만 소리로 들으면 걸립니다.
+     그래서 '~다.' 로 끝나는 온전한 문장만 골라 읽습니다. */
+  function isSent(s) {
+    if (s.length < 16 || s.length > 220) return false;
+    if (/제공|사진=|자료사진|무단 ?전재|재배포|저작권|기자$|촬영/.test(s)) return false;
+    return /(다|요)[.!?]$/.test(s);
+  }
+  function leadOf(desc, howMany) {
+    if (howMany <= 0) return [];
+    var t = plain(desc)
+      .replace(/^\([^)]{2,24}\)\s*/, "")                          // (서울=연합뉴스)
+      .replace(/^\[[^\]]{1,24}\]\s*[가-힣A-Za-z]{2,10}\s*기자\s*=\s*/, "")  // [서울=뉴시스]김○○ 기자 =
+      .replace(/^\[[^\]]{1,24}\]\s*/, "");
+    var ss = koSents(t), got = [], i;
+    for (i = 0; i < ss.length && got.length < howMany; i++) {
+      if (isSent(ss[i])) got.push(ss[i]);
+    }
+    return got;
+  }
+  /* 통신사 제목 끝의 (종합)·(2보) 같은 표시는 읽어 봐야 군더더기입니다. */
+  function titleOf(t) {
+    return plain(t)
+      .replace(/^(\[[^\]]{1,14}\]\s*)+/, "")
+      .replace(/\s*\((종합|전문|영상|포토|표|그래픽)[0-9]*보?\)\s*$/g, "")
+      .replace(/[\s·…]+$/, "").trim();
+  }
+
+  /* ---------- 가져오기 ---------- */
+  function fetchFeed(f, cb) {
+    var done = false, to = null;
+    function fin(rows) { if (done) return; done = true; if (to) clearTimeout(to); cb(rows); }
+    to = setTimeout(function () { fin([]); }, 13000);
+    try {
+      fetch(N_API + encodeURIComponent(f.u))
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          var out = [];
+          ((d && d.items) || []).forEach(function (it) {
+            var ti = titleOf(it.title);
+            if (!ti) return;
+            var when = Date.parse(String(it.pubDate || "").replace(" ", "T") + "Z");
+            out.push({ c: f.c, src: f.n, f: f.u, t: ti,
+                       d: it.description || it.content || "",
+                       at: when || 0 });
+          });
+          fin(out);
+        })["catch"](function () { fin([]); });
+    } catch (e) { fin([]); }
+  }
+
+  /* 같은 기사가 두 신문에서 오면 하나만 남깁니다.
+     경제는 증시에 울리는 순서로, 정치·문화는 새 것 순서로 고릅니다. */
+  function pickNews(all, want) {
+    var seen = {}, by = { eco: [], pol: [], cul: [] };
+    all.sort(function (a, b) { return b.at - a.at; });
+    all.forEach(function (x) {
+      var k = x.t.replace(/[^가-힣A-Za-z0-9]/g, "").slice(0, 14);
+      if (!k || seen[k]) return;
+      seen[k] = 1;
+      // 읽을 전문이 없는 것(인사 발령 같은 토막글)은 뒤로 미룹니다
+      x.sc = mktScore(x) + (leadOf(x.d, 1).length ? 4 : -8);
+      if (by[x.c]) by[x.c].push(x);
+    });
+    by.eco.sort(function (a, b) { return (b.sc - a.sc) || (b.at - a.at); });
+
+    var nPol = want >= 6 ? 1 : 0;
+    var nCul = want >= 5 ? 1 : 0;
+    var nEco = Math.max(1, want - nPol - nCul);
+
+    /* 그냥 점수 순서대로 뽑으면 '일본 증시 마감·홍콩 증시 마감·중국 증시 마감'
+       처럼 거의 같은 이야기가 줄줄이 나옵니다. 두 가지로 막습니다.
+       한 신문에서 너무 많이 가져오지 않기, 그리고 시황 기사는 두 개까지. */
+    var feeds = {}, nf = 0;
+    by.eco.forEach(function (x) { if (!feeds[x.f]) { feeds[x.f] = 1; nf++; } });
+    var cap = Math.max(2, Math.ceil(nEco / Math.max(1, nf)));
+
+    var SIHWANG = /증시|지수|마감|개장|코스피|코스닥|환율/;
+    var used = {}, nSi = 0, eco = [], spare = [];
+    by.eco.forEach(function (x) {
+      var si = SIHWANG.test(x.t);
+      if (eco.length >= nEco || (used[x.f] || 0) >= cap || (si && nSi >= 2)) {
+        spare.push(x); return;
+      }
+      used[x.f] = (used[x.f] || 0) + 1;
+      if (si) nSi++;
+      eco.push(x);
+    });
+    // 그래도 모자라면 점수 순서대로 마저 채웁니다
+    for (var si2 = 0; si2 < spare.length && eco.length < nEco; si2++) eco.push(spare[si2]);
+
+    return eco.concat(by.pol.slice(0, nPol)).concat(by.cul.slice(0, nCul));
+  }
+
+  function newsCache() {
+    try { return JSON.parse(localStorage.getItem(NKEY) || "null"); } catch (e) { return null; }
+  }
+  function newsLoad(force, cb) {
+    var old = newsCache();
+    if (!force && old && old.items && old.items.length &&
+        Date.now() - (old.at || 0) < 40 * 60000) { cb(old.items, true); return; }
+
+    var feeds = NFEEDS.slice();
+    if (S.cfg.nen) feeds.push(NFEED_EN);
+    var got = [], left = feeds.length;
+
+    feeds.forEach(function (f) {
+      fetchFeed(f, function (rows) {
+        got = got.concat(rows);
+        if (--left > 0) return;
+
+        var items = pickNews(got.filter(function (x) { return x.c !== "en"; }), S.cfg.nnum);
+        if (S.cfg.nen) {
+          var en = got.filter(function (x) { return x.c === "en"; });
+          en.sort(function (a, b) { return b.at - a.at; });
+          if (en[0]) items.push(en[0]);
+        }
+        if (!items.length) { cb((old && old.items) || [], true); return; }
+        try { localStorage.setItem(NKEY, JSON.stringify({ at: Date.now(), items: items })); } catch (e) {}
+        cb(items, false);
+      });
+    });
+  }
+
+  /* ---------- 읽어 주기 ---------- */
+  /* lisSay 의 기다림은 짧은 영어 문장에 맞춰 둔 것이라 긴 한국어 기사에는 모자랍니다.
+     길이에 넉넉히 비례해 기다립니다. 그리고 한 문장씩 따로 읽습니다 —
+     긴 글을 한 번에 넘기면 중간에 멎는 기기가 있습니다. */
+  /* 기사 제목에는 소리로 읽으면 어색한 기호가 많습니다.
+     "닛케이 1.94%↑" 를 그대로 넘기면 화살표를 읽거나 그냥 삼킵니다. */
+  function forSpeech(t) {
+    return String(t)
+      .replace(/([0-9%])\s*↑/g, "$1 상승")
+      .replace(/([0-9%])\s*↓/g, "$1 하락")
+      .replace(/%p/gi, "퍼센트포인트")
+      .replace(/[↑▲]/g, " 상승 ").replace(/[↓▼]/g, " 하락 ")
+      .replace(/[…·ㆍ]/g, ", ")
+      .replace(/[“”"'‘’]/g, " ")
+      .replace(/\s*~\s*/g, " 에서 ")
+      .replace(/\s*[|·]\s*/g, ", ")
+      .replace(/\s+/g, " ").trim();
+  }
+
+  function nSay(text, lang, done) {
+    var fired = false, wd = null;
+    function fin() { if (fired) return; fired = true; if (wd) clearTimeout(wd); done(); }
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(lang === "ko-KR" ? forSpeech(text) : String(text));
+      u.lang = lang; u.rate = (lang === "ko-KR") ? 1 : 0.9;
+      var v = (lang === "ko-KR") ? koVoice : voice;
+      if (v) { try { u.voice = v; } catch (e2) {} }
+      u.onend = fin; u.onerror = fin;
+      wd = setTimeout(fin, 4000 + String(text).length * 320);
+      speechSynthesis.speak(u);
+    } catch (e) { fin(); }
+  }
+
+  function newsSeq(it, sayCat) {
+    var seq = [], i;
+    if (sayCat) seq.push({ s: CAT_KO[it.c] + "입니다.", l: "ko-KR", w: 450 });
+    if (it.c === "en") {
+      seq.push({ s: it.t, l: "en-US", w: 600 });
+      var es = splitSents(plain(it.d));
+      if (es[0]) seq.push({ s: es[0], l: "en-US", w: 500 });
+    } else {
+      seq.push({ s: it.t + ".", l: "ko-KR", w: 500 });
+      var ls = leadOf(it.d, S.cfg.nlen);
+      for (i = 0; i < ls.length; i++) seq.push({ s: ls[i], l: "ko-KR", w: 320 });
+    }
+    seq[seq.length - 1].w = 900;         // 꼭지 사이는 좀 쉬어 갑니다
+    return seq;
+  }
+
+  function drawNews(it, n) {
+    $("ns-cat").textContent = CAT_KO[it.c] + " · " + it.src;
+    $("ns-title").textContent = it.t;
+    $("ns-lead").textContent = (it.c === "en")
+      ? (splitSents(plain(it.d))[0] || "")
+      : leadOf(it.d, S.cfg.nlen).join(" ");
+    $("ns-count").textContent = n + " / " + NEWS.items.length;
+  }
+
+  function newsRun() {
+    if (!NEWS.on) return;
+    var g = NEWS.gen;
+    if (NEWS.i >= NEWS.items.length) { newsEnd(); return; }
+
+    var it = NEWS.items[NEWS.i];
+    var prev = NEWS.i > 0 ? NEWS.items[NEWS.i - 1] : null;
+    drawNews(it, NEWS.i + 1);
+
+    var seq = newsSeq(it, !prev || prev.c !== it.c), k = 0;
+    function step() {
+      if (!NEWS.on || g !== NEWS.gen) return;
+      if (k >= seq.length) { NEWS.i++; NEWS.tm = setTimeout(newsRun, 200); return; }
+      var st = seq[k++];
+      nSay(st.s, st.l, function () {
+        if (!NEWS.on || g !== NEWS.gen) return;
+        NEWS.tm = setTimeout(step, st.w || 300);
+      });
+    }
+    step();
+  }
+
+  function newsSkip(d) {
+    if (!NEWS.on) return;
+    NEWS.gen++;
+    if (NEWS.tm) { clearTimeout(NEWS.tm); NEWS.tm = null; }
+    try { speechSynthesis.cancel(); } catch (e) {}
+    NEWS.i = Math.max(0, Math.min(NEWS.items.length, NEWS.i + d));
+    NEWS.tm = setTimeout(newsRun, 400);
+  }
+
+  function newsTick() {
+    var s = Math.max(0, Math.round((Date.now() - NEWS.startAt) / 1000));
+    $("ns-time").textContent = Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60);
+  }
+
+  /* 뉴스가 끝나면 그대로 영어 듣기로 넘어갑니다. 운전 중에 손을 안 대도 되게. */
+  function newsEnd() {
+    var go = NEWS.chain;
+    newsQuiet(go);
+    if (go) { listenStart(false); return; }
+    showStage("home"); renderHome();
+  }
+  function newsQuiet(keepSound) {
+    NEWS.on = false; NEWS.gen++;
+    if (NEWS.tm) { clearTimeout(NEWS.tm); NEWS.tm = null; }
+    if (NEWS.tick) { clearInterval(NEWS.tick); NEWS.tick = null; }
+    try { speechSynthesis.cancel(); } catch (e) {}
+    wakeOff();
+    if (!keepSound) keepOff();      // 이어서 들을 때는 블루투스를 깨워 둔 채로
+  }
+  function newsStop() {
+    if (!NEWS.on && !NEWS.busy) return;
+    NEWS.busy = false;
+    newsQuiet(false);
+    showStage("home"); renderHome();
+  }
+
+  function newsStart(chain) {
+    if (!("speechSynthesis" in window)) { toast("이 기기는 소리 읽기를 못 해요."); return; }
+    if (!koVoice) pickVoice();
+    if (!koVoice) { toast("한국어 목소리가 없어서 뉴스를 읽지 못해요."); return; }
+
+    prime(); keepOn(); wakeOn();
+    NEWS.chain = !!chain;
+    NEWS.busy = true;
+    NEWS.items = []; NEWS.i = 0;
+
+    showStage("stage-news");
+    $("ns-cat").textContent = "";
+    $("ns-title").textContent = "뉴스를 가져오는 중이에요";
+    $("ns-lead").textContent = "잠깐만요.";
+    $("ns-count").textContent = "";
+    $("ns-time").textContent = "0:00";
+
+    newsLoad(false, function (items, stale) {
+      if (!NEWS.busy) return;                  // 그 사이에 멈췄으면 그만
+      if (!items.length) {
+        toast("뉴스를 못 가져왔어요.");
+        NEWS.busy = false;
+        if (chain) { newsQuiet(true); listenStart(false); return; }
+        newsQuiet(false); showStage("home"); renderHome();
+        return;
+      }
+      if (stale) toast("저장해 둔 뉴스를 들려줍니다.");
+      NEWS.items = items; NEWS.i = 0; NEWS.on = true; NEWS.gen++;
+      NEWS.startAt = Date.now();
+      newsTick();
+      NEWS.tick = setInterval(newsTick, 1000);
+      NEWS.tm = setTimeout(newsRun, 900);      // 블루투스가 깨어날 틈
+    });
+  }
 
   /* ==========================================================
      화면
@@ -1498,10 +1886,12 @@
   });
 
   var VIEWS = ["today", "find", "read", "reward", "me"];
-  var STAGES = ["home", "stage-card", "stage-talk", "stage-fast", "stage-listen", "stage-done"];
+  var STAGES = ["home", "stage-card", "stage-talk", "stage-fast", "stage-listen",
+                "stage-news", "stage-done"];
 
   function showView(n) {
     backDisarm();                   // 탭을 옮기면 쌓아둔 뒤로가기 자리는 버립니다
+    if (NEWS.on || NEWS.busy) { NEWS.busy = false; newsQuiet(false); }
     if (LIS.on) listenStop(true);   // 다른 곳으로 가면 듣기는 멈춥니다
     VIEWS.forEach(function (v) { $("view-" + v).hidden = (v !== n); });
     [].slice.call(document.querySelectorAll(".tab")).forEach(function (t) {
@@ -1567,6 +1957,15 @@
       : ("운전할 때 · " + dirTxt +
          (hd ? " — 오늘 들은 " + hd + "개는 뒤로" : " — " + S.cfg.lmin + "분, 손 안 대도 됩니다"));
     $("btn-listen-restart").hidden = !spot;
+
+    $("btn-news").hidden = !S.cfg.news;
+    if (S.cfg.news) {
+      var cached = newsCache();
+      var fresh = cached && cached.at && (Date.now() - cached.at < 40 * 60000);
+      $("news-note").textContent =
+        (S.cfg.nchain ? "경제 중심 · 끝나면 영어로 이어서" : "경제 중심 · 뉴스만") +
+        (fresh ? " — 받아 둔 것이 있어요" : "");
+    }
 
     renderNextReward();
   }
@@ -2065,6 +2464,13 @@
     markSeg("#cfg-ltalk", "data-ltalk", String(S.cfg.ltalk));
     markSeg("#cfg-lfast", "data-lfast", String(S.cfg.lfast));
 
+    markSeg("#cfg-news", "data-news", String(S.cfg.news));
+    markSeg("#cfg-nnum", "data-nnum", String(S.cfg.nnum));
+    markSeg("#cfg-nlen", "data-nlen", String(S.cfg.nlen));
+    markSeg("#cfg-nen", "data-nen", String(S.cfg.nen));
+    markSeg("#cfg-nchain", "data-nchain", String(S.cfg.nchain));
+    renderNewsNote();
+
     $("ldir-note").textContent = S.cfg.ldir === "auto"
       ? "오후 2시 전에는 ‘영어 → 뜻’, 그 뒤에는 ‘뜻 → 영어’로 돕니다."
       : S.cfg.ldir === "en"
@@ -2076,6 +2482,54 @@
       "오늘 이미 들은 표현은 다음 차례에 뒤로 미룹니다.";
 
     renderBackup();
+  }
+
+  /* 얼마나 걸리는지 미리 셈해 둡니다. 한국어 소리는 대충 1초에 다섯 자입니다.
+     차에서 2~3분이 목표라, 설정을 바꿀 때마다 바로 보이게 합니다. */
+  function newsMins() {
+    var perItem = 26 + S.cfg.nlen * 52;          // 제목 + 전문 글자 수
+    var chars = S.cfg.nnum * perItem + (S.cfg.nen ? 90 : 0);
+    var sec = Math.round(chars / 5 + S.cfg.nnum * 1.6);
+    return Math.max(1, Math.round(sec / 30) / 2);   // 0.5분 단위
+  }
+  function renderNewsNote() {
+    var c = newsCache();
+    var when = "";
+    if (c && c.at) {
+      var m = Math.round((Date.now() - c.at) / 60000);
+      when = m < 1 ? " 방금 받아 뒀어요." : m < 60
+        ? (" " + m + "분 전에 받아 뒀어요.")
+        : (" " + Math.round(m / 60) + "시간 전에 받아 뒀어요.");
+    }
+    $("news-cfg-note").textContent = S.cfg.news
+      ? ("대략 " + newsMins() + "분쯤 걸려요." + when)
+      : "뉴스를 끄면 첫 화면에서 단추가 사라집니다.";
+  }
+
+  /* 차에서 듣기 전에, 어떤 글이 어떻게 읽힐지 눈으로 확인하는 자리입니다. */
+  function newsPreview() {
+    var box = $("news-preview");
+    box.innerHTML = "";
+    box.appendChild(el("p", "sec-note", "받아 오는 중이에요…"));
+    newsLoad(true, function (items) {
+      box.innerHTML = "";
+      if (!items.length) {
+        box.appendChild(el("p", "sec-note", "못 가져왔어요. 인터넷을 확인해 주세요."));
+        return;
+      }
+      items.forEach(function (it) {
+        var d = el("div", "np-item");
+        d.appendChild(el("p", "np-cat", CAT_KO[it.c] + " · " + it.src));
+        d.appendChild(el("p", "np-title", it.t));
+        var lead = (it.c === "en")
+          ? (splitSents(plain(it.d))[0] || "")
+          : leadOf(it.d, S.cfg.nlen).join(" ");
+        if (lead) d.appendChild(el("p", "np-lead", lead));
+        else d.appendChild(el("p", "np-lead dim", "(전문이 없어 제목만 읽어요)"));
+        box.appendChild(d);
+      });
+      renderNewsNote();
+    });
   }
 
   /* 영어 목소리 고르기.
@@ -2352,6 +2806,13 @@
 
     $("btn-go").onclick = start;
     $("btn-listen").onclick = function () { listenStart(false); };
+    $("btn-news").onclick = function () { newsStart(!!S.cfg.nchain); };
+    $("btn-ns-next").onclick = function () { newsSkip(1); };
+    $("btn-ns-again").onclick = function () { newsSkip(0); };
+    $("btn-ns-stop").onclick = function () { newsStop(); };
+    $("btn-ns-skip").onclick = function () {
+      NEWS.busy = false; newsQuiet(true); listenStart(false);
+    };
     $("btn-listen-restart").onclick = function () { S.listenAt = null; save(); listenStart(true); };
     $("btn-listen-stop").onclick = function () { listenStop(); };
     $("btn-ls-prev").onclick = function () { lisSkip(-5); };
@@ -2380,6 +2841,7 @@
     $("btn-fast-next").onclick = function () { FS.i++; drawFast(); };
 
     $("btn-add-link").onclick = addLink;
+    $("btn-news-test").onclick = newsPreview;
 
     // 읽기
     $("btn-read-new").onclick = function () { $("read-editor").hidden = false; };
@@ -2450,7 +2912,9 @@
 
     [["#cfg-lmin", "data-lmin", "lmin"], ["#cfg-lko", "data-lko", "lko"],
      ["#cfg-lgap", "data-lgap", "lgap"], ["#cfg-ltalk", "data-ltalk", "ltalk"],
-     ["#cfg-lfast", "data-lfast", "lfast"]]
+     ["#cfg-lfast", "data-lfast", "lfast"], ["#cfg-news", "data-news", "news"],
+     ["#cfg-nnum", "data-nnum", "nnum"], ["#cfg-nlen", "data-nlen", "nlen"],
+     ["#cfg-nen", "data-nen", "nen"], ["#cfg-nchain", "data-nchain", "nchain"]]
       .forEach(function (p) {
         [].slice.call(document.querySelectorAll(p[0] + " button")).forEach(function (b) {
           b.onclick = function () {

@@ -254,6 +254,25 @@ html.has-bg body { background: transparent; }
 .drive-btn .dr-ico { font-size: 1.5rem; }
 .drive-btn .dr-t { display: block; font-size: 1.05rem; font-weight: 700; margin-top: 2px; }
 .drive-btn .dr-s { display: block; font-size: .82rem; color: var(--ink2); margin-top: 3px; line-height: 1.5; }
+/* 뉴스는 먼저 듣는 것이라 위에 두되, 영어가 본래 할 일이니 더 조용하게. */
+.drive-btn.news { background: var(--card2); border-color: var(--line); margin-bottom: 10px; }
+
+/* ---- 뉴스 (운전 중 화면) ---- */
+.news-body { justify-content: flex-start; padding-top: 8px; }
+.ns-cat { color: var(--coral); font-size: .82rem; font-weight: 500; margin: 0 0 12px; }
+.ns-title { font-size: 1.5rem; line-height: 1.4; font-weight: 700; margin: 0;
+  color: var(--ink); word-break: keep-all; }
+.ns-lead { font-size: 1.05rem; line-height: 1.7; margin: 16px 0 0; color: var(--ink2);
+  word-break: keep-all; }
+
+.news-preview { margin-top: 12px; }
+.np-item { border-top: 1px solid var(--line); padding: 12px 0; }
+.np-cat { color: var(--coral); font-size: .76rem; font-weight: 500; margin: 0 0 4px; }
+.np-title { font-size: .98rem; font-weight: 700; line-height: 1.45; margin: 0;
+  color: var(--ink); word-break: keep-all; }
+.np-lead { font-size: .86rem; line-height: 1.6; margin: 5px 0 0; color: var(--ink2);
+  word-break: keep-all; }
+.np-lead.dim { color: var(--mute); font-style: italic; }
 
 /* ---- 듣기만 하기 (운전 중 화면) ---- */
 .listen { display: flex; flex-direction: column; min-height: calc(100vh - var(--tab) - 96px); }
