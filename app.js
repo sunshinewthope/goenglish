@@ -1889,8 +1889,10 @@
   var STAGES = ["home", "stage-card", "stage-talk", "stage-fast", "stage-listen",
                 "stage-news", "stage-done"];
 
-  function showView(n) {
-    backDisarm();                   // 탭을 옮기면 쌓아둔 뒤로가기 자리는 버립니다
+  /* keepBack: 찾기에서 표현을 눌러 '오늘'로 넘어가는 것처럼, 화면은 옮기지만
+     돌아갈 자리는 그대로 두어야 할 때 씁니다. 아래 탭을 눌러 옮길 때는 버립니다. */
+  function showView(n, keepBack) {
+    if (!keepBack) backDisarm();    // 탭을 옮기면 쌓아둔 뒤로가기 자리는 버립니다
     if (NEWS.on || NEWS.busy) { NEWS.busy = false; newsQuiet(false); }
     if (LIS.on) listenStop(true);   // 다른 곳으로 가면 듣기는 멈춥니다
     VIEWS.forEach(function (v) { $("view-" + v).hidden = (v !== n); });
@@ -2047,6 +2049,7 @@
     if (TK.rec) { try { TK.rec.abort(); } catch (e) {} TK.rec = null; }
     try { speechSynthesis.cancel(); } catch (e) {}
     TK.busy = false;
+    backDisarm();                   // 여기서 끝났으니 돌아갈 자리도 거둡니다
     showStage("home");
     renderHome();
   }
@@ -2356,12 +2359,30 @@
         '<span class="sl-t">이 묶음 통째로 듣기</span>' +
         '<span class="sl-s">' + hits.length + '개 · 한 바퀴 약 ' +
         Math.max(1, Math.round(hits.length * 10 / 60)) + '분 · 시간이 남으면 다시 돕니다</span>';
-      play.onclick = function () { showView("today"); listenStart(false, findSet); };
+      play.onclick = function () {
+        showView("today", true); listenStart(false, findSet);
+        backArm(backToFind);
+      };
       box.appendChild(play);
     }
 
     if (!hits.length) { box.appendChild(emptyBox("찾는 표현이 없어요.", "다른 말로 찾아보세요.")); return; }
     hits.forEach(function (r) { box.appendChild(hitCard(r)); });
+  }
+
+  /* 찾기에서 표현을 눌러 들어왔을 때, 폰 뒤로가기는 찾던 자리로 돌아옵니다.
+     예전에는 showView 가 쌓아 둔 자리를 버리기만 하고 새로 걸지 않아서
+     뒤로가기가 앱을 통째로 닫아 버렸습니다.
+     findSet 과 찾기 칸의 글자는 그대로 두므로 보던 목록이 그대로 나옵니다. */
+  function backToFind() {
+    if (TK.rec) { try { TK.rec.abort(); } catch (e) {} TK.rec = null; }
+    try { speechSynthesis.cancel(); } catch (e) {}
+    TK.busy = false;
+    showStage("home");
+    showView("find");
+    // 묶음 안으로 돌아온 것이라면, 거기서 또 뒤로가기를 눌렀을 때
+    // 앱이 닫히지 않게 '전체 묶음'으로 돌아갈 자리를 다시 깔아 둡니다.
+    if (findSet) backArm(function () { findSet = null; renderFind(); });
   }
 
   function hitCard(r) {
@@ -2388,12 +2409,14 @@
       else if (a === "talk") {
         TK.list = [r.e]; TK.i = 0; TK.solo = true;
         TK.okCount = 0; TK.doneCount = 0; TK.micUsed = false;
-        showView("today"); showStage("stage-talk"); drawTalk();
+        showView("today", true); showStage("stage-talk"); drawTalk();
+        backArm(backToFind);
       }
       else {
         SESSION = { list: [r.e], nextPtr: S.ptr };
         idx = 0; results = { ok: 0, no: 0, newN: 0 };
-        showView("today"); showStage("stage-card"); drawCard();
+        showView("today", true); showStage("stage-card"); drawCard();
+        backArm(backToFind);
       }
     });
     return c;
