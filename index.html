@@ -345,6 +345,11 @@
     <p class="sec-note">골라서 들어 보세요. 마음에 드는 것으로 두면 계속 그 목소리로 읽습니다.</p>
     <div id="voice-list" class="voice-list"></div>
 
+    <h2 class="sec-title">한국어 목소리</h2>
+    <p class="sec-note">뉴스와 ‘뜻 → 영어’ 듣기를 이 목소리가 읽습니다.
+      기본으로 잡히는 것이 딱딱하게 들리면 다른 것으로 바꿔 보세요.</p>
+    <div id="kovoice-list" class="voice-list"></div>
+
     <h2 class="sec-title">뉴스</h2>
     <p class="sec-note">가는 길에 먼저 듣습니다. 한국어로 읽어 줘요.
       경향신문·동아일보에서 가져오고, 받아 온 글은 이 폰 안에만 둡니다.</p>
@@ -369,6 +374,13 @@
       <button type="button" data-nlen="2">제목 + 두 문장</button>
     </div>
     <p class="sec-note" id="news-cfg-note"></p>
+
+    <p class="f-label">읽는 속도</p>
+    <div class="seg" id="cfg-nrate">
+      <button type="button" data-nrate="85">천천히</button>
+      <button type="button" data-nrate="100">보통</button>
+      <button type="button" data-nrate="115">빠르게</button>
+    </div>
 
     <p class="f-label">끝나면</p>
     <div class="seg" id="cfg-nchain">
@@ -538,6 +550,6 @@
 
 <script src="phrases.js?v=11"></script>
 <script src="talk.js?v=14"></script>
-<script src="app.js?v=37"></script>
+<script src="app.js?v=43"></script>
 </body>
 </html>

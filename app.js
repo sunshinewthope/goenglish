@@ -243,7 +243,7 @@
     return { seen: {}, ptr: 0, days: {}, sessions: 0, rewards: [],
              heard: {}, heardDay: {}, listenXp: 0, listenMin: 0, links: [], reads: [], fastPtr: 0,
              cfg: { per: 15, newPer: 5, sets: sets, lmin: 10, lko: 1, lgap: 1, ldir: "auto",
-                    news: 1, nnum: 7, nlen: 2, nen: 0, nchain: 1 },
+                    news: 1, nnum: 7, nlen: 2, nen: 0, nchain: 1, nrate: 100 },
              theme: "auto", lastBackup: "" };
   }
 
@@ -279,6 +279,8 @@
     if ([0, 1, 2].indexOf(S.cfg.nlen) < 0) S.cfg.nlen = 2;
     if (S.cfg.nen !== 0 && S.cfg.nen !== 1) S.cfg.nen = 0;
     if (S.cfg.nchain !== 0 && S.cfg.nchain !== 1) S.cfg.nchain = 1;
+    if ([85, 100, 115].indexOf(S.cfg.nrate) < 0) S.cfg.nrate = 100;
+    if (typeof S.cfg.kvoice !== "string") S.cfg.kvoice = "";
   }
 
   function load() {
@@ -374,7 +376,7 @@
   }
 
   /* ---------- 소리 ---------- */
-  var voice = null, koVoice = null, enVoices = [], primed = false;
+  var voice = null, koVoice = null, enVoices = [], koVoices = [], primed = false;
 
   /* 영어 목소리가 하나도 없으면 한국어 목소리가 영어를 읽습니다.
      그러면 발음이 한국식이 되어 듣기 연습이 되지 않습니다.
@@ -391,16 +393,29 @@
     return s;
   }
 
+  /* 한국어 목소리도 골라 쓸 수 있어야 합니다. 뉴스와 ‘뜻 → 영어’ 를 이 목소리가
+     읽는데, 예전에는 기기에 깔린 것 중 맨 처음 것을 그냥 썼습니다. 그러면 대개
+     제조사 기본 음성이 잡혀 딱딱하게 들립니다. 구글 음성이 있으면 그쪽이 낫습니다. */
+  function koRank(v) {
+    var n = (v.name || ""), s = 0;
+    if (/natural|neural|enhanced|premium|wavenet/i.test(n)) s += 20;
+    if (/google/i.test(n)) s += 14;
+    if (/siri/i.test(n)) s += 6;
+    if (!v.localService) s += 3;
+    return s;
+  }
+
   function pickVoice() {
     if (!("speechSynthesis" in window)) return;
     var vs = speechSynthesis.getVoices() || [], i;
-    koVoice = null; enVoices = [];
+    enVoices = []; koVoices = [];
     for (i = 0; i < vs.length; i++) {
       var l = vs[i].lang || "";
-      if (/^ko/i.test(l)) { if (!koVoice) koVoice = vs[i]; }
+      if (/^ko/i.test(l)) koVoices.push(vs[i]);
       else if (/^en/i.test(l)) enVoices.push(vs[i]);
     }
     enVoices.sort(function (a, b) { return voiceRank(b) - voiceRank(a); });
+    koVoices.sort(function (a, b) { return koRank(b) - koRank(a); });
 
     voice = null;
     if (S && S.cfg && S.cfg.voice) {
@@ -409,6 +424,14 @@
       }
     }
     if (!voice) voice = enVoices[0] || null;
+
+    koVoice = null;
+    if (S && S.cfg && S.cfg.kvoice) {
+      for (i = 0; i < koVoices.length; i++) {
+        if (koVoices[i].name === S.cfg.kvoice) { koVoice = koVoices[i]; break; }
+      }
+    }
+    if (!koVoice) koVoice = koVoices[0] || null;
   }
   function hasEnVoice() { if (!enVoices.length) pickVoice(); return !!voice; }
 
@@ -1514,23 +1537,65 @@
     { c: "cul", n: "동아", u: "https://rss.donga.com/culture.xml" }
   ];
 
-  /* 같은 경제라도 송이값·치킨값보다 금리·환율·실적이 먼저 나오게 합니다. */
+  /* 같은 경제라도 송이값·치킨값보다 금리·환율·실적이 먼저 나오게 합니다.
+     그리고 남의 나라 증시가 몇 퍼센트 올랐다는 마감 시황은 우리 증시
+     이야기가 아닙니다. 보고 싶은 건 오늘 우리 증시를 움직인 굵직한 기사입니다. */
+  var FOREIGN = /올댓차이나|닛케이|항셍|창업판|상하이종합|선전종합|다우 ?지수|나스닥|S&P ?500|도쿄증시|뉴욕증시|유럽증시|[日中美英]증시|(홍콩|중국|일본|미국|유럽|대만|인도) ?증시/;
   var MKT = [
-    [/코스피|코스닥|증시|주가|상장|공모주|자사주|공매도|배당|시가총액|증권/g, 6],
+    [/코스피|코스닥|원[·\/]?달러|한국은행|금융위|금융감독원|거래소|국내 ?증시/g, 8],
+    [/증시|주가|상장|공모주|자사주|공매도|배당|시가총액|증권/g, 6],
     [/금리|한국은행|기준금리|연준|연방준비|FOMC|국채|채권|환율|달러|엔화|외환/g, 6],
-    [/실적|영업이익|매출|어닝|적자|흑자|인수|합병|유상증자|출자|자본확충|투자/g, 5],
+    [/실적|영업이익|매출|어닝|적자|흑자|인수|합병|유상증자|출자|자본확충/g, 5],
     [/물가|수출|수입|무역수지|경상수지|GDP|성장률|관세|유가|경기|내수|고용/g, 4],
     [/반도체|삼성전자|하이닉스|현대차|이차전지|배터리|조선|방산|바이오|인공지능/g, 3],
-    [/부동산|아파트|대출|가계부채|세제|감세|증세|예산|연금/g, 2]
+    [/부동산|아파트|대출|가계부채|세제|감세|증세|예산|연금/g, 2],
+    // 교육과정 모집·행사 공고 같은 홍보성 기사는 증시와 상관이 없습니다
+    [/과정 ?개설|수강생|모집|세미나|공모전|아카데미|설명회|이벤트|캠페인|후원|기부|협약|출범식/g, -12]
   ];
-  function mktScore(it) {
+  /* 정치는 정치인이 주고받는 말보다 제도가 바뀌는 일과 굵직한 사건을,
+     문화는 연예인 소식보다 공연·전시·문학을 앞으로 올립니다.
+     빼기 점수가 붙은 낱말은 그런 기사에만 나오는 말들입니다. */
+  var POL = [
+    [/법안|개정|제정|입법|본회의|통과|발의|의결|예산안|시행령|제도|규제|과징금|집단소송|정책/g, 7],
+    [/회담|정상|외교|안보|협정|정전|유엔|한미|방위|국방|북한|파병|관세|수출통제/g, 6],
+    [/특검|탄핵|구속|기소|선고|판결|압수수색|국정감사|인사청문|위반/g, 5],
+    [/여론조사|통계|지표|하락|상승|포인트/g, 3],
+    [/화답|반박|비판|일침|맞불|공세|공방|설전|논평|해명|겨냥|반발|촉구|유감|저격/g, -8],
+    [/위문|격려|참석|축사|회동|오찬|만찬|예방|행보|거취|의혹|성추행/g, -6]
+  ];
+  var CUL = [
+    [/공연|무대|콘서트|오페라|뮤지컬|연극|음악회|교향악|오케스트라|발레|국악|협연|리사이틀|초연|내한/g, 8],
+    [/전시|미술관|박물관|비엔날레|회고전|특별전|개인전|작품|개막/g, 7],
+    [/문학|소설|시집|출판|노벨|수상작|작가|번역|도서|시인/g, 6],
+    [/영화제|개봉|감독|주연|배급/g, 5],
+    [/예능|방송인|열애|결혼|이혼|근황|심경|폭로|서운|고백|털어놨|눈물|화제|유튜브|인스타|소속사|학폭|사생활/g, -9],
+    [/재단|포럼|유치|선정|영예|호평|출범|협약|홍보|이벤트/g, -5]
+  ];
+
+  function score(it, rules) {
     var t = it.t + " " + plain(it.d).slice(0, 220), s = 0, i, m;
-    for (i = 0; i < MKT.length; i++) {
-      m = t.match(MKT[i][0]);
-      if (m) s += MKT[i][1] * Math.min(3, m.length);
+    for (i = 0; i < rules.length; i++) {
+      m = t.match(rules[i][0]);
+      if (m) s += rules[i][1] * Math.min(3, m.length);
     }
     return s;
   }
+  /* 해외 경제 기사라도 우리와 이어지는 대목이 있으면 봅니다.
+     ("中 인프라 161조 집행…韓 건설기계·철강 청신호" 는 우리 증시 이야기입니다.)
+     그런 고리가 없는 남의 나라 지표 발표는 내립니다. */
+  var ABROAD = /영국|프랑스|독일|유로존|유럽|일본|중국|미국|대만|인도|브라질|G7|OECD|[美中日英獨佛]/;
+  var OURS = /韓|한국|국내|코스피|코스닥|원[·\/]?달러|삼성|현대|SK|LG|우리 ?기업/;
+  function mktScore(it) {
+    var s = score(it, MKT);
+    if (FOREIGN.test(it.t)) s -= 30;
+    if (ABROAD.test(it.t) && !OURS.test(it.t + " " + plain(it.d).slice(0, 220))) s -= 10;
+    return s;
+  }
+  function polScore(it) {
+    // 따옴표로 시작하는 제목은 대개 "누가 뭐라고 했다" 하는 발언 기사입니다
+    return score(it, POL) - (/[“”"]/.test(it.t) ? 4 : 0);
+  }
+  function culScore(it) { return score(it, CUL); }
   var NFEED_EN = { c: "en", n: "BBC", u: "https://feeds.bbci.co.uk/news/business/rss.xml" };
   var CAT_KO = { eco: "경제", pol: "정치", cul: "문화", en: "영어 뉴스" };
 
@@ -1630,23 +1695,69 @@
     } catch (e) { fin([]); }
   }
 
+  /* 같은 사건을 다룬 기사가 제목만 달리해 여러 꼭지로 들어옵니다.
+     ("한화생명, 캐피탈 인수·증권 5000억 증자" 와
+      "한화투자증권, 9000억 자본조달 추진" 은 사실 한 이야기입니다.)
+     제목 앞부분만 견주면 못 잡습니다. 제목과 첫 문장을 다섯 글자씩 잘라
+     그 조각이 얼마나 겹치는지로 봅니다. 한국어는 조사가 붙어 낱말이
+     달라 보여도 이렇게 자르면 겹치는 데가 드러납니다. */
+  function shingles(s) {
+    var t = String(s).replace(/[^가-힣0-9A-Za-z]/g, ""), out = {}, i;
+    for (i = 0; i + 4 <= t.length; i++) out[t.substr(i, 4)] = 1;
+    return out;
+  }
+  /* 그냥 견주면 "했다고 밝혔다" 같은 흔한 말투까지 겹쳐서, 아무 상관 없는
+     기사끼리도 너덧 개씩 걸립니다. 그래서 여러 기사에 두루 나오는 조각은
+     빼고 봅니다. 그날 들어온 기사로 재 보니 이렇게 하면
+     같은 이야기는 7개 이상 겹치고 남남인 기사는 4개를 넘지 않았습니다. */
+  function rareOnly(list) {
+    var df = {}, i, k;
+    for (i = 0; i < list.length; i++) {
+      for (k in list[i].sh) if (list[i].sh.hasOwnProperty(k)) df[k] = (df[k] || 0) + 1;
+    }
+    for (i = 0; i < list.length; i++) {
+      var r = {};
+      for (k in list[i].sh) if (list[i].sh.hasOwnProperty(k) && df[k] < 3) r[k] = 1;
+      list[i].sh = r;
+    }
+  }
+  function alike(a, b) {
+    var shared = 0, k;
+    for (k in a) if (a.hasOwnProperty(k) && b[k]) shared++;
+    return shared;
+  }
+
   /* 같은 기사가 두 신문에서 오면 하나만 남깁니다.
-     경제는 증시에 울리는 순서로, 정치·문화는 새 것 순서로 고릅니다. */
+     그리고 면마다 보고 싶은 쪽이 달라서 점수를 따로 매깁니다. */
   function pickNews(all, want) {
-    var seen = {}, by = { eco: [], pol: [], cul: [] };
+    var by = { eco: [], pol: [], cul: [] }, rows = [], i;
     all.sort(function (a, b) { return b.at - a.at; });
     all.forEach(function (x) {
-      var k = x.t.replace(/[^가-힣A-Za-z0-9]/g, "").slice(0, 14);
-      if (!k || seen[k]) return;
-      seen[k] = 1;
+      x.lead = leadOf(x.d, 1);
+      x.sh = shingles(x.t + " " + (x.lead[0] || "").slice(0, 90));
+      rows.push(x);
+    });
+    rareOnly(rows);                       // 흔한 말투는 견주기에서 빼 둡니다
+
+    var kept = [];
+    rows.forEach(function (x) {
+      for (var j = 0; j < kept.length; j++) {
+        if (alike(x.sh, kept[j].sh) >= 5) return;   // 앞서 넣은 것과 같은 이야기
+      }
+      kept.push(x);
       // 읽을 전문이 없는 것(인사 발령 같은 토막글)은 뒤로 미룹니다
-      x.sc = mktScore(x) + (leadOf(x.d, 1).length ? 4 : -8);
+      var bonus = (x.lead.length ? 4 : -8);
+      x.sc = (x.c === "pol" ? polScore(x) : x.c === "cul" ? culScore(x) : mktScore(x)) + bonus;
       if (by[x.c]) by[x.c].push(x);
     });
-    by.eco.sort(function (a, b) { return (b.sc - a.sc) || (b.at - a.at); });
+    ["eco", "pol", "cul"].forEach(function (c) {
+      by[c].sort(function (a, b) { return (b.sc - a.sc) || (b.at - a.at); });
+    });
 
-    var nPol = want >= 6 ? 1 : 0;
-    var nCul = want >= 5 ? 1 : 0;
+    /* 그날 정치·문화에 볼 만한 게 없으면(공방 기사만, 연예 소식만) 빼고
+       그 자리를 경제로 채웁니다. 억지로 하나씩 끼워 넣지 않습니다. */
+    var nPol = (want >= 6 && by.pol.length && by.pol[0].sc > 4) ? 1 : 0;
+    var nCul = (want >= 5 && by.cul.length && by.cul[0].sc > 4) ? 1 : 0;
     var nEco = Math.max(1, want - nPol - nCul);
 
     /* 그냥 점수 순서대로 뽑으면 '일본 증시 마감·홍콩 증시 마감·중국 증시 마감'
@@ -1659,6 +1770,9 @@
     var SIHWANG = /증시|지수|마감|개장|코스피|코스닥|환율/;
     var used = {}, nSi = 0, eco = [], spare = [];
     by.eco.forEach(function (x) {
+      /* 전문이 있다는 것만으로 4점이 붙으므로, 10점은 '증시와 닿는 낱말이
+         적어도 하나는 제대로 있다'는 뜻입니다. 이 선을 못 넘으면 거릅니다. */
+      if (x.sc < 10) return;
       var si = SIHWANG.test(x.t);
       if (eco.length >= nEco || (used[x.f] || 0) >= cap || (si && nSi >= 2)) {
         spare.push(x); return;
@@ -1667,8 +1781,10 @@
       if (si) nSi++;
       eco.push(x);
     });
-    // 그래도 모자라면 점수 순서대로 마저 채웁니다
-    for (var si2 = 0; si2 < spare.length && eco.length < nEco; si2++) eco.push(spare[si2]);
+    /* 한 신문 제한에 걸려 밀린 것은 마저 채우되, 자리를 메우려고 시원찮은
+       기사까지 끌어오지는 않습니다. 다섯 개를 억지로 채우는 것보다
+       괜찮은 네 개를 듣는 편이 낫습니다. */
+    for (var j2 = 0; j2 < spare.length && eco.length < nEco; j2++) eco.push(spare[j2]);
 
     return eco.concat(by.pol.slice(0, nPol)).concat(by.cul.slice(0, nCul));
   }
@@ -1728,7 +1844,8 @@
     try {
       speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(lang === "ko-KR" ? forSpeech(text) : String(text));
-      u.lang = lang; u.rate = (lang === "ko-KR") ? 1 : 0.9;
+      u.lang = lang;
+      u.rate = (lang === "ko-KR") ? (S.cfg.nrate || 100) / 100 : 0.9;
       var v = (lang === "ko-KR") ? koVoice : voice;
       if (v) { try { u.voice = v; } catch (e2) {} }
       u.onend = fin; u.onerror = fin;
@@ -2479,6 +2596,7 @@
 
     voiceTries = 0;        // 나 탭에 들어올 때마다 다시 넉넉히 기다려 봅니다
     renderVoices();
+    renderKoVoices();
 
     markSeg("#cfg-lmin", "data-lmin", String(S.cfg.lmin));
     markSeg("#cfg-lko", "data-lko", String(S.cfg.lko));
@@ -2492,6 +2610,7 @@
     markSeg("#cfg-nlen", "data-nlen", String(S.cfg.nlen));
     markSeg("#cfg-nen", "data-nen", String(S.cfg.nen));
     markSeg("#cfg-nchain", "data-nchain", String(S.cfg.nchain));
+    markSeg("#cfg-nrate", "data-nrate", String(S.cfg.nrate));
     renderNewsNote();
 
     $("ldir-note").textContent = S.cfg.ldir === "auto"
@@ -2542,6 +2661,8 @@
       }
       items.forEach(function (it) {
         var d = el("div", "np-item");
+        // 어떤 기준으로 뽑혔는지 나중에 들여다볼 수 있게 점수를 남겨 둡니다
+        if (it.sc != null) d.setAttribute("data-sc", it.sc);
         d.appendChild(el("p", "np-cat", CAT_KO[it.c] + " · " + it.src));
         d.appendChild(el("p", "np-title", it.t));
         var lead = (it.c === "en")
@@ -2585,6 +2706,40 @@
     return ["설정 → 시간 및 언어 → 언어 및 지역 → <b>언어 추가</b>",
             "<b>English (United States)</b> 를 고르고, 다음 화면에서 <b>음성</b> 항목까지 체크해 설치하세요.",
             "설치 뒤 브라우저를 껐다 켜야 목록에 뜹니다."];
+  }
+
+  /* 한국어 목소리 고르기. 뉴스와 ‘뜻 → 영어’ 를 이 목소리가 읽습니다.
+     기기에 여러 개 깔려 있는 경우가 많은데 그동안 고를 수가 없었습니다. */
+  var KO_SAMPLE = "코스피가 사흘 만에 반등했습니다.";
+
+  function renderKoVoices() {
+    var box = $("kovoice-list");
+    if (!box) return;
+    box.innerHTML = "";
+
+    if (!koVoices.length) {
+      box.appendChild(el("p", "sec-note",
+        allVoices().length
+          ? "이 기기에 한국어 목소리가 없습니다. 뉴스를 읽지 못해요."
+          : "아직 목소리 목록이 오지 않았어요. 위 ‘다시 찾기’를 눌러 보세요."));
+      return;
+    }
+
+    koVoices.forEach(function (v) {
+      var on = koVoice && v.name === koVoice.name;
+      var b = el("button", "voice-item" + (on ? " on" : "")); b.type = "button";
+      b.appendChild(el("span", "vi-n", v.name));
+      b.appendChild(el("span", "vi-l", v.lang + (on ? " · 쓰는 중" : "")));
+      b.onclick = function () {
+        S.cfg.kvoice = v.name; save(); pickVoice(); renderKoVoices();
+        nSay(KO_SAMPLE, "ko-KR", function () {});
+      };
+      box.appendChild(b);
+    });
+    box.appendChild(el("p", "sec-note",
+      koVoices.length > 1
+        ? "눌러서 들어 보고 마음에 드는 것으로 두세요. 대개 ‘Google’ 이 붙은 쪽이 자연스럽습니다."
+        : "목소리가 하나뿐이에요. 눌러서 들어 볼 수 있습니다."));
   }
 
   /* 안드로이드는 getVoices() 가 처음에 빈 배열을 돌려줍니다.
@@ -2937,7 +3092,8 @@
      ["#cfg-lgap", "data-lgap", "lgap"], ["#cfg-ltalk", "data-ltalk", "ltalk"],
      ["#cfg-lfast", "data-lfast", "lfast"], ["#cfg-news", "data-news", "news"],
      ["#cfg-nnum", "data-nnum", "nnum"], ["#cfg-nlen", "data-nlen", "nlen"],
-     ["#cfg-nen", "data-nen", "nen"], ["#cfg-nchain", "data-nchain", "nchain"]]
+     ["#cfg-nen", "data-nen", "nen"], ["#cfg-nchain", "data-nchain", "nchain"],
+     ["#cfg-nrate", "data-nrate", "nrate"]]
       .forEach(function (p) {
         [].slice.call(document.querySelectorAll(p[0] + " button")).forEach(function (b) {
           b.onclick = function () {
