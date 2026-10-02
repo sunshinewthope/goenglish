@@ -244,7 +244,8 @@
              heard: {}, heardDay: {}, listenXp: 0, listenMin: 0, links: [], reads: [], fastPtr: 0,
              cfg: { per: 15, newPer: 5, sets: sets, lmin: 10, lko: 1, lgap: 1, ldir: "auto",
                     news: 1, nnum: 7, nlen: 2, nen: 0, nchain: 1, nrate: 100,
-                    yt: 0, ytCh: "", ytPat: "", ytMax: 6 },
+                    yt: 0, ytCh: "", ytPat: "", ytMax: 6, ytN: 3, lmix: 70,
+                    mission: 0 },
              theme: "auto", lastBackup: "" };
   }
 
@@ -286,6 +287,9 @@
     if (typeof S.cfg.ytCh !== "string") S.cfg.ytCh = "";
     if (typeof S.cfg.ytPat !== "string") S.cfg.ytPat = "";
     if ([3, 6, 10, 20].indexOf(S.cfg.ytMax) < 0) S.cfg.ytMax = 6;
+    if ([1, 3, 5].indexOf(S.cfg.ytN) < 0) S.cfg.ytN = 3;
+    if ([50, 70, 100].indexOf(S.cfg.lmix) < 0) S.cfg.lmix = 70;
+    if (S.cfg.mission !== 0 && S.cfg.mission !== 1) S.cfg.mission = 0;
     if (typeof S.cfg.rssKey !== "string") S.cfg.rssKey = "";
     if (!S.cfg.ytCh) {                      // 처음에는 확인해 둔 채널로 시작합니다
       S.cfg.ytCh = YT_CHANS[0].id;
@@ -1102,6 +1106,32 @@
     return a.map(function (x) { return x.e; });
   }
 
+  /* 아직 안 들은 것과 들어 본 것을 정한 비율로 섞습니다.
+     적게 들은 것부터만 세우면 새 표현 272개가 다 돌기까지 복습이 안 끼고,
+     그냥 마구 섞으면 새 표현이 좀처럼 안 나옵니다.
+     열 자리를 놓고 그중 몇 자리를 새 표현에 줄지로 가릅니다. */
+  function mixNewOld(keys) {
+    var fresh = [], again = [], i;
+    for (i = 0; i < keys.length; i++) {
+      if (((S.heard && S.heard[keys[i]]) || 0) > 0) again.push(keys[i]);
+      else fresh.push(keys[i]);
+    }
+    fresh = byFewest(fresh);
+    again = byFewest(again);
+    if (!fresh.length) return again;
+    if (!again.length) return fresh;
+
+    var pct = S.cfg.lmix, out = [], fi = 0, ai = 0, n = 0;
+    while (fi < fresh.length || ai < again.length) {
+      var wantNew = ((n % 10) * 10) < pct;
+      n++;
+      if (wantNew && fi < fresh.length) { out.push(fresh[fi++]); continue; }
+      if (!wantNew && ai < again.length) { out.push(again[ai++]); continue; }
+      if (fi < fresh.length) out.push(fresh[fi++]); else out.push(again[ai++]);
+    }
+    return out;
+  }
+
   /* 들을 차례: 틀린 것 → 복습할 때가 된 것 → 새 것 → 나머지.
      오늘 이미 들은 것은 맨 뒤로 미룹니다.
      그래야 가는 길과 오는 길에 다른 표현이 나옵니다. */
@@ -1123,7 +1153,7 @@
        어느 묶음이든 비슷한 말이 연달아 나오지 않게 섞어 줄 세웁니다. */
     return withFast(spread(byFewest(hard)).concat(
       spread(byFewest(due)),
-      spread(byFewest(neu)),
+      spread(mixNewOld(neu)),
       spread(byFewest(rest)),
       spread(byFewest(later))
     ));
@@ -1354,9 +1384,12 @@
     var rep = null;
     if (t.replies && t.replies.length) rep = t.replies[Math.floor(Math.random() * t.replies.length)];
     else { for (i = pi + 1; i < t.lines.length; i++) if (t.lines[i].w === "them") { rep = t.lines[i]; break; } }
+    /* 돌아오는 답도 내 말과 같은 리듬으로 갑니다.
+       예전에는 여기만 '영어 → 우리말' 에서 끝나 마지막 영어가 없었습니다.
+       질문은 쉬운데 답이 안 들린다고 하셔서, 답도 한 번 더 듣고 넘어갑니다. */
     if (rep) {
       seq.push({ cue: "이런 답이 돌아와요" });
-      hearLine(seq, rep.e, rep.k, 800);
+      speakLine(seq, rep.e, rep.k, 800);
     }
     return seq;
   }
@@ -1409,11 +1442,14 @@
     return sp;
   }
 
-  /* 묶음 하나만 통째로. 배운 순서 그대로 갑니다. */
+  /* 묶음 하나만 통째로.
+     예전에는 묶음에 든 차례 그대로 내보냈습니다. 그러면 들을 때마다 똑같은
+     앞쪽 몇 개만 돌아서 "비슷한 문장만 나온다"가 됩니다.
+     여기도 적게 들은 것부터 세웁니다. */
   function buildListenSet(sid) {
     var out = [];
     DECK.forEach(function (row) { if (row.sid === sid) out.push(row.e); });
-    return out;
+    return mixNewOld(out);
   }
 
   function listenStart(fromStart, sid) {
@@ -1444,6 +1480,7 @@
     if (spot) toast(startAt + 1 + "번째부터 이어서 들어요.");
 
     showStage("stage-listen");
+    backArmIfFree(backToHome);
     $("ls-set").textContent = "";
     $("ls-en").textContent = "";
     $("ls-ko").textContent = "";
@@ -1462,6 +1499,7 @@
     if (LIS.guard) { clearTimeout(LIS.guard); LIS.guard = null; }
     try { speechSynthesis.cancel(); } catch (e) {}
     keepOff(); wakeOff();
+    backDisarm();                   // 여기서 끝났으니 돌아갈 자리도 거둡니다
 
     var used = Math.round((S.cfg.lmin * 60000 - Math.max(0, LIS.endAt - Date.now())) / 60000);
     // 몇 초 듣고 끈 것은 "오늘 했다"로 치지 않습니다.
@@ -1966,6 +2004,7 @@
     NEWS.items = []; NEWS.i = 0;
 
     showStage("stage-news");
+    backArmIfFree(backToHome);
     $("ns-cat").textContent = "";
     $("ns-title").textContent = "뉴스를 가져오는 중이에요";
     $("ns-lead").textContent = "잠깐만요.";
@@ -1999,19 +2038,25 @@
           (타이글 브리핑은 4~6분으로 딱 맞았지만 넉 달째 안 올립니다)
        2) 플레이어가 영상을 문 뒤 getDuration() 으로 길이를 재서, 넘치면 건너뛰기
      찾다 실패하면 조용히 있지 말고 원래 뉴스 읽어 주기로 넘어갑니다. */
+  /* 실제로 며칠 지켜본 결과입니다.
+     매일경제TV 와 SBS Biz 는 짧은 코너가 있는 날과 없는 날이 갈립니다
+     (2026-10-02 에는 양쪽 다 6분 이내가 하나도 없었습니다).
+     매경 자이앤트 숏클립만 1분 안팎으로 하루에도 몇 개씩 꾸준히 올라옵니다.
+     그래서 이쪽을 기본으로 두고, 짧은 대신 몇 개를 이어서 봅니다. */
   var YT_CHANS = [
+    { id: "UCPTy0BNqiv-0SdAvFgrXvXg", n: "매경 자이앤트 숏클립", pat: "숏클립",
+      note: "1분 안팎. 하루에도 몇 개씩 꾸준히 올라와서 가장 믿을 만합니다" },
     { id: "UCnfwIKyFYRuqZzzKBDt6JOA", n: "매일경제TV", pat: "",
-      note: "2~3분짜리 뉴스 리포트를 자주 올려요. 긴 종목상담 방송은 길이 제한이 걸러 줍니다" },
+      note: "2~3분 뉴스 리포트가 있는 날도 있고 없는 날도 있습니다" },
     { id: "UCbMjg2EvXs_RUGW-KrdM3pw", n: "SBS Biz",
       pat: "뉴욕증시 전략|애프터마켓 브리핑|투자의 날",
-      note: "3~6분짜리 코너만 골라 듣습니다" },
-    { id: "UCPTy0BNqiv-0SdAvFgrXvXg", n: "매경 자이앤트", pat: "숏클립",
-      note: "1분 안팎 숏클립. 아주 짧게 훑고 싶을 때" },
+      note: "3~6분 코너. 밤사이 미국 증시 정리라 가는 길에 맞지만 매일은 아닙니다" },
     { id: "UCdOjVxkj5JA0iDu3_xcsTyQ", n: "증시각도기TV", pat: "시황",
       note: "한국·미국 시황을 매일. 다만 20~30분이라 길이 제한을 늘려야 합니다" }
   ];
 
-  var YTS = { on: false, gen: 0, busy: false, list: [], i: 0, player: null, tm: null };
+  var YTS = { on: false, gen: 0, busy: false, list: [], i: 0, player: null, tm: null,
+              played: 0 };
 
   /* rss2json 이 유튜브 피드도 중계해 줍니다. 제목은 손대지 않습니다 —
      코너 이름이 대괄호 안에 있어서 떼면 걸러낼 수가 없습니다. */
@@ -2074,7 +2119,7 @@
 
     var it = YTS.list[YTS.i];
     $("yt-title").textContent = it.t;
-    $("yt-note").textContent = (YTS.i + 1) + " / " + YTS.list.length + " · 길이를 확인하는 중…";
+    $("yt-note").textContent = (YTS.played + 1) + " / " + S.cfg.ytN + " · 길이를 보는 중…";
     ytKill();
 
     ytApi(function () {
@@ -2124,7 +2169,15 @@
     try { p.playVideo(); } catch (e) {}
   }
 
+  /* 영상 하나가 끝났을 때. 숏클립은 1분이라 하나로는 짧아서,
+     정한 개수만큼 이어서 봅니다. 듣다가 그만하고 싶으면 '영어로' 를 누르면 됩니다. */
   function ytEnd() {
+    YTS.played++;
+    if (YTS.played < S.cfg.ytN && YTS.i + 1 < YTS.list.length) {
+      YTS.i++;
+      YTS.tm = setTimeout(ytPlay, 500);
+      return;
+    }
     var go = YTS.chain;
     ytQuiet(true);
     if (go) { listenStart(false); return; }
@@ -2149,9 +2202,10 @@
 
   function ytStart(chain) {
     YTS.chain = !!chain;
-    YTS.busy = true; YTS.list = []; YTS.i = 0; YTS.gen++;
+    YTS.busy = true; YTS.list = []; YTS.i = 0; YTS.played = 0; YTS.gen++;
     wakeOn();
     showStage("stage-yt");
+    backArmIfFree(backToHome);
     $("yt-title").textContent = "영상을 찾는 중이에요";
     $("yt-note").textContent = "";
     ytKill();
@@ -2179,6 +2233,19 @@
     if (backClose) { backClose = close; return; }   // 이미 있으면 갈아끼우기만
     backClose = close;
     try { history.pushState({ b: 1 }, ""); } catch (e) {}
+  }
+  /* 찾기에서 들어온 자리를 덮어쓰면 안 되는 경우에 씁니다.
+     듣기·뉴스·영상은 어디서든 시작될 수 있어서, 이미 돌아갈 곳이 정해져
+     있으면 그것을 그대로 둡니다. */
+  function backArmIfFree(close) { if (!backClose) backArm(close); }
+
+  /* 듣기·뉴스·영상을 보다가 뒤로가기를 누르면 첫 화면으로.
+     예전에는 여기에 돌아갈 자리가 없어서 앱이 통째로 닫혔습니다. */
+  function backToHome() {
+    if (YTS.on || YTS.busy) ytQuiet(false);
+    if (NEWS.on || NEWS.busy) { NEWS.busy = false; newsQuiet(false); }
+    if (LIS.on) { listenStop(true); return; }        // 이쪽이 알아서 첫 화면으로 갑니다
+    showStage("home"); renderHome();
   }
   function backFire() {                              // 앱 안의 ← 단추가 부릅니다
     if (!backClose) return false;
@@ -2244,6 +2311,11 @@
     var talkN = s.list.length ? buildTalk(s.list).length : 0;
     var fastN = s.list.length ? Math.min(2, (typeof FAST !== "undefined" ? FAST.length : 0)) : 0;
 
+    /* 듣기만 하기가 주된 쓰임새라, 하루 미션은 기본으로 감춥니다.
+       기능은 그대로 두어 '나' 에서 켤 수 있고, '찾기' 에서 표현을 눌러
+       낱개로는 언제든 익힐 수 있습니다. */
+    $("btn-go").hidden = !S.cfg.mission;
+    $("go-note").hidden = !S.cfg.mission;
     $("btn-go").textContent = s.list.length ? "오늘의 미션 시작하기" : "오늘 볼 것을 다 봤어요";
     $("btn-go").disabled = !s.list.length;
 
@@ -2815,6 +2887,9 @@
     markSeg("#cfg-nrate", "data-nrate", String(S.cfg.nrate));
     markSeg("#cfg-yt", "data-yt", String(S.cfg.yt));
     markSeg("#cfg-ytmax", "data-ytmax", String(S.cfg.ytMax));
+    markSeg("#cfg-ytn", "data-ytn", String(S.cfg.ytN));
+    markSeg("#cfg-lmix", "data-lmix", String(S.cfg.lmix));
+    markSeg("#cfg-mission", "data-mission", String(S.cfg.mission));
     renderYtCfg();
     $("rss-key").value = S.cfg.rssKey || "";
     renderNewsNote();
@@ -3402,7 +3477,8 @@
      ["#cfg-nnum", "data-nnum", "nnum"], ["#cfg-nlen", "data-nlen", "nlen"],
      ["#cfg-nen", "data-nen", "nen"], ["#cfg-nchain", "data-nchain", "nchain"],
      ["#cfg-nrate", "data-nrate", "nrate"], ["#cfg-yt", "data-yt", "yt"],
-     ["#cfg-ytmax", "data-ytmax", "ytMax"]]
+     ["#cfg-ytmax", "data-ytmax", "ytMax"], ["#cfg-ytn", "data-ytn", "ytN"],
+     ["#cfg-lmix", "data-lmix", "lmix"], ["#cfg-mission", "data-mission", "mission"]]
       .forEach(function (p) {
         [].slice.call(document.querySelectorAll(p[0] + " button")).forEach(function (b) {
           b.onclick = function () {

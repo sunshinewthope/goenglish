@@ -367,6 +367,16 @@
     <p class="sec-note">골라서 들어 보세요. 마음에 드는 것으로 두면 계속 그 목소리로 읽습니다.</p>
     <div id="voice-list" class="voice-list"></div>
 
+    <h2 class="sec-title">하루 미션</h2>
+    <p class="sec-note">카드 → 대화 → 조금 빠른 말로 가는 세 단계예요.
+      운전하면서 듣는 쪽을 주로 쓰셔서 첫 화면에서는 감춰 뒀습니다.
+      켜면 첫 화면에 단추가 다시 나옵니다.
+      꺼 두어도 <b>찾기</b>에서 표현을 눌러 낱개로 익힐 수 있어요.</p>
+    <div class="seg" id="cfg-mission">
+      <button type="button" data-mission="0">감추기</button>
+      <button type="button" data-mission="1">첫 화면에 두기</button>
+    </div>
+
     <h2 class="sec-title">한국어 목소리</h2>
     <p class="sec-note">뉴스와 ‘뜻 → 영어’ 듣기를 이 목소리가 읽습니다.
       기본으로 잡히는 것이 딱딱하게 들리면 다른 것으로 바꿔 보세요.</p>
@@ -392,6 +402,15 @@
       <p class="f-label">어느 채널</p>
       <div class="seg col" id="cfg-ytch"></div>
       <p class="sec-note" id="ytch-note"></p>
+
+      <p class="f-label">몇 개 이어서 볼까요</p>
+      <div class="seg" id="cfg-ytn">
+        <button type="button" data-ytn="1">1개</button>
+        <button type="button" data-ytn="3">3개</button>
+        <button type="button" data-ytn="5">5개</button>
+      </div>
+      <p class="sec-note">숏클립은 1분 안팎이라 하나로는 짧아요.
+        듣다가 그만하고 싶으면 🎧 <b>영어로</b> 를 누르면 됩니다.</p>
 
       <p class="f-label">이보다 길면 건너뛰기</p>
       <div class="seg" id="cfg-ytmax">
@@ -497,6 +516,15 @@
       <button type="button" data-lko="1">같이 들려주기</button>
       <button type="button" data-lko="0">영어만</button>
     </div>
+
+    <p class="f-label">새 표현과 복습을 어떻게 섞을까요</p>
+    <div class="seg col" id="cfg-lmix">
+      <button type="button" data-lmix="100">안 들은 것부터 다 듣기</button>
+      <button type="button" data-lmix="70">새 표현 70 · 복습 30</button>
+      <button type="button" data-lmix="50">반반</button>
+    </div>
+    <p class="sec-note">적게 들은 것부터 나옵니다. 묶음을 통째로 들을 때도 같습니다 —
+      예전에는 늘 같은 차례라 앞쪽 몇 개만 되풀이됐어요.</p>
 
     <p class="f-label">따라 말할 틈</p>
     <div class="seg" id="cfg-lgap">
@@ -610,6 +638,6 @@
 
 <script src="phrases.js?v=11"></script>
 <script src="talk.js?v=14"></script>
-<script src="app.js?v=46"></script>
+<script src="app.js?v=47"></script>
 </body>
 </html>
